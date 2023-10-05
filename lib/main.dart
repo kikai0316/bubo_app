@@ -1,4 +1,4 @@
-import 'package:bubu_app/home_page.dart';
+import 'package:bubu_app/user_app.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -12,7 +12,6 @@ class MyApp extends HookConsumerWidget {
   const MyApp({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return const MaterialApp(
-        debugShowCheckedModeBanner: false, home: HomePage());
+    return const MaterialApp(debugShowCheckedModeBanner: false, home: MyPage());
   }
 }
