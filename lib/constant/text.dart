@@ -10,6 +10,7 @@ Widget nText(
 }) {
   return Text(
     text,
+    overflow: TextOverflow.ellipsis,
     style: TextStyle(
       decoration: TextDecoration.none,
       fontFamily: "Normal",
