@@ -61,15 +61,6 @@ class HomePage extends HookConsumerWidget {
       );
       nearbyService.stateChangedSubscription(
         callback: (devicesList) async {
-          // deviceList.value = devicesList
-          //     .map(
-          //       (device) => UserData(
-          //         imgList: [],
-          //         id: device.deviceName.split('@')[1],
-          //         name: device.deviceName.split('@')[0],
-          //       ),
-          //     )
-          //     .toList();
           for (final device in devicesList) {
             if (device.state == SessionState.notConnected) {
               try {
@@ -144,27 +135,12 @@ class HomePage extends HookConsumerWidget {
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: [
-                      SizedBox(width: safeAreaWidth * 0.03),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push<Widget>(
-                            context,
-                            PageRouteBuilder(
-                              transitionDuration:
-                                  const Duration(milliseconds: 200),
-                              pageBuilder: (_, __, ___) => ScreenPage(
-                                heroTag: myData.value.id,
-                              ),
-                            ),
-                          );
-                        },
-                        child: Hero(
-                          tag: myData.value.id,
-                          child: onProfile(
-                            context,
-                            isMyData: true,
-                            data: myData.value,
-                          ),
+                      Padding(
+                        padding: EdgeInsets.only(left: safeAreaWidth * 0.04),
+                        child: onProfile(
+                          context,
+                          isMyData: true,
+                          data: myData.value,
                         ),
                       ),
                       for (int i = 0; i < deviceList.value.length; i++) ...{
@@ -185,39 +161,6 @@ class HomePage extends HookConsumerWidget {
               height: safeAreaHeight * 0.11,
             )
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class ScreenPage extends HookConsumerWidget {
-  const ScreenPage({super.key, required this.heroTag});
-  final String heroTag;
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Hero(
-      tag: heroTag,
-      child: Scaffold(
-        backgroundColor: blackColor,
-        body: SafeArea(
-          child: GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: Container(
-              height: double.infinity,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Colors.black,
-                borderRadius: BorderRadius.circular(8),
-                image: const DecorationImage(
-                  image: NetworkImage(
-                    "https://i.pinimg.com/474x/58/0b/2b/580b2ba5fe0f8dd9e07d75984653b307.jpg",
-                  ),
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-          ),
         ),
       ),
     );

@@ -1,7 +1,7 @@
-import 'package:bubu_app/account.dart';
 import 'package:bubu_app/constant/color.dart';
 import 'package:bubu_app/constant/text.dart';
-import 'package:bubu_app/home.dart';
+import 'package:bubu_app/page/account.dart';
+import 'package:bubu_app/page/home.dart';
 import 'package:bubu_app/utility/utility.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';

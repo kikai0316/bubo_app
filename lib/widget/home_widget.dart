@@ -1,6 +1,7 @@
 import 'package:bubu_app/constant/color.dart';
 import 'package:bubu_app/constant/text.dart';
 import 'package:bubu_app/model/user_data.dart';
+import 'package:bubu_app/page/swiper.dart';
 import 'package:bubu_app/utility/utility.dart';
 import 'package:flutter/material.dart';
 
@@ -33,95 +34,114 @@ Widget onProfile(
   final calculatedWidth = baseHeight * (3 / 2);
   return Padding(
     padding: EdgeInsets.only(right: safeAreaWidth * 0.04),
-    child: SizedBox(
-      width: safeAreaHeight * 0.12,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            alignment: Alignment.center,
-            height: baseHeight,
-            width: calculatedWidth,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              gradient: const LinearGradient(
-                begin: FractionalOffset.topRight,
-                end: FractionalOffset.bottomLeft,
-                colors: [
-                  Color.fromARGB(255, 4, 15, 238),
-                  Color.fromARGB(255, 6, 120, 255),
-                  Color.fromARGB(255, 4, 200, 255),
-                ],
-              ),
-            ),
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                Padding(
-                  padding: EdgeInsets.all(safeAreaHeight * 0.004),
-                  child: Container(
-                    alignment: Alignment.center,
-                    height: double.infinity,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: blackColor,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Padding(
-                      padding: EdgeInsets.all(safeAreaHeight * 0.0035),
+    child: GestureDetector(
+      onTap: () => Navigator.push<Widget>(
+        context,
+        PageRouteBuilder(
+          transitionDuration: const Duration(milliseconds: 200),
+          pageBuilder: (_, __, ___) => SwiperPage(
+            heroTag: data.id,
+          ),
+        ),
+      ),
+      child: Hero(
+        tag: data.id,
+        child: SizedBox(
+          width: safeAreaHeight * 0.12,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                alignment: Alignment.center,
+                height: baseHeight,
+                width: calculatedWidth,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  gradient: const LinearGradient(
+                    begin: FractionalOffset.topRight,
+                    end: FractionalOffset.bottomLeft,
+                    colors: [
+                      Color.fromARGB(255, 4, 15, 238),
+                      Color.fromARGB(255, 6, 120, 255),
+                      Color.fromARGB(255, 4, 200, 255),
+                    ],
+                  ),
+                ),
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.all(safeAreaHeight * 0.004),
                       child: Container(
+                        alignment: Alignment.center,
                         height: double.infinity,
                         width: double.infinity,
                         decoration: BoxDecoration(
-                          color: Colors.black,
-                          borderRadius: BorderRadius.circular(8),
-                          image: data.imgList.isEmpty
-                              ? null
-                              : DecorationImage(
-                                  image: MemoryImage(data.imgList.first),
-                                  fit: BoxFit.cover,
-                                ),
+                          color: blackColor,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Padding(
+                          padding: EdgeInsets.all(safeAreaHeight * 0.0035),
+                          child: Container(
+                            height: double.infinity,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: Colors.black,
+                              borderRadius: BorderRadius.circular(8),
+                              image: data.imgList.isEmpty
+                                  ? null
+                                  : DecorationImage(
+                                      image: MemoryImage(data.imgList.first),
+                                      fit: BoxFit.cover,
+                                    ),
+                            ),
+                          ),
                         ),
                       ),
                     ),
+                    if (isMyData)
+                      Align(
+                        alignment: Alignment.bottomRight,
+                        child: Padding(
+                          padding: EdgeInsets.all(safeAreaHeight * 0.01),
+                          child: GestureDetector(
+                            onTap: () {},
+                            child: Container(
+                              alignment: Alignment.center,
+                              height: safeAreaHeight * 0.035,
+                              width: safeAreaHeight * 0.035,
+                              decoration: const BoxDecoration(
+                                color: Colors.green,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.add,
+                                color: Colors.white,
+                                size: safeAreaWidth / 25,
+                              ),
+                            ),
+                          ),
+                        ),
+                      )
+                  ],
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: safeAreaHeight * 0.005),
+                child: Text(
+                  data.id,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    decoration: TextDecoration.none,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: safeAreaWidth / 30,
                   ),
                 ),
-                if (isMyData)
-                  Align(
-                    alignment: Alignment.bottomRight,
-                    child: Padding(
-                      padding: EdgeInsets.all(safeAreaHeight * 0.01),
-                      child: Container(
-                        alignment: Alignment.center,
-                        height: safeAreaHeight * 0.03,
-                        width: safeAreaHeight * 0.03,
-                        decoration: const BoxDecoration(
-                          color: Colors.green,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.add,
-                          color: Colors.white,
-                          size: safeAreaWidth / 25,
-                        ),
-                      ),
-                    ),
-                  )
-              ],
-            ),
+              )
+            ],
           ),
-          Padding(
-            padding: EdgeInsets.only(top: safeAreaHeight * 0.005),
-            child: Text(
-              data.id,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: safeAreaWidth / 30,
-              ),
-            ),
-          )
-        ],
+        ),
       ),
     ),
   );
