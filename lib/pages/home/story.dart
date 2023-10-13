@@ -1,26 +1,40 @@
-import 'dart:ui';
-
+import 'package:bubu_app/component/text.dart';
 import 'package:bubu_app/constant/dummy_data.dart';
-import 'package:bubu_app/constant/text.dart';
+import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/utility.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_carousel_slider/carousel_slider.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-final TextEditingController controller = TextEditingController();
+final ScrollController scrollController = ScrollController();
 
-class SwiperPage extends HookConsumerWidget {
-  const SwiperPage({super.key, required this.heroTag});
-  final String heroTag;
+class StoryPage extends HookConsumerWidget {
+  const StoryPage({super.key, required this.index, required this.storyList});
+  final int index;
+  final List<UserData> storyList;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final GlobalKey sliderKey = GlobalKey();
+    final pageIndex = useState<int>(index);
     final safeAreaHeight = safeHeight(context);
     final safeAreaWidth = MediaQuery.of(context).size.width;
-    final isTextFiled = useState<bool>(false);
+    useEffect(
+      () {
+        void listener() {
+          if (scrollController.offset < -150) {
+            Navigator.pop(context);
+            scrollController.removeListener(listener);
+          }
+        }
+
+        scrollController.addListener(listener);
+        return () => scrollController.removeListener(listener);
+      },
+      [],
+    );
     return Hero(
-      tag: heroTag,
+      tag: storyList[pageIndex.value],
       child: Scaffold(
         extendBody: true,
         resizeToAvoidBottomInset: false,
@@ -32,102 +46,69 @@ class SwiperPage extends HookConsumerWidget {
             slideTransform: const CubeTransform(),
             itemCount: dummyImgList.length,
             slideBuilder: (index) {
-              return Column(
-                children: [
-                  Expanded(
-                    child: OnSwiper(
-                      imgList: dummyImgList[index],
-                      onNext: () {},
-                      onBack: () {},
+              return SingleChildScrollView(
+                controller: scrollController,
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: safeAreaHeight * 0.93,
+                      width: safeAreaWidth * 1,
+                      child: OnSwiper(
+                        imgList: dummyImgList[index],
+                        onNext: () {},
+                        onBack: () {},
+                      ),
                     ),
-                  ),
-                  SizedBox(
-                    height: safeAreaHeight * 0.07,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        for (int i = 0; i < 2; i++) ...{
-                          Material(
-                            color: Colors.black.withOpacity(0),
-                            borderRadius: BorderRadius.circular(50),
-                            child: InkWell(
-                              onTap: () {
-                                isTextFiled.value = true;
-                              },
-                              borderRadius: BorderRadius.circular(50),
-                              child: Container(
-                                alignment: Alignment.center,
-                                height: safeAreaHeight * 0.05,
-                                width: safeAreaWidth * 0.48,
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: Colors.white,
-                                    width: 0.3,
-                                  ),
-                                  borderRadius: BorderRadius.circular(50),
-                                ),
-                                child: nText(
-                                  i == 0 ? "InstagramをGETする" : "メッセージを送信...",
-                                  color: Colors.white,
-                                  fontSize: safeAreaWidth / 30,
-                                  bold: 400,
-                                ),
-                              ),
-                            ),
-                          )
-                        }
-                      ],
+                    SizedBox(
+                      height: safeAreaHeight * 0.07,
+                      width: double.infinity,
+                      // child: Row(
+                      //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      //   crossAxisAlignment: CrossAxisAlignment.end,
+                      //   children: [
+                      //     for (int i = 0; i < 2; i++) ...{
+                      //       Material(
+                      //         color: Colors.black.withOpacity(0),
+                      //         borderRadius: BorderRadius.circular(50),
+                      //         child: InkWell(
+                      //           onTap: () {
+                      //             if (i == 0) {}
+                      //             if (i == 1) {
+                      //               bottomSheet(context, MessageBottomSheet());
+                      //             }
+                      //           },
+                      //           borderRadius: BorderRadius.circular(50),
+                      //           child: Container(
+                      //             alignment: Alignment.center,
+                      //             height: safeAreaHeight * 0.05,
+                      //             width: safeAreaWidth * 0.48,
+                      //             decoration: BoxDecoration(
+                      //               border: Border.all(
+                      //                 color: Colors.white,
+                      //                 width: 0.3,
+                      //               ),
+                      //               borderRadius: BorderRadius.circular(50),
+                      //             ),
+                      //             child: nText(
+                      //               i == 0 ? "InstagramをGETする" : "メッセージを送信...",
+                      //               color: Colors.white,
+                      //               fontSize: safeAreaWidth / 30,
+                      //               bold: 400,
+                      //             ),
+                      //           ),
+                      //         ),
+                      //       )
+                      //     }
+                      //   ],
+                      // ),
                     ),
-                  )
-                ],
+                    SizedBox(
+                      height: safeAreaHeight * 0.01,
+                    )
+                  ],
+                ),
               );
             },
-          ),
-        ),
-        bottomSheet: Visibility(
-          visible: isTextFiled.value,
-          child: Container(
-            alignment: Alignment.center,
-            height: safeAreaHeight * 0.05,
-            width: safeAreaWidth * 0.9,
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.white, width: 0.3),
-              borderRadius: BorderRadius.circular(50),
-            ),
-            child: TextFormField(
-              autofocus: true,
-              controller: controller,
-              onChanged: (index) {},
-              textAlign: TextAlign.left,
-              style: TextStyle(
-                fontFamily: "Normal",
-                fontVariations: const [FontVariation("wght", 400)],
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: safeAreaWidth / 30,
-              ),
-              decoration: InputDecoration(
-                // enabledBorder: UnderlineInputBorder(
-                //   borderSide: BorderSide(
-                //     color: Colors.grey.withOpacity(0.5),
-                //   ),
-                // ),
-                // focusedBorder: UnderlineInputBorder(
-                //   borderSide: BorderSide(
-                //     color: Colors.grey.withOpacity(0.5),
-                //   ),
-                // ),
-                hintText: "メッセージを送信...",
-                hintStyle: TextStyle(
-                  fontFamily: "Normal",
-                  fontVariations: const [FontVariation("wght", 700)],
-                  color: Colors.grey.withOpacity(0.5),
-                  fontWeight: FontWeight.bold,
-                  fontSize: safeAreaWidth / 30,
-                ),
-              ),
-            ),
           ),
         ),
       ),
@@ -194,6 +175,7 @@ class OnSwiper extends HookConsumerWidget {
             alignment: Alignment.topCenter,
             child: Container(
               height: safeAreaHeight * 0.1,
+              width: double.infinity,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: FractionalOffset.topCenter,
@@ -233,8 +215,8 @@ class OnSwiper extends HookConsumerWidget {
                         },
                       ],
                     ),
-                    Padding(
-                      padding: EdgeInsets.only(top: safeAreaHeight * 0.015),
+                    SizedBox(height: safeAreaHeight * 0.015),
+                    Flexible(
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "393702546014",
+    "project_id": "bobo-app-9e643",
+    "storage_bucket": "bobo-app-9e643.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:393702546014:android:71b007b102f2eefea172cf",
+        "android_client_info": {
+          "package_name": "com.example.bubu_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBZmF45LXol9g5efIyeIZq23TDy4Tr5ILs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
