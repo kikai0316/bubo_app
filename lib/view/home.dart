@@ -3,7 +3,6 @@ import 'package:bubu_app/component/button.dart';
 import 'package:bubu_app/component/component.dart';
 import 'package:bubu_app/constant/color.dart';
 import 'package:bubu_app/model/user_data.dart';
-import 'package:bubu_app/utility/path_provider_utility.dart';
 import 'package:bubu_app/utility/utility.dart';
 import 'package:bubu_app/view/home/story.dart';
 import 'package:bubu_app/widget/home_widget.dart';
@@ -84,8 +83,13 @@ class HomePage extends HookConsumerWidget {
                 .toList();
             final String getId = receivedData['id'] as String;
             final String getName = receivedData['name'] as String;
-            final UserData setData =
-                UserData(imgList: imgListDecode, id: getId, name: getName);
+            final UserData setData = UserData(
+              imgList: imgListDecode,
+              id: getId,
+              name: getName,
+              birthday: "",
+              family: "",
+            );
             deviceList.value = [...deviceList.value, setData];
           }
         },
@@ -184,12 +188,9 @@ class HomePage extends HookConsumerWidget {
             },
             bottomButton(
               context: context,
-              backgroundColor: Colors.white,
-              textColor: Colors.black,
+              isWhiteMainColor: true,
               text: "削除",
-              onTap: () {
-                deleteUserData();
-              },
+              onTap: () async {},
             ),
             SizedBox(
               height: safeAreaHeight * 0.11,

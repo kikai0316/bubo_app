@@ -10,5 +10,7 @@ class UserData with _$UserData {
     required List<Uint8List> imgList,
     required String id,
     required String name,
+    required String birthday,
+    required String family,
   }) = _UserData;
 }

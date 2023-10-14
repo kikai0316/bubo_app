@@ -22,6 +22,8 @@ Future<bool> writeUserData(UserData data) async {
       "id": data.id,
       "name": data.name,
       "img": toBase64,
+      "birthday": data.birthday,
+      "family": data.family
     };
     final jsonList = jsonEncode(setData);
     await file.writeAsString(jsonList);
@@ -35,15 +37,15 @@ Future<UserData?> readUserData() async {
   try {
     final file = await _localFile("user");
     final String contents = await file.readAsString();
-
     final toDecode = jsonDecode(contents) as Map<String, dynamic>;
-
     final imgListDecode = (toDecode["img"] as List<dynamic>)
         .map((dynamic base64String) => base64Decode(base64String as String))
         .toList();
     final setData = UserData(
       id: toDecode["id"] as String,
       name: toDecode["name"] as String,
+      birthday: toDecode["birthday"] as String,
+      family: "dsas",
       imgList: imgListDecode,
     );
     return setData;
@@ -58,5 +60,29 @@ Future<void> deleteUserData() async {
     file.delete();
   } catch (e) {
     return;
+  }
+}
+
+Future<UserData?> read() async {
+  try {
+    final file = await _localFile("user");
+    if (await file.exists()) {
+      final jsonString = await file.readAsString();
+      final jsonData = jsonDecode(jsonString) as Map<String, dynamic>;
+      final imgListDecode = (jsonData["img"] as List<dynamic>)
+          .map((dynamic base64String) => base64Decode(base64String as String))
+          .toList();
+      return UserData(
+        id: jsonData["id"] as String,
+        name: jsonData["name"] as String,
+        imgList: imgListDecode,
+        birthday: jsonData["birthday"] as String,
+        family: jsonData["family"] as String,
+      );
+    } else {
+      return null;
+    }
+  } catch (e) {
+    return null;
   }
 }

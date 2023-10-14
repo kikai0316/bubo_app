@@ -1,3 +1,4 @@
+import 'package:bubu_app/component/text.dart';
 import 'package:bubu_app/constant/img.dart';
 import 'package:bubu_app/utility/utility.dart';
 import 'package:flutter/material.dart';
@@ -27,14 +28,11 @@ Widget loadinPage({
           if (text != null) ...{
             Padding(
               padding: EdgeInsets.only(top: safeAreaHeight * 0.01),
-              child: Text(
+              child: nText(
                 text,
-                style: TextStyle(
-                  decoration: TextDecoration.none,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: safeAreaWidth / 30,
-                ),
+                color: Colors.white,
+                fontSize: safeAreaWidth / 30,
+                bold: 600,
               ),
             ),
           }

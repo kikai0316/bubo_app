@@ -11,6 +11,7 @@ void errorSnackbar(
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
       backgroundColor: Colors.red,
+      elevation: 0,
       margin: padding == null
           ? null
           : EdgeInsets.only(

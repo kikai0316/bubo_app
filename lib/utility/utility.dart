@@ -12,30 +12,36 @@ double safeHeight(BuildContext context) {
 }
 
 void bottomSheet(
-  BuildContext context,
-  Widget page,
-) {
+  BuildContext context, {
+  required Widget page,
+  required bool isBackgroundColor,
+  required bool isPOP,
+}) {
   showModalBottomSheet<Widget>(
     isScrollControlled: true,
+    isDismissible: isPOP,
+    enableDrag: isPOP,
     context: context,
     elevation: 0,
-    backgroundColor: Colors.transparent,
-    // shape: const RoundedRectangleBorder(
-    //   borderRadius: BorderRadiusDirectional.only(
-    //     topEnd: Radius.circular(15),
-    //     topStart: Radius.circular(15),
-    //   ),
-    // ),
+    backgroundColor: isBackgroundColor ? Colors.white : Colors.transparent,
+    shape: isBackgroundColor
+        ? const RoundedRectangleBorder(
+            borderRadius: BorderRadiusDirectional.only(
+              topEnd: Radius.circular(15),
+              topStart: Radius.circular(15),
+            ),
+          )
+        : null,
     builder: (context) => page,
-  );
+  ).then((value) => ScaffoldMessenger.of(context).hideCurrentSnackBar());
 }
 
 Future getMobileImage({
   required void Function(Uint8List) onSuccess,
   required void Function() onError,
 }) async {
-  final picker = ImagePicker();
   try {
+    final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       final List<int> imageBytes = await File(pickedFile.path).readAsBytes();
@@ -57,4 +63,14 @@ Future openURL({required String url, required void Function()? onError}) async {
       onError();
     }
   }
+}
+
+EdgeInsetsGeometry xPadding(
+  BuildContext context,
+) {
+  final safeAreaWidth = MediaQuery.of(context).size.width;
+  return EdgeInsets.only(
+    left: safeAreaWidth * 0.03,
+    right: safeAreaWidth * 0.03,
+  );
 }

@@ -136,7 +136,9 @@ class StoryPage extends HookConsumerWidget {
                                           if (i == 1) {
                                             bottomSheet(
                                               context,
-                                              MessageBottomSheet(),
+                                              page: MessageBottomSheet(),
+                                              isPOP: true,
+                                              isBackgroundColor: false,
                                             );
                                           }
                                         },
