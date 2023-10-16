@@ -2,6 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+    <key>NSCameraUsageDescription</key>
+    <string>画像を送る際に使用します</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>ユーザーのプロフィール写真などを追加する時に必要です。</string>
+	<key>NSMicrophoneUsageDescription</key>
+    <string>音声メッセージを送る際に,使用します</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
@@ -27,11 +33,13 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>{YOUR_DESCRIPTION}</string>
+	<string>Bubu Appは、Bluetoothを使用して周辺デバイスと接続し、メッセージをやり取りします。これにより、普段出会わない人と出会うという体験を提供します</string>
+	<key>NSLocalNetworkUsageDescription</key>
+    <string>BubuAppは、ローカルネットワークを使用して,普段出会わない人とのデータ通信を行います</string>
 	<key>NSBonjourServices</key>
 	<array>
-		<string>_{YOUR_SERVICE_TYPE}._tcp</string>
-	</array>
+        <string>_bobo._tcp</string>
+    </array>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
