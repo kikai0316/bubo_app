@@ -10,11 +10,20 @@ Future<bool> upLoadImg({
   final storagedb = FirebaseStorage.instance;
   try {
     for (int i = 0; i < imgList.length; i++) {
-      await storagedb
-          .ref(
-            '${userData.id}/${"${userData.name}@${userData.birthday.split(' / ').join()}@${userData.family}@$i"} ',
-          )
-          .putData(imgList[i]);
+      if (i == 0) {
+        await storagedb
+            .ref(
+              '${userData.id}/main/${"${userData.name}@${userData.birthday.split(' / ').join()}@${userData.family}@$i"} ',
+            )
+            .putData(imgList[i]);
+      } else {
+        await storagedb
+            .ref(
+              '${userData.id}/others/${"${userData.name}@${userData.birthday.split(' / ').join()}@${userData.family}@$i"} ',
+            )
+            .putData(imgList[i]);
+      }
+
       onStream(i + 1);
     }
 
@@ -26,22 +35,34 @@ Future<bool> upLoadImg({
 
 Future<UserData?> getImg(String id) async {
   try {
-    final List<Uint8List> list = [];
-    final result = await FirebaseStorage.instance.ref(id).listAll();
-    for (final ref in result.items) {
+    final List<Uint8List> imgList = [];
+    final List<String> userDataList = [];
+    final resultMain = await FirebaseStorage.instance.ref("$id/main").listAll();
+    final mainImgGet = await resultMain.items.first.getData();
+    if (mainImgGet != null) {
+      imgList.add(mainImgGet);
+      final List<String> parts = resultMain.items.first.name.split('@');
+      userDataList.addAll(parts);
+    }
+    final resultOthers =
+        await FirebaseStorage.instance.ref("$id/others").listAll();
+    for (final ref in resultOthers.items) {
       final Uint8List? getDate = await ref.getData();
       if (getDate != null) {
-        list.add(getDate);
+        imgList.add(getDate);
       }
     }
-    final List<String> parts = result.items.first.name.split('@');
-    return UserData(
-      imgList: list,
-      id: id,
-      name: parts[0],
-      birthday: parts[1],
-      family: parts[2],
-    );
+    if (imgList.isNotEmpty && userDataList.isNotEmpty) {
+      return UserData(
+        imgList: imgList,
+        id: id,
+        name: userDataList[0],
+        birthday: userDataList[1],
+        family: userDataList[2],
+      );
+    } else {
+      return null;
+    }
   } on FirebaseException {
     return null;
   }

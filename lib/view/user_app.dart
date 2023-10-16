@@ -5,64 +5,59 @@ import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/utility.dart';
 import 'package:bubu_app/view/account.dart';
 import 'package:bubu_app/view/home.dart';
-import 'package:bubu_app/view/home/not_image_sheet.dart';
 import 'package:bubu_app/view_model/loading_model.dart';
-import 'package:bubu_app/view_model/user_data.dart';
-import 'package:bubu_app/widget/home_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class UserApp extends HookConsumerWidget {
-  const UserApp({
-    super.key,
-  });
-
+  const UserApp({super.key, required this.userData});
+  final UserData userData;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final safeAreaHeight = safeHeight(context);
     final safeAreaWidth = MediaQuery.of(context).size.width;
     final loadingNotifier = ref.watch(loadingNotifierProvider);
     final selectInt = useState<int>(0);
-    final notifier = ref.watch(userDataNotifierProvider);
-    Future<void> showNotImgPage(BuildContext context, UserData userData) async {
-      await Future<void>.delayed(const Duration(seconds: 1));
-      // ignore: use_build_context_synchronously
-      bottomSheet(
-        context,
-        isPOP: false,
-        page: NotImgPage(
-          userData: userData,
-          onTap: () {
-            final notifier = ref.read(userDataNotifierProvider.notifier);
-            notifier.reLoad();
-          },
-        ),
-        isBackgroundColor: true,
-      );
-    }
 
-    final notifierWhen = notifier.when(
-      data: (data) {
-        if (data != null) {
-          if (data.imgList.isEmpty) {
-            showNotImgPage(context, data);
-            return null;
-          }
-          return selectInt.value == 0
-              ? HomePage(userData: data)
-              : AccountPage(userData: data);
-        } else {
-          return errorWidget(
-            context,
-          );
-        }
-      },
-      error: (e, s) => errorWidget(
-        context,
-      ),
-      loading: () => loadinPage(isLoading: true, text: null, context: context),
-    );
+    // final notifier = ref.watch(userDataNotifierProvider);
+    // Future<void> showNotImgPage(BuildContext context, UserData userData) async {
+    //   await Future<void>.delayed(const Duration(seconds: 1));
+    //   // ignore: use_build_context_synchronously
+    //   bottomSheet(
+    //     context,
+    //     isPOP: false,
+    //     page: NotImgPage(
+    //       userData: userData,
+    //       onTap: () {
+    //         screenTransition(context, const UserApp());
+    //       },
+    //     ),
+    //     isBackgroundColor: false,
+    //   );
+    // }
+
+    // final notifierWhen = notifier.when(
+    //   data: (data) {
+    //     if (data != null) {
+    //       if (data.imgList.isEmpty) {
+    //         showNotImgPage(context, data);
+    //         return null;
+    //       }
+    //       return selectInt.value == 0
+    //           ? HomePage(userData: data)
+    //           : AccountPage(userData: data);
+    //     } else {
+    //       return errorWidget(
+    //         context,
+    //       );
+    //     }
+    //   },
+    //   error: (e, s) => errorWidget(
+    //     context,
+    //   ),
+    //   loading: () => loadinPage(isLoading: true, text: null, context: context),
+    // );
 
     return WillPopScope(
       onWillPop: () async => false,
@@ -72,7 +67,9 @@ class UserApp extends HookConsumerWidget {
             backgroundColor: blackColor,
             extendBody: true,
             resizeToAvoidBottomInset: false,
-            body: notifierWhen,
+            body: selectInt.value == 0
+                ? HomePage(userData: userData)
+                : AccountPage(userData: userData),
             bottomNavigationBar: Container(
               alignment: Alignment.topCenter,
               height: safeAreaHeight * 0.09,

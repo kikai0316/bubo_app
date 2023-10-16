@@ -1,8 +1,4 @@
 PODS:
-  - audio_waveforms (0.0.1):
-    - Flutter
-  - emoji_picker_flutter (0.0.1):
-    - Flutter
   - Firebase/Auth (10.15.0):
     - Firebase/CoreOnly
     - FirebaseAuth (~> 10.15.0)
@@ -82,8 +78,6 @@ PODS:
     - Flutter
 
 DEPENDENCIES:
-  - audio_waveforms (from `.symlinks/plugins/audio_waveforms/ios`)
-  - emoji_picker_flutter (from `.symlinks/plugins/emoji_picker_flutter/ios`)
   - firebase_auth (from `.symlinks/plugins/firebase_auth/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - firebase_storage (from `.symlinks/plugins/firebase_storage/ios`)
@@ -112,10 +106,6 @@ SPEC REPOS:
     - SwiftyJSON
 
 EXTERNAL SOURCES:
-  audio_waveforms:
-    :path: ".symlinks/plugins/audio_waveforms/ios"
-  emoji_picker_flutter:
-    :path: ".symlinks/plugins/emoji_picker_flutter/ios"
   firebase_auth:
     :path: ".symlinks/plugins/firebase_auth/ios"
   firebase_core:
@@ -138,8 +128,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/url_launcher_ios/ios"
 
 SPEC CHECKSUMS:
-  audio_waveforms: cd736909ebc6b6a164eb74701d8c705ce3241e1c
-  emoji_picker_flutter: fe2e6151c5b548e975d546e6eeb567daf0962a58
   Firebase: 66043bd4579e5b73811f96829c694c7af8d67435
   firebase_auth: b62e99e6ece589afe88ebe8919eb9563b52c384c
   firebase_core: 28e84c2a4fcf6a50ef83f47b145ded8c1fa331e4
@@ -164,6 +152,6 @@ SPEC CHECKSUMS:
   SwiftyJSON: 6faa0040f8b59dead0ee07436cbf76b73c08fd08
   url_launcher_ios: 08a3dfac5fb39e8759aeb0abbd5d9480f30fc8b4
 
-PODFILE CHECKSUM: 1715d9097b38ddb71d20a429a6c27b1c121a43a9
+PODFILE CHECKSUM: b4fcb4dac6633cea29eadb3347fa9e9b0e939927
 
 COCOAPODS: 1.11.3

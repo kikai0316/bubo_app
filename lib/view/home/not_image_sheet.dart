@@ -7,6 +7,7 @@ import 'package:bubu_app/utility/firebase_utility.dart';
 import 'package:bubu_app/utility/path_provider_utility.dart';
 import 'package:bubu_app/utility/snack_bar_utility.dart';
 import 'package:bubu_app/utility/utility.dart';
+import 'package:bubu_app/view_model/user_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -51,6 +52,8 @@ class NotImgPage extends HookConsumerWidget {
         );
         final iswWite = await writeUserData(setData);
         if (iswWite) {
+          final notifier = ref.read(userDataNotifierProvider.notifier);
+          notifier.reLoad();
           await Future<void>.delayed(const Duration(seconds: 1));
           // ignore: use_build_context_synchronously
           Navigator.pop(context);
@@ -66,110 +69,136 @@ class NotImgPage extends HookConsumerWidget {
     return SizedBox(
       height: safeAreaHeight * 0.9,
       width: safeAreaWidth * 1,
-      child: Scaffold(
-        body: Stack(
-          children: [
-            Center(
-              child: Column(
+      child: Stack(
+        children: [
+          Scaffold(
+            backgroundColor: Colors.transparent,
+            appBar: PreferredSize(
+              preferredSize: const Size.fromHeight(30),
+              child: AppBar(
+                automaticallyImplyLeading: false,
+                elevation: 0,
+                backgroundColor: Colors.white,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(10),
+                    topRight: Radius.circular(10),
+                  ),
+                ),
+              ),
+            ),
+            body: ColoredBox(
+              color: Colors.white,
+              child: Stack(
                 children: [
-                  Padding(
-                    padding: EdgeInsets.only(
-                      top: safeAreaHeight * 0.05,
-                      bottom: safeAreaHeight * 0.05,
-                    ),
-                    child: nText(
-                      "プロフィール画像を\n1枚上選択してください。",
-                      color: Colors.black,
-                      fontSize: safeAreaWidth / 16,
-                      bold: 700,
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(bottom: safeAreaHeight * 0.04),
-                    child: nText(
-                      "アップロード可能枚数：残り ${3 - (imgList.value.length)}枚",
-                      color: Colors.grey,
-                      fontSize: safeAreaWidth / 30,
-                      bold: 500,
-                    ),
-                  ),
-                  SizedBox(
-                    width: safeAreaWidth * 1,
-                    height: safeAreaHeight * 0.3,
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding:
-                                EdgeInsets.only(left: safeAreaWidth * 0.03),
-                            child: Opacity(
-                              opacity: imgList.value.length < 3 ? 1 : 0.3,
-                              child: upWidget(
-                                context,
-                                onTap: () async {
-                                  if (imgList.value.length < 3) {
-                                    isLoading.value = true;
-                                    await getMobileImage(
-                                      onSuccess: (value) => imgList.value = [
-                                        ...imgList.value,
-                                        value
-                                      ],
-                                      onError: () => errorSnackbar(
-                                        context,
-                                        text: "",
-                                        padding: 0,
-                                      ),
-                                    );
-                                    isLoading.value = false;
-                                  }
-                                },
-                              ),
+                  Center(
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.only(
+                            bottom: safeAreaHeight * 0.05,
+                          ),
+                          child: nText(
+                            "プロフィール画像を\n1枚上選択してください。",
+                            color: Colors.black,
+                            fontSize: safeAreaWidth / 16,
+                            bold: 700,
+                          ),
+                        ),
+                        Padding(
+                          padding:
+                              EdgeInsets.only(bottom: safeAreaHeight * 0.04),
+                          child: nText(
+                            "アップロード可能枚数：残り ${3 - (imgList.value.length)}枚",
+                            color: Colors.grey,
+                            fontSize: safeAreaWidth / 30,
+                            bold: 500,
+                          ),
+                        ),
+                        SizedBox(
+                          width: safeAreaWidth * 1,
+                          height: safeAreaHeight * 0.3,
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.only(
+                                    left: safeAreaWidth * 0.03,
+                                  ),
+                                  child: Opacity(
+                                    opacity: imgList.value.length < 3 ? 1 : 0.3,
+                                    child: upWidget(
+                                      context,
+                                      onTap: () async {
+                                        if (imgList.value.length < 3) {
+                                          isLoading.value = true;
+                                          await getMobileImage(
+                                            onSuccess: (value) =>
+                                                imgList.value = [
+                                              ...imgList.value,
+                                              value
+                                            ],
+                                            onError: () => errorSnackbar(
+                                              context,
+                                              text: "",
+                                              padding: 0,
+                                            ),
+                                          );
+                                          isLoading.value = false;
+                                        }
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                for (int i = 0;
+                                    i < imgList.value.length;
+                                    i++) ...{
+                                  imgWidget(
+                                    context,
+                                    img: imgList.value[i],
+                                    onTap: () {
+                                      imgList.value.removeAt(i);
+                                      imgList.value = [...imgList.value];
+                                    },
+                                  ),
+                                }
+                              ],
                             ),
                           ),
-                          for (int i = 0; i < imgList.value.length; i++) ...{
-                            imgWidget(
-                              context,
-                              img: imgList.value[i],
-                              onTap: () {
-                                imgList.value.removeAt(i);
-                                imgList.value = [...imgList.value];
-                              },
-                            ),
-                          }
-                        ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: SafeArea(
+                      child: Opacity(
+                        opacity: imgList.value.isEmpty ? 0.3 : 1,
+                        child: bottomButton(
+                          context: context,
+                          isWhiteMainColor: false,
+                          text: "アップロード",
+                          onTap: () async {
+                            if (imgList.value.isNotEmpty) {
+                              dataUpLoad();
+                            }
+                          },
+                        ),
                       ),
                     ),
                   ),
                 ],
               ),
             ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: SafeArea(
-                child: Opacity(
-                  opacity: imgList.value.isEmpty ? 0.3 : 1,
-                  child: bottomButton(
-                    context: context,
-                    isWhiteMainColor: false,
-                    text: "アップロード",
-                    onTap: () async {
-                      if (imgList.value.isNotEmpty) {
-                        dataUpLoad();
-                      }
-                    },
-                  ),
-                ),
-              ),
-            ),
-            loadinPage(
-              context: context,
-              isLoading: isLoading.value,
-              text: upLoadMesse.value,
-            )
-          ],
-        ),
+          ),
+          loadinPage(
+            context: context,
+            isLoading: isLoading.value,
+            text: upLoadMesse.value,
+          )
+        ],
       ),
     );
   }

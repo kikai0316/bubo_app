@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:bubu_app/component/button.dart';
 import 'package:bubu_app/component/text.dart';
 import 'package:bubu_app/utility/utility.dart';
+import 'package:bubu_app/widget/app_widget.dart';
 import 'package:bubu_app/widget/login/login_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';

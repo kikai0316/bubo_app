@@ -24,9 +24,12 @@ class MyApp extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final User? user = FirebaseAuth.instance.currentUser;
     final notifier = ref.watch(userDataNotifierProvider);
-    FirebaseAuth.instance.signOut();
     final notifierWhen = notifier.when(
-      data: (data) => user != null ? const UserApp() : const StartPage(),
+      data: (data) => user != null
+          ? UserApp(
+              userData: data!,
+            )
+          : const StartPage(),
       error: (e, s) => const StartPage(),
       loading: () => const WithIconInLoadingPage(),
     );

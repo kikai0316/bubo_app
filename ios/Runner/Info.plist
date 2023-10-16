@@ -2,10 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+    <key>NSCameraUsageDescription</key>
+    <string>画像を送る際に使用します</string>
     <key>NSPhotoLibraryUsageDescription</key>
     <string>ユーザーのプロフィール写真などを追加する時に必要です。</string>
 	<key>NSMicrophoneUsageDescription</key>
-    <string>このアプリはマイクにアクセスする機能は使用していませんが、外部ライブラリの要件によりこの許可が必要です。</string>
+    <string>音声メッセージを送る際に,使用します</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
