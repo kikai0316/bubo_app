@@ -4,6 +4,7 @@ import 'package:bubu_app/constant/color.dart';
 import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/screen_transition_utility.dart';
 import 'package:bubu_app/utility/utility.dart';
+import 'package:bubu_app/view/home/message_screen.dart';
 import 'package:bubu_app/view/start_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -120,7 +121,7 @@ class OnStory extends HookConsumerWidget {
                                         color: Colors.black.withOpacity(0.5),
                                         blurRadius: 10,
                                         spreadRadius: 1.0,
-                                      )
+                                      ),
                                     ],
                                   ),
                                   child: Icon(
@@ -130,7 +131,7 @@ class OnStory extends HookConsumerWidget {
                                   ),
                                 ),
                               ),
-                            )
+                            ),
                           } else ...{
                             Align(
                               alignment: Alignment.bottomRight,
@@ -146,12 +147,12 @@ class OnStory extends HookConsumerWidget {
                                       color: greenColor.withOpacity(0.5),
                                       blurRadius: 10,
                                       spreadRadius: 1.0,
-                                    )
+                                    ),
                                   ],
                                 ),
                               ),
-                            )
-                          }
+                            ),
+                          },
                         ],
                       ),
                     ),
@@ -165,7 +166,7 @@ class OnStory extends HookConsumerWidget {
                     fontSize: safeAreaWidth / 35,
                     bold: 500,
                   ),
-                )
+                ),
               ],
             ),
           ),
@@ -182,15 +183,15 @@ Widget onMessage(BuildContext context, UserData userData) {
     color: Colors.transparent,
     borderRadius: BorderRadius.circular(15),
     child: InkWell(
-      // onTap: () => Navigator.push<Widget>(
-      //   context,
-      //   MaterialPageRoute(
-      //     builder: (context) => MessageScreenPage(
-      //       myData: userData,
-      //       partnerData: userData,
-      //     ),
-      //   ),
-      // ),
+      onTap: () => Navigator.push<Widget>(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MessageScreenPage(
+            myData: userData,
+            recipientData: userData,
+          ),
+        ),
+      ),
       child: Container(
         width: double.infinity,
         color: Colors.black.withOpacity(0),
@@ -236,7 +237,7 @@ Widget onMessage(BuildContext context, UserData userData) {
                         color: Colors.grey,
                         fontSize: safeAreaWidth / 30,
                         bold: 500,
-                      )
+                      ),
                     ],
                   ),
                 ),
@@ -258,14 +259,14 @@ Widget onMessage(BuildContext context, UserData userData) {
                           height: safeAreaHeight * 0.02,
                           width: safeAreaHeight * 0.02,
                           decoration: const BoxDecoration(
-                            color: Color.fromARGB(255, 4, 15, 238),
+                            color: blueColor2,
                             shape: BoxShape.circle,
                           ),
                         ),
-                      )
+                      ),
                     ],
                   ),
-                )
+                ),
               ],
             ),
           ),
@@ -317,7 +318,7 @@ Widget errorWidget(
             backgroundColor: Colors.white,
             onTap: () => screenTransitionToTop(context, const StartPage()),
           ),
-        )
+        ),
       ],
     ),
   );

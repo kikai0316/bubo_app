@@ -2,7 +2,7 @@ final dummyImgList = [
   [
     "https://i.pinimg.com/474x/4b/75/2a/4b752a2548cb329ed9e260bc112b7e3b.jpg",
     "https://i.pinimg.com/474x/c3/74/11/c37411cdbb71f018201aabee8c22eaa2.jpg",
-    "https://i.pinimg.com/474x/bf/37/cd/bf37cd6bfabee37f8d992d05b186a02a.jpg"
+    "https://i.pinimg.com/474x/bf/37/cd/bf37cd6bfabee37f8d992d05b186a02a.jpg",
   ],
   [
     "https://i.pinimg.com/474x/85/e2/25/85e225ddc1232f28bd53f38f18e17475.jpg",

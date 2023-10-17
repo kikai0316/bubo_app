@@ -163,8 +163,8 @@ class HomePage extends HookConsumerWidget {
                         ),
                       );
                     },
-                  )
-                }
+                  ),
+                },
               ],
             ),
           ),
@@ -184,7 +184,7 @@ class HomePage extends HookConsumerWidget {
             if (i != 0) ...{
               line(context, top: 0, bottom: 0),
             },
-            onMessage(context, userData)
+            onMessage(context, userData),
           },
           // SizedBox(
           //   height: safeAreaHeight * 0.11,
@@ -236,9 +236,9 @@ class HomePage extends HookConsumerWidget {
                 color: Colors.white,
                 fontSize: safeAreaWidth / 35,
                 bold: 500,
-              )
+              ),
             ],
-          )
+          ),
         ],
       ),
     );

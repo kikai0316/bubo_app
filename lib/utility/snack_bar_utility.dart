@@ -44,7 +44,7 @@ void errorSnackbar(
               color: Colors.white,
               size: safeAreaWidth / 20,
             ),
-          )
+          ),
         ],
       ),
       behavior: SnackBarBehavior.floating,

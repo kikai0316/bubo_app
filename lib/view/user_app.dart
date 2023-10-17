@@ -107,13 +107,13 @@ class UserApp extends HookConsumerWidget {
                                 color: Colors.white.withOpacity(0.8),
                                 fontSize: safeAreaWidth / 40,
                                 bold: 400,
-                              )
+                              ),
                             ],
                           ),
                         ),
                       ),
                     ),
-                  }
+                  },
                 ],
               ),
             ),
@@ -122,7 +122,7 @@ class UserApp extends HookConsumerWidget {
             context: context,
             isLoading: loadingNotifier,
             text: "アップロード中...",
-          )
+          ),
         ],
       ),
     );
@@ -137,7 +137,7 @@ final List<BottomData> pageList = [
   BottomData(
     Icons.person,
     "Account",
-  )
+  ),
 ];
 
 class BottomData {

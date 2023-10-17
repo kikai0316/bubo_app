@@ -85,10 +85,11 @@ class _$UserDataCopyWithImpl<$Res, $Val extends UserData>
 }
 
 /// @nodoc
-abstract class _$$_UserDataCopyWith<$Res> implements $UserDataCopyWith<$Res> {
-  factory _$$_UserDataCopyWith(
-          _$_UserData value, $Res Function(_$_UserData) then) =
-      __$$_UserDataCopyWithImpl<$Res>;
+abstract class _$$UserDataImplCopyWith<$Res>
+    implements $UserDataCopyWith<$Res> {
+  factory _$$UserDataImplCopyWith(
+          _$UserDataImpl value, $Res Function(_$UserDataImpl) then) =
+      __$$UserDataImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call(
@@ -100,11 +101,11 @@ abstract class _$$_UserDataCopyWith<$Res> implements $UserDataCopyWith<$Res> {
 }
 
 /// @nodoc
-class __$$_UserDataCopyWithImpl<$Res>
-    extends _$UserDataCopyWithImpl<$Res, _$_UserData>
-    implements _$$_UserDataCopyWith<$Res> {
-  __$$_UserDataCopyWithImpl(
-      _$_UserData _value, $Res Function(_$_UserData) _then)
+class __$$UserDataImplCopyWithImpl<$Res>
+    extends _$UserDataCopyWithImpl<$Res, _$UserDataImpl>
+    implements _$$UserDataImplCopyWith<$Res> {
+  __$$UserDataImplCopyWithImpl(
+      _$UserDataImpl _value, $Res Function(_$UserDataImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -116,7 +117,7 @@ class __$$_UserDataCopyWithImpl<$Res>
     Object? birthday = null,
     Object? family = null,
   }) {
-    return _then(_$_UserData(
+    return _then(_$UserDataImpl(
       imgList: null == imgList
           ? _value._imgList
           : imgList // ignore: cast_nullable_to_non_nullable
@@ -143,8 +144,8 @@ class __$$_UserDataCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$_UserData implements _UserData {
-  const _$_UserData(
+class _$UserDataImpl implements _UserData {
+  const _$UserDataImpl(
       {required final List<Uint8List> imgList,
       required this.id,
       required this.name,
@@ -178,7 +179,7 @@ class _$_UserData implements _UserData {
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_UserData &&
+            other is _$UserDataImpl &&
             const DeepCollectionEquality().equals(other._imgList, _imgList) &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
@@ -199,8 +200,8 @@ class _$_UserData implements _UserData {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_UserDataCopyWith<_$_UserData> get copyWith =>
-      __$$_UserDataCopyWithImpl<_$_UserData>(this, _$identity);
+  _$$UserDataImplCopyWith<_$UserDataImpl> get copyWith =>
+      __$$UserDataImplCopyWithImpl<_$UserDataImpl>(this, _$identity);
 }
 
 abstract class _UserData implements UserData {
@@ -209,7 +210,7 @@ abstract class _UserData implements UserData {
       required final String id,
       required final String name,
       required final String birthday,
-      required final String family}) = _$_UserData;
+      required final String family}) = _$UserDataImpl;
 
   @override
   List<Uint8List> get imgList;
@@ -223,6 +224,6 @@ abstract class _UserData implements UserData {
   String get family;
   @override
   @JsonKey(ignore: true)
-  _$$_UserDataCopyWith<_$_UserData> get copyWith =>
+  _$$UserDataImplCopyWith<_$UserDataImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

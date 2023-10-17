@@ -35,7 +35,7 @@ Widget loadinPage({
                 bold: 600,
               ),
             ),
-          }
+          },
         ],
       ),
     ),

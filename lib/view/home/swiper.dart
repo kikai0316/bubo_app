@@ -1,7 +1,7 @@
 import 'package:bubu_app/component/text.dart';
 import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/utility.dart';
-import 'package:bubu_app/widget/home/message_sheet.dart';
+import 'package:bubu_app/view/home/message_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_carousel_slider/carousel_slider.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -165,15 +165,15 @@ class SwiperPage extends HookConsumerWidget {
                                           ),
                                         ),
                                       ),
-                                    )
-                                  }
+                                    ),
+                                  },
                                 ],
                               ),
                             ),
                           ),
                           SizedBox(
                             height: safeAreaHeight * 0.01,
-                          )
+                          ),
                         ],
                       ),
                     );
@@ -248,7 +248,7 @@ class OnSwiper extends HookConsumerWidget {
                     ),
                   ),
                 ),
-              }
+              },
             ],
           ),
           Align(
@@ -340,11 +340,11 @@ class OnSwiper extends HookConsumerWidget {
                                   size: safeAreaWidth / 12,
                                 ),
                               ),
-                            )
+                            ),
                           ],
                         ),
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),

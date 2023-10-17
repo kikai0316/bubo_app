@@ -23,7 +23,7 @@ Future<bool> writeUserData(UserData data) async {
       "name": data.name,
       "img": toBase64,
       "birthday": data.birthday,
-      "family": data.family
+      "family": data.family,
     };
     final jsonList = jsonEncode(setData);
     await file.writeAsString(jsonList);

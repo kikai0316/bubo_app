@@ -209,14 +209,14 @@ class StartPage extends HookConsumerWidget {
                     ),
                     SizedBox(
                       height: safeAreaHeight * 0.02,
-                    )
+                    ),
                   ],
                 ),
               ),
             ),
           ),
         ),
-        loadinPage(context: context, isLoading: isLoading.value, text: null)
+        loadinPage(context: context, isLoading: isLoading.value, text: null),
       ],
     );
   }

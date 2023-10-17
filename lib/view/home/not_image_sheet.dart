@@ -138,7 +138,7 @@ class NotImgPage extends HookConsumerWidget {
                                             onSuccess: (value) =>
                                                 imgList.value = [
                                               ...imgList.value,
-                                              value
+                                              value,
                                             ],
                                             onError: () => errorSnackbar(
                                               context,
@@ -163,7 +163,7 @@ class NotImgPage extends HookConsumerWidget {
                                       imgList.value = [...imgList.value];
                                     },
                                   ),
-                                }
+                                },
                               ],
                             ),
                           ),
@@ -197,7 +197,7 @@ class NotImgPage extends HookConsumerWidget {
             context: context,
             isLoading: isLoading.value,
             text: upLoadMesse.value,
-          )
+          ),
         ],
       ),
     );
