@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:bubu_app/component/text.dart';
 import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/utility.dart';
@@ -11,8 +12,13 @@ final ScrollController scrollController = ScrollController();
 final CarouselSliderController controller = CarouselSliderController();
 
 class SwiperPage extends HookConsumerWidget {
-  const SwiperPage({super.key, required this.index, required this.storyList});
+  const SwiperPage({
+    super.key,
+    required this.index,
+    required this.storyList,
+  });
   final int index;
+  // final List<Map<String, dynamic>> storyList;
   final List<UserData> storyList;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -21,13 +27,19 @@ class SwiperPage extends HookConsumerWidget {
     final safeAreaWidth = MediaQuery.of(context).size.width;
     final isMove = useState<bool>(false);
     final scrollBack = useState<double>(0);
-    String isHeroTagNot() {
-      if (pageIndex.value == 0) {
-        return "${storyList[0].id}${0}";
-      } else if (pageIndex.value == storyList.length + 1) {
-        return "${storyList[storyList.length - 1].id}${storyList.length - 1}";
-      } else {
-        return "${storyList[pageIndex.value - 1].id}${pageIndex.value - 1}";
+    final imgList = useState<List<List<Uint8List>>>([]);
+
+    Future<void> compressImage() async {
+      for (int i = 0; i < storyList.length; i++) {
+        // final List<Uint8List> list = [];
+        // for (int a = 0; a < storyList[i].imgList.length; a++) {
+        //   final compressedResult = await FlutterImageCompress.compressWithList(
+        //     storyList[i].imgList[a],
+        //     quality: 50, // 0-100間で圧縮の品質を指定します。ここでは70%の品質で圧縮しています。
+        //   );
+        //   list.add(Uint8List.fromList(compressedResult));
+        // }
+        imgList.value = [...imgList.value, storyList[i].imgList];
       }
     }
 
@@ -47,6 +59,7 @@ class SwiperPage extends HookConsumerWidget {
 
     useEffect(
       () {
+        compressImage();
         void listener() {
           if (scrollController.offset < -60) {
             if (scrollBack.value > scrollController.offset) {
@@ -59,13 +72,15 @@ class SwiperPage extends HookConsumerWidget {
         }
 
         scrollController.addListener(listener);
-        return () => scrollController.removeListener(listener);
+        return () {
+          scrollController.removeListener(listener);
+        };
       },
       [],
     );
 
     return Hero(
-      tag: isHeroTagNot(),
+      tag: storyList.first.id,
       child: Stack(
         children: [
           Scaffold(
@@ -83,7 +98,7 @@ class SwiperPage extends HookConsumerWidget {
                   pageIndex.value = value;
                 },
                 slideTransform: const CubeTransform(),
-                itemCount: storyList.length + 2,
+                itemCount: imgList.value.length + 2,
                 slideBuilder: (index) {
                   if (isNotScreen(index)) {
                     return Container(
@@ -91,92 +106,97 @@ class SwiperPage extends HookConsumerWidget {
                       color: Colors.black,
                     );
                   } else {
-                    return SingleChildScrollView(
-                      controller: scrollController,
-                      child: Column(
-                        children: [
-                          SizedBox(
-                            height: safeAreaHeight * 0.93,
-                            width: safeAreaWidth * 1,
-                            child: OnSwiper(
-                              data: storyList[index - 1],
-                              onNext: () {
-                                moveAnimation();
-                                controller.nextPage(
-                                  const Duration(milliseconds: 300),
-                                );
-                              },
-                              onBack: () {
-                                if (index != 1) {
-                                  moveAnimation();
-                                  controller.previousPage(
-                                    const Duration(milliseconds: 300),
-                                  );
-                                }
-                              },
-                            ),
-                          ),
-                          FittedBox(
-                            fit: BoxFit.fitWidth,
-                            child: SizedBox(
-                              height: safeAreaHeight * 0.07,
-                              width: safeAreaWidth * 1,
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  for (int i = 0; i < 2; i++) ...{
-                                    Material(
-                                      color: Colors.black.withOpacity(0),
-                                      borderRadius: BorderRadius.circular(50),
-                                      child: InkWell(
-                                        onTap: () {
-                                          if (i == 0) {}
-                                          if (i == 1) {
-                                            bottomSheet(
-                                              context,
-                                              page: MessageBottomSheet(),
-                                              isPOP: true,
-                                              isBackgroundColor: false,
-                                            );
-                                          }
-                                        },
-                                        borderRadius: BorderRadius.circular(50),
-                                        child: Container(
-                                          alignment: Alignment.center,
-                                          height: safeAreaHeight * 0.05,
-                                          width: safeAreaWidth * 0.48,
-                                          decoration: BoxDecoration(
-                                            border: Border.all(
-                                              color: Colors.white,
-                                              width: 0.3,
-                                            ),
+                    return imgList.value.isEmpty
+                        ? Container()
+                        : SingleChildScrollView(
+                            controller: scrollController,
+                            child: Column(
+                              children: [
+                                SizedBox(
+                                  height: safeAreaHeight * 0.93,
+                                  width: safeAreaWidth * 1,
+                                  child: OnSwiper(
+                                    data: imgList.value[index - 1],
+                                    onNext: () {
+                                      moveAnimation();
+                                      controller.nextPage(
+                                        const Duration(milliseconds: 300),
+                                      );
+                                    },
+                                    onBack: () {
+                                      if (index != 1) {
+                                        moveAnimation();
+                                        controller.previousPage(
+                                          const Duration(milliseconds: 300),
+                                        );
+                                      }
+                                    },
+                                  ),
+                                ),
+                                FittedBox(
+                                  fit: BoxFit.fitWidth,
+                                  child: SizedBox(
+                                    height: safeAreaHeight * 0.07,
+                                    width: safeAreaWidth * 1,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: [
+                                        for (int i = 0; i < 2; i++) ...{
+                                          Material(
+                                            color: Colors.black.withOpacity(0),
                                             borderRadius:
                                                 BorderRadius.circular(50),
+                                            child: InkWell(
+                                              onTap: () {
+                                                if (i == 0) {}
+                                                if (i == 1) {
+                                                  bottomSheet(
+                                                    context,
+                                                    page: MessageBottomSheet(),
+                                                    isPOP: true,
+                                                    isBackgroundColor: false,
+                                                  );
+                                                }
+                                              },
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                              child: Container(
+                                                alignment: Alignment.center,
+                                                height: safeAreaHeight * 0.05,
+                                                width: safeAreaWidth * 0.48,
+                                                decoration: BoxDecoration(
+                                                  border: Border.all(
+                                                    color: Colors.white,
+                                                    width: 0.3,
+                                                  ),
+                                                  borderRadius:
+                                                      BorderRadius.circular(50),
+                                                ),
+                                                child: nText(
+                                                  i == 0
+                                                      ? "InstagramをGETする"
+                                                      : "メッセージを送信...",
+                                                  color: Colors.white,
+                                                  fontSize: safeAreaWidth / 37,
+                                                  bold: 200,
+                                                ),
+                                              ),
+                                            ),
                                           ),
-                                          child: nText(
-                                            i == 0
-                                                ? "InstagramをGETする"
-                                                : "メッセージを送信...",
-                                            color: Colors.white,
-                                            fontSize: safeAreaWidth / 37,
-                                            bold: 200,
-                                          ),
-                                        ),
-                                      ),
+                                        },
+                                      ],
                                     ),
-                                  },
-                                ],
-                              ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: safeAreaHeight * 0.01,
+                                ),
+                              ],
                             ),
-                          ),
-                          SizedBox(
-                            height: safeAreaHeight * 0.01,
-                          ),
-                        ],
-                      ),
-                    );
+                          );
                   }
                 },
               ),
@@ -196,6 +216,8 @@ class SwiperPage extends HookConsumerWidget {
   }
 }
 
+// late UserData onSwiperData;
+
 class OnSwiper extends HookConsumerWidget {
   const OnSwiper({
     super.key,
@@ -203,25 +225,42 @@ class OnSwiper extends HookConsumerWidget {
     required this.onNext,
     required this.onBack,
   });
-  final UserData data;
+  final List<Uint8List> data;
   final void Function() onNext;
   final void Function() onBack;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final safeAreaWidth = MediaQuery.of(context).size.width;
     final safeAreaHeight = safeHeight(context);
     final imgIndex = useState<int>(0);
+    // precacheImages(context, data.imgList);
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: MemoryImage(data.imgList[imgIndex.value]),
+          image: MemoryImage(data[imgIndex.value]),
           fit: BoxFit.cover,
         ),
         borderRadius: BorderRadius.circular(15),
       ),
       child: Stack(
         children: [
+          // for (int i = 0; i < data.imgList.length; i++) ...{
+          //   Opacity(
+          //     opacity: i == imgIndex.value ? 1 : 0,
+          //     child: Container(
+          //       width: double.infinity,
+          //       decoration: BoxDecoration(
+          //         image: DecorationImage(
+          //           image: MemoryImage(data.imgList[i]),
+          //           fit: BoxFit.cover,
+          //         ),
+          //         borderRadius: BorderRadius.circular(15),
+          //       ),
+          //     ),
+          //   )
+          // },
           Row(
             children: [
               for (int i = 0; i < 2; i++) ...{
@@ -235,7 +274,7 @@ class OnSwiper extends HookConsumerWidget {
                           onBack();
                         }
                       } else {
-                        if (imgIndex.value < data.imgList.length - 1) {
+                        if (imgIndex.value < data.length - 1) {
                           imgIndex.value++;
                         } else {
                           onNext();
@@ -277,7 +316,7 @@ class OnSwiper extends HookConsumerWidget {
                   children: [
                     Row(
                       children: [
-                        for (int i = 0; i < data.imgList.length; i++) ...{
+                        for (int i = 0; i < data.length; i++) ...{
                           Expanded(
                             child: Opacity(
                               opacity: i == imgIndex.value ? 1 : 0.4,
@@ -290,7 +329,7 @@ class OnSwiper extends HookConsumerWidget {
                               ),
                             ),
                           ),
-                          if (i < data.imgList.length - 1)
+                          if (i < data.length - 1)
                             SizedBox(width: safeAreaWidth * 0.01),
                         },
                       ],

@@ -161,6 +161,9 @@ class SingInSheetWidget extends HookConsumerWidget {
                             name: controllerList[2].text,
                             birthday: birthday.value!,
                             family: "",
+                            isGetData: true,
+                            isView: false,
+                            acquisitionAt: null,
                           );
                           onTap(
                             dataSet,

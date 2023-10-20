@@ -21,6 +21,9 @@ mixin _$UserData {
   String get name => throw _privateConstructorUsedError;
   String get birthday => throw _privateConstructorUsedError;
   String get family => throw _privateConstructorUsedError;
+  bool get isGetData => throw _privateConstructorUsedError;
+  bool get isView => throw _privateConstructorUsedError;
+  DateTime? get acquisitionAt => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $UserDataCopyWith<UserData> get copyWith =>
@@ -37,7 +40,10 @@ abstract class $UserDataCopyWith<$Res> {
       String id,
       String name,
       String birthday,
-      String family});
+      String family,
+      bool isGetData,
+      bool isView,
+      DateTime? acquisitionAt});
 }
 
 /// @nodoc
@@ -58,6 +64,9 @@ class _$UserDataCopyWithImpl<$Res, $Val extends UserData>
     Object? name = null,
     Object? birthday = null,
     Object? family = null,
+    Object? isGetData = null,
+    Object? isView = null,
+    Object? acquisitionAt = freezed,
   }) {
     return _then(_value.copyWith(
       imgList: null == imgList
@@ -80,6 +89,18 @@ class _$UserDataCopyWithImpl<$Res, $Val extends UserData>
           ? _value.family
           : family // ignore: cast_nullable_to_non_nullable
               as String,
+      isGetData: null == isGetData
+          ? _value.isGetData
+          : isGetData // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isView: null == isView
+          ? _value.isView
+          : isView // ignore: cast_nullable_to_non_nullable
+              as bool,
+      acquisitionAt: freezed == acquisitionAt
+          ? _value.acquisitionAt
+          : acquisitionAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
     ) as $Val);
   }
 }
@@ -97,7 +118,10 @@ abstract class _$$UserDataImplCopyWith<$Res>
       String id,
       String name,
       String birthday,
-      String family});
+      String family,
+      bool isGetData,
+      bool isView,
+      DateTime? acquisitionAt});
 }
 
 /// @nodoc
@@ -116,6 +140,9 @@ class __$$UserDataImplCopyWithImpl<$Res>
     Object? name = null,
     Object? birthday = null,
     Object? family = null,
+    Object? isGetData = null,
+    Object? isView = null,
+    Object? acquisitionAt = freezed,
   }) {
     return _then(_$UserDataImpl(
       imgList: null == imgList
@@ -138,6 +165,18 @@ class __$$UserDataImplCopyWithImpl<$Res>
           ? _value.family
           : family // ignore: cast_nullable_to_non_nullable
               as String,
+      isGetData: null == isGetData
+          ? _value.isGetData
+          : isGetData // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isView: null == isView
+          ? _value.isView
+          : isView // ignore: cast_nullable_to_non_nullable
+              as bool,
+      acquisitionAt: freezed == acquisitionAt
+          ? _value.acquisitionAt
+          : acquisitionAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
     ));
   }
 }
@@ -150,7 +189,10 @@ class _$UserDataImpl implements _UserData {
       required this.id,
       required this.name,
       required this.birthday,
-      required this.family})
+      required this.family,
+      required this.isGetData,
+      required this.isView,
+      required this.acquisitionAt})
       : _imgList = imgList;
 
   final List<Uint8List> _imgList;
@@ -169,10 +211,16 @@ class _$UserDataImpl implements _UserData {
   final String birthday;
   @override
   final String family;
+  @override
+  final bool isGetData;
+  @override
+  final bool isView;
+  @override
+  final DateTime? acquisitionAt;
 
   @override
   String toString() {
-    return 'UserData(imgList: $imgList, id: $id, name: $name, birthday: $birthday, family: $family)';
+    return 'UserData(imgList: $imgList, id: $id, name: $name, birthday: $birthday, family: $family, isGetData: $isGetData, isView: $isView, acquisitionAt: $acquisitionAt)';
   }
 
   @override
@@ -185,7 +233,12 @@ class _$UserDataImpl implements _UserData {
             (identical(other.name, name) || other.name == name) &&
             (identical(other.birthday, birthday) ||
                 other.birthday == birthday) &&
-            (identical(other.family, family) || other.family == family));
+            (identical(other.family, family) || other.family == family) &&
+            (identical(other.isGetData, isGetData) ||
+                other.isGetData == isGetData) &&
+            (identical(other.isView, isView) || other.isView == isView) &&
+            (identical(other.acquisitionAt, acquisitionAt) ||
+                other.acquisitionAt == acquisitionAt));
   }
 
   @override
@@ -195,7 +248,10 @@ class _$UserDataImpl implements _UserData {
       id,
       name,
       birthday,
-      family);
+      family,
+      isGetData,
+      isView,
+      acquisitionAt);
 
   @JsonKey(ignore: true)
   @override
@@ -210,7 +266,10 @@ abstract class _UserData implements UserData {
       required final String id,
       required final String name,
       required final String birthday,
-      required final String family}) = _$UserDataImpl;
+      required final String family,
+      required final bool isGetData,
+      required final bool isView,
+      required final DateTime? acquisitionAt}) = _$UserDataImpl;
 
   @override
   List<Uint8List> get imgList;
@@ -222,6 +281,12 @@ abstract class _UserData implements UserData {
   String get birthday;
   @override
   String get family;
+  @override
+  bool get isGetData;
+  @override
+  bool get isView;
+  @override
+  DateTime? get acquisitionAt;
   @override
   @JsonKey(ignore: true)
   _$$UserDataImplCopyWith<_$UserDataImpl> get copyWith =>

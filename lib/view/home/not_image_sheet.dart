@@ -13,10 +13,11 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class NotImgPage extends HookConsumerWidget {
-  const NotImgPage({super.key, required this.userData, required this.onTap});
-
+  const NotImgPage({
+    super.key,
+    required this.userData,
+  });
   final UserData userData;
-  final void Function() onTap;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final safeAreaHeight = safeHeight(context);
@@ -49,15 +50,16 @@ class NotImgPage extends HookConsumerWidget {
           name: userData.name,
           birthday: userData.birthday,
           family: userData.family,
+          isGetData: true,
+          isView: false,
+          acquisitionAt: null,
         );
         final iswWite = await writeUserData(setData);
         if (iswWite) {
-          final notifier = ref.read(userDataNotifierProvider.notifier);
-          notifier.reLoad();
-          await Future<void>.delayed(const Duration(seconds: 1));
           // ignore: use_build_context_synchronously
           Navigator.pop(context);
-          onTap();
+          final notifier = ref.read(userDataNotifierProvider.notifier);
+          notifier.reLoad();
         } else {
           showSnackbar();
         }

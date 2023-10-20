@@ -25,15 +25,14 @@ class MyApp extends HookConsumerWidget {
     final User? user = FirebaseAuth.instance.currentUser;
     final notifier = ref.watch(userDataNotifierProvider);
     final notifierWhen = notifier.when(
-      data: (data) => user != null
+      data: (data) => user != null && data != null
           ? UserApp(
-              userData: data!,
+              userData: data,
             )
           : const StartPage(),
       error: (e, s) => const StartPage(),
       loading: () => const WithIconInLoadingPage(),
     );
-
     return MaterialApp(debugShowCheckedModeBanner: false, home: notifierWhen);
   }
 }

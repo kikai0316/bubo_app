@@ -2,10 +2,12 @@ import 'package:bubu_app/component/button.dart';
 import 'package:bubu_app/component/text.dart';
 import 'package:bubu_app/constant/color.dart';
 import 'package:bubu_app/model/user_data.dart';
+import 'package:bubu_app/utility/firebase_utility.dart';
 import 'package:bubu_app/utility/screen_transition_utility.dart';
 import 'package:bubu_app/utility/utility.dart';
 import 'package:bubu_app/view/home/message_screen.dart';
 import 'package:bubu_app/view/start_page.dart';
+import 'package:bubu_app/view_model/story_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -14,22 +16,45 @@ class OnStory extends HookConsumerWidget {
   const OnStory({
     super.key,
     required this.isMyData,
-    required this.data,
+    required this.userData,
     required this.onTap,
     required this.index,
+    required this.height,
+    required this.width,
   });
-  final bool isMyData;
-  final UserData data;
+  final UserData userData;
   final void Function() onTap;
   final int index;
+  final double height;
+  final double width;
+  final bool isMyData;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final safeAreaHeight = safeHeight(context);
-    final safeAreaWidth = MediaQuery.of(context).size.width;
     final isTapEvent = useState<bool>(false);
+    useEffect(
+      () {
+        var cancelled = false;
+        if (userData.imgList.isEmpty) {
+          Future(() async {
+            if (userData.imgList.isEmpty) {
+              final getData = await imgMainGet(userData);
+              if (cancelled) return; // もしキャンセルされたら、ここで処理を終了
+              if (getData != null) {
+                final notifier = ref.read(storyListNotifierProvider.notifier);
+                notifier.mainImgUpDate(getData);
+              }
+            }
+          });
+        }
+        return () {
+          cancelled = true;
+        };
+      },
+      [],
+    );
     return Padding(
-      padding: EdgeInsets.only(right: safeAreaWidth * 0.03),
+      padding: EdgeInsets.only(right: height * 0.03),
       child: GestureDetector(
         onTap: () {
           isTapEvent.value = false;
@@ -42,22 +67,23 @@ class OnStory extends HookConsumerWidget {
           isTapEvent.value = false;
         },
         child: Hero(
-          tag: "${data.id}$index",
-          child: SizedBox(
-            height: safeAreaHeight * 0.13,
-            width: safeAreaHeight * 0.105,
+          tag: userData.id,
+          child: Container(
+            alignment: Alignment.center,
+            height: height * 0.13,
+            width: height * 0.105,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Expanded(
                   child: Padding(
                     padding: EdgeInsets.all(
-                      isTapEvent.value ? safeAreaWidth * 0.008 : 0,
+                      isTapEvent.value ? width * 0.008 : 0,
                     ),
                     child: Container(
                       alignment: Alignment.center,
-                      height: safeAreaHeight * 0.105,
-                      width: safeAreaHeight * 0.105,
+                      height: height * 0.105,
+                      width: height * 0.105,
                       decoration: const BoxDecoration(
                         shape: BoxShape.circle,
                         gradient: LinearGradient(
@@ -74,7 +100,7 @@ class OnStory extends HookConsumerWidget {
                         alignment: Alignment.center,
                         children: [
                           Padding(
-                            padding: EdgeInsets.all(safeAreaHeight * 0.004),
+                            padding: EdgeInsets.all(height * 0.004),
                             child: Container(
                               alignment: Alignment.center,
                               height: double.infinity,
@@ -84,19 +110,19 @@ class OnStory extends HookConsumerWidget {
                                 shape: BoxShape.circle,
                               ),
                               child: Padding(
-                                padding:
-                                    EdgeInsets.all(safeAreaHeight * 0.0035),
+                                padding: EdgeInsets.all(height * 0.0035),
                                 child: Container(
                                   height: double.infinity,
                                   width: double.infinity,
                                   decoration: BoxDecoration(
                                     color: Colors.black,
                                     shape: BoxShape.circle,
-                                    image: data.imgList.isEmpty
+                                    image: userData.imgList.isEmpty
                                         ? null
                                         : DecorationImage(
-                                            image:
-                                                MemoryImage(data.imgList.first),
+                                            image: MemoryImage(
+                                              userData.imgList.first,
+                                            ),
                                             fit: BoxFit.cover,
                                           ),
                                   ),
@@ -111,8 +137,8 @@ class OnStory extends HookConsumerWidget {
                                 onTap: () {},
                                 child: Container(
                                   alignment: Alignment.center,
-                                  height: safeAreaHeight * 0.038,
-                                  width: safeAreaHeight * 0.038,
+                                  height: height * 0.038,
+                                  width: height * 0.038,
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     shape: BoxShape.circle,
@@ -127,7 +153,7 @@ class OnStory extends HookConsumerWidget {
                                   child: Icon(
                                     Icons.add,
                                     color: blueColor,
-                                    size: safeAreaWidth / 18,
+                                    size: width / 18,
                                   ),
                                 ),
                               ),
@@ -137,8 +163,8 @@ class OnStory extends HookConsumerWidget {
                               alignment: Alignment.bottomRight,
                               child: Container(
                                 alignment: Alignment.center,
-                                height: safeAreaHeight * 0.03,
-                                width: safeAreaHeight * 0.03,
+                                height: height * 0.03,
+                                width: height * 0.03,
                                 decoration: BoxDecoration(
                                   color: greenColor,
                                   shape: BoxShape.circle,
@@ -159,11 +185,11 @@ class OnStory extends HookConsumerWidget {
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(top: safeAreaHeight * 0.005),
+                  padding: EdgeInsets.only(top: height * 0.005),
                   child: nText(
-                    data.name,
+                    userData.name,
                     color: Colors.white.withOpacity(0.9),
-                    fontSize: safeAreaWidth / 35,
+                    fontSize: width / 35,
                     bold: 500,
                   ),
                 ),
@@ -213,10 +239,13 @@ Widget onMessage(BuildContext context, UserData userData) {
                     height: safeAreaHeight * 0.08,
                     width: safeAreaHeight * 0.08,
                     decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: MemoryImage(userData.imgList.first),
-                        fit: BoxFit.cover,
-                      ),
+                      color: blackColor,
+                      image: userData.imgList.isNotEmpty
+                          ? DecorationImage(
+                              image: MemoryImage(userData.imgList.first),
+                              fit: BoxFit.cover,
+                            )
+                          : null,
                       shape: BoxShape.circle,
                     ),
                   ),

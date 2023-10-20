@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -33,7 +34,7 @@ void bottomSheet(
           )
         : null,
     builder: (context) => page,
-  ).then((value) => ScaffoldMessenger.of(context).hideCurrentSnackBar());
+  );
 }
 
 Future getMobileImage({
@@ -47,7 +48,9 @@ Future getMobileImage({
       final List<int> imageBytes = await File(pickedFile.path).readAsBytes();
       final String base64Image = base64Encode(imageBytes);
       final Uint8List unit8 = base64Decode(base64Image);
-      onSuccess(unit8);
+      final compressedResult =
+          await FlutterImageCompress.compressWithList(unit8, quality: 0);
+      onSuccess(Uint8List.fromList(compressedResult));
     }
   } catch (e) {
     onError();
@@ -73,4 +76,14 @@ EdgeInsetsGeometry xPadding(
     left: safeAreaWidth * 0.03,
     right: safeAreaWidth * 0.03,
   );
+}
+
+void precacheImages(
+  BuildContext context,
+  List<Uint8List> imageList,
+) {
+  for (final imageData in imageList) {
+    final imageProvider = MemoryImage(imageData);
+    precacheImage(imageProvider, context);
+  }
 }
