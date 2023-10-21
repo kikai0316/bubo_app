@@ -1,15 +1,18 @@
 import 'package:bubu_app/component/component.dart';
+import 'package:bubu_app/component/loading.dart';
 import 'package:bubu_app/component/text.dart';
 import 'package:bubu_app/constant/color.dart';
 import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/utility.dart';
 import 'package:bubu_app/view/home/swiper.dart';
+import 'package:bubu_app/view/user_app.dart';
 import 'package:bubu_app/view_model/device_list.dart';
+import 'package:bubu_app/view_model/message_list.dart';
 import 'package:bubu_app/view_model/story_list.dart';
-import 'package:bubu_app/widget/home/home_widget.dart';
+import 'package:bubu_app/widget/home/home_message_widget.dart';
+import 'package:bubu_app/widget/home/home_story_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class HomePage extends HookConsumerWidget {
   const HomePage({super.key, required this.userData});
@@ -19,6 +22,7 @@ class HomePage extends HookConsumerWidget {
     final safeAreaHeight = safeHeight(context);
     final safeAreaWidth = MediaQuery.of(context).size.width;
     final storyList = ref.watch(storyListNotifierProvider);
+    final messageList = ref.watch(messageListNotifierProvider);
     final deviceList = ref.watch(deviseListNotifierProvider);
     final storyListWhen = storyList.when(
       data: (value) {
@@ -88,6 +92,26 @@ class HomePage extends HookConsumerWidget {
       ),
     );
 
+    final messageListWhen = messageList.when(
+      data: (value) => Column(
+        children: [
+          for (int i = 0; i < value.length; i++) ...{
+            OnMessage(
+              messageData: value[i],
+              myData: userData,
+            ),
+          },
+        ],
+      ),
+      loading: () => messageLoading(context),
+      error: (e, s) => messageError(
+        context,
+        UserApp(
+          userData: userData,
+        ),
+      ),
+    );
+
     return Scaffold(
       extendBody: true,
       resizeToAvoidBottomInset: false,
@@ -99,9 +123,25 @@ class HomePage extends HookConsumerWidget {
           storyListWhen,
           line(
             context,
-            top: safeAreaHeight * 0.01,
-            bottom: safeAreaHeight * 0.01,
+            top: safeAreaHeight * 0.015,
+            bottom: 0,
           ),
+          Padding(
+            padding: EdgeInsets.only(
+              left: safeAreaWidth * 0.03,
+              top: safeAreaHeight * 0.015,
+              bottom: safeAreaHeight * 0.01,
+            ),
+            child: nText(
+              "メッセージ",
+              color: Colors.white,
+              fontSize: safeAreaWidth / 22,
+              bold: 700,
+            ),
+          ),
+
+          messageListWhen,
+
           // Align(
           //   child: Padding(
           //     padding: EdgeInsets.only(bottom: safeAreaHeight * 0.01),
@@ -109,12 +149,12 @@ class HomePage extends HookConsumerWidget {
           //         color: Colors.white, fontSize: safeAreaWidth / 20, bold: 700),
           //   ),
           // ),
-          for (int i = 0; i < 2; i++) ...{
-            if (i != 0) ...{
-              line(context, top: 0, bottom: 0),
-            },
-            onMessage(context, userData),
-          },
+          // for (int i = 0; i < 2; i++) ...{
+          //   if (i != 0) ...{
+          //     line(context, top: 0, bottom: 0),
+          //   },
+          //   onMessage(context, userData),
+          // },
           // SizedBox(
           //   height: safeAreaHeight * 0.11,
           // ),
@@ -129,6 +169,102 @@ class HomePage extends HookConsumerWidget {
           //   isWhiteMainColor: true,
           //   text: "削除",
           //   onTap: () async {
+          //     final ss = MessageList(
+          //       userData: UserData(
+          //         imgList: [],
+          //         id: "2WG8m5w5jyOUjgrLHfeGDnXxYX02",
+          //         name: "だおすけ",
+          //         birthday: "",
+          //         family: "",
+          //         isGetData: false,
+          //         isView: false,
+          //         acquisitionAt: DateTime.now(),
+          //       ),
+          //       message: [
+          //         MessageData(
+          //           message: "こんにちは！",
+          //           dateTime:
+          //               DateTime.now().subtract(const Duration(hours: 48)),
+          //           isMyMessage: false,
+          //           isRead: false,
+          //         ),
+          //         MessageData(
+          //           message: "こちらこそ、よろしく！",
+          //           dateTime:
+          //               DateTime.now().subtract(const Duration(hours: 47)),
+          //           isMyMessage: true,
+          //           isRead: false,
+          //         ),
+          //         MessageData(
+          //           message: "こちらこそ、よろしく！",
+          //           dateTime:
+          //               DateTime.now().subtract(const Duration(hours: 46)),
+          //           isMyMessage: false,
+          //           isRead: false,
+          //         ),
+          //         MessageData(
+          //           message: "何歳？",
+          //           dateTime:
+          //               DateTime.now().subtract(const Duration(hours: 45)),
+          //           isMyMessage: true,
+          //           isRead: false,
+          //         ),
+          //         MessageData(
+          //           message: "あああああああああああ",
+          //           dateTime:
+          //               DateTime.now().subtract(const Duration(hours: 44)),
+          //           isMyMessage: false,
+          //           isRead: false,
+          //         ),
+          //         MessageData(
+          //           message: "あああああああああああ",
+          //           dateTime:
+          //               DateTime.now().subtract(const Duration(hours: 44)),
+          //           isMyMessage: false,
+          //           isRead: false,
+          //         ),
+          //         MessageData(
+          //           message: "あああああああああああ",
+          //           dateTime:
+          //               DateTime.now().subtract(const Duration(hours: 44)),
+          //           isMyMessage: false,
+          //           isRead: false,
+          //         ),
+          //         MessageData(
+          //           message: "あああああああああああ",
+          //           dateTime:
+          //               DateTime.now().subtract(const Duration(hours: 44)),
+          //           isMyMessage: false,
+          //           isRead: false,
+          //         ),
+          //         MessageData(
+          //           message: "あああああああああああ",
+          //           dateTime:
+          //               DateTime.now().subtract(const Duration(hours: 44)),
+          //           isMyMessage: false,
+          //           isRead: false,
+          //         ),
+          //         MessageData(
+          //           message: "ういいいいいいいいいいいいいい",
+          //           dateTime:
+          //               DateTime.now().subtract(const Duration(hours: 24)),
+          //           isMyMessage: false,
+          //           isRead: false,
+          //         ),
+          //         MessageData(
+          //           message: "むしーーー？",
+          //           dateTime: DateTime.now(),
+          //           isMyMessage: false,
+          //           isRead: false,
+          //         ),
+          //       ],
+          //     );
+          //     final dd = await writeMessageData([ss]);
+          //     if (dd) {
+          //       print("成功");
+          //     } else {
+          //       print("不正解");
+          //     }
           //     // final dd = List.generate(
           //     //     20,
           //     //     (index) => UserData(
@@ -189,65 +325,6 @@ class HomePage extends HookConsumerWidget {
             ),
           ),
           const SizedBox(),
-        ],
-      ),
-    );
-  }
-
-  Widget storyLoadingWidget(BuildContext context) {
-    final safeAreaHeight = safeHeight(context);
-    return Container(
-      alignment: Alignment.center,
-      height: safeAreaHeight * 0.13,
-      width: double.infinity,
-      child: LoadingAnimationWidget.staggeredDotsWave(
-        color: Colors.white,
-        size: MediaQuery.of(context).size.width / 13,
-      ),
-    );
-  }
-
-  Widget storyErrorWidget(BuildContext context) {
-    final safeAreaHeight = safeHeight(context);
-    final safeAreaWidth = MediaQuery.of(context).size.width;
-    return SizedBox(
-      height: safeAreaHeight * 0.13,
-      width: double.infinity,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          nText(
-            "データ取得に失敗しました",
-            color: Colors.white,
-            fontSize: safeAreaWidth / 25,
-            bold: 700,
-          ),
-          Padding(
-            padding: EdgeInsets.only(top: safeAreaHeight * 0.01),
-            child: Material(
-              color: blackColor,
-              borderRadius: BorderRadius.circular(5),
-              child: InkWell(
-                onTap: () {},
-                borderRadius: BorderRadius.circular(5),
-                child: Container(
-                  alignment: Alignment.center,
-                  height: safeAreaHeight * 0.04,
-                  width: safeAreaWidth * 0.25,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.white, width: 0.5),
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  child: nText(
-                    "再試行",
-                    color: Colors.white,
-                    fontSize: safeAreaWidth / 30,
-                    bold: 700,
-                  ),
-                ),
-              ),
-            ),
-          ),
         ],
       ),
     );

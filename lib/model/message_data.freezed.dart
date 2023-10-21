@@ -16,7 +16,7 @@ final _privateConstructorUsedError = UnsupportedError(
 
 /// @nodoc
 mixin _$MessageData {
-  String get userId => throw _privateConstructorUsedError;
+  bool get isMyMessage => throw _privateConstructorUsedError;
   String get message => throw _privateConstructorUsedError;
   DateTime get dateTime => throw _privateConstructorUsedError;
   bool get isRead => throw _privateConstructorUsedError;
@@ -32,7 +32,7 @@ abstract class $MessageDataCopyWith<$Res> {
           MessageData value, $Res Function(MessageData) then) =
       _$MessageDataCopyWithImpl<$Res, MessageData>;
   @useResult
-  $Res call({String userId, String message, DateTime dateTime, bool isRead});
+  $Res call({bool isMyMessage, String message, DateTime dateTime, bool isRead});
 }
 
 /// @nodoc
@@ -48,16 +48,16 @@ class _$MessageDataCopyWithImpl<$Res, $Val extends MessageData>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? userId = null,
+    Object? isMyMessage = null,
     Object? message = null,
     Object? dateTime = null,
     Object? isRead = null,
   }) {
     return _then(_value.copyWith(
-      userId: null == userId
-          ? _value.userId
-          : userId // ignore: cast_nullable_to_non_nullable
-              as String,
+      isMyMessage: null == isMyMessage
+          ? _value.isMyMessage
+          : isMyMessage // ignore: cast_nullable_to_non_nullable
+              as bool,
       message: null == message
           ? _value.message
           : message // ignore: cast_nullable_to_non_nullable
@@ -82,7 +82,7 @@ abstract class _$$MessageDataImplCopyWith<$Res>
       __$$MessageDataImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String userId, String message, DateTime dateTime, bool isRead});
+  $Res call({bool isMyMessage, String message, DateTime dateTime, bool isRead});
 }
 
 /// @nodoc
@@ -96,16 +96,16 @@ class __$$MessageDataImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? userId = null,
+    Object? isMyMessage = null,
     Object? message = null,
     Object? dateTime = null,
     Object? isRead = null,
   }) {
     return _then(_$MessageDataImpl(
-      userId: null == userId
-          ? _value.userId
-          : userId // ignore: cast_nullable_to_non_nullable
-              as String,
+      isMyMessage: null == isMyMessage
+          ? _value.isMyMessage
+          : isMyMessage // ignore: cast_nullable_to_non_nullable
+              as bool,
       message: null == message
           ? _value.message
           : message // ignore: cast_nullable_to_non_nullable
@@ -126,13 +126,13 @@ class __$$MessageDataImplCopyWithImpl<$Res>
 
 class _$MessageDataImpl implements _MessageData {
   const _$MessageDataImpl(
-      {required this.userId,
+      {required this.isMyMessage,
       required this.message,
       required this.dateTime,
       required this.isRead});
 
   @override
-  final String userId;
+  final bool isMyMessage;
   @override
   final String message;
   @override
@@ -142,7 +142,7 @@ class _$MessageDataImpl implements _MessageData {
 
   @override
   String toString() {
-    return 'MessageData(userId: $userId, message: $message, dateTime: $dateTime, isRead: $isRead)';
+    return 'MessageData(isMyMessage: $isMyMessage, message: $message, dateTime: $dateTime, isRead: $isRead)';
   }
 
   @override
@@ -150,7 +150,8 @@ class _$MessageDataImpl implements _MessageData {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$MessageDataImpl &&
-            (identical(other.userId, userId) || other.userId == userId) &&
+            (identical(other.isMyMessage, isMyMessage) ||
+                other.isMyMessage == isMyMessage) &&
             (identical(other.message, message) || other.message == message) &&
             (identical(other.dateTime, dateTime) ||
                 other.dateTime == dateTime) &&
@@ -159,7 +160,7 @@ class _$MessageDataImpl implements _MessageData {
 
   @override
   int get hashCode =>
-      Object.hash(runtimeType, userId, message, dateTime, isRead);
+      Object.hash(runtimeType, isMyMessage, message, dateTime, isRead);
 
   @JsonKey(ignore: true)
   @override
@@ -170,13 +171,13 @@ class _$MessageDataImpl implements _MessageData {
 
 abstract class _MessageData implements MessageData {
   const factory _MessageData(
-      {required final String userId,
+      {required final bool isMyMessage,
       required final String message,
       required final DateTime dateTime,
       required final bool isRead}) = _$MessageDataImpl;
 
   @override
-  String get userId;
+  bool get isMyMessage;
   @override
   String get message;
   @override

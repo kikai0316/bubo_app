@@ -7,7 +7,7 @@ part of 'device_list.dart';
 // **************************************************************************
 
 String _$deviseListNotifierHash() =>
-    r'546b145c3ce8c4a1efa22cfbe2b48e4a2f824f59';
+    r'e8e95d52211640fc829cddad8181ee1e95a15628';
 
 /// See also [DeviseListNotifier].
 @ProviderFor(DeviseListNotifier)

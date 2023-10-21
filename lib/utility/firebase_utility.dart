@@ -74,17 +74,14 @@ Future<UserData?> myDataGet(String id) async {
 Future<UserData?> imgMainGet(UserData userData) async {
   try {
     final resultMain =
-        // await FirebaseStorage.instance.ref("${userData.id}/main").listAll();
-        await FirebaseStorage.instance
-            .ref("2WG8m5w5jyOUjgrLHfeGDnXxYX02/main")
-            .listAll();
+        await FirebaseStorage.instance.ref("${userData.id}/main").listAll();
     final mainImgGet = await resultMain.items.first.getData();
     if (mainImgGet != null) {
       final List<String> parts = resultMain.items.first.name.split('@');
       return UserData(
         imgList: [mainImgGet],
         id: userData.id,
-        name: userData.name,
+        name: parts[0],
         birthday: parts[1],
         family: parts[2],
         isGetData: false,
@@ -103,10 +100,7 @@ Future<UserData?> imgOtherGet(UserData userData) async {
   try {
     final List<Uint8List> imgList = [];
     final result =
-        // await FirebaseStorage.instance.ref("${userData.id}/others").listAll();
-        await FirebaseStorage.instance
-            .ref("2WG8m5w5jyOUjgrLHfeGDnXxYX02/others")
-            .listAll();
+        await FirebaseStorage.instance.ref("${userData.id}/others").listAll();
     for (final ref in result.items) {
       final Uint8List? getDate = await ref.getData();
       if (getDate != null) {

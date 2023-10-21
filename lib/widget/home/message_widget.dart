@@ -1,22 +1,27 @@
 import 'dart:math';
-import 'dart:typed_data';
 import 'dart:ui';
+import 'package:bubu_app/component/text.dart';
 import 'package:bubu_app/constant/color.dart';
+import 'package:bubu_app/model/message_data.dart';
+import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/utility.dart';
+import 'package:bubu_app/view/home/swiper.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 
 Widget myChatWidget(
   BuildContext context, {
-  required String messeageText,
-  required DateTime dateTime,
+  required MessageData messeageData,
 }) {
   final safeAreaHeight = safeHeight(context);
   final safeAreaWidth = MediaQuery.of(context).size.width;
 
   return Padding(
     padding: EdgeInsets.only(
-      top: safeAreaHeight * 0.03,
+      top: safeAreaHeight * 0.01,
+      bottom: safeAreaHeight * 0.01,
       left: safeAreaWidth * 0.04,
       right: safeAreaWidth * 0.04,
     ),
@@ -26,13 +31,11 @@ Widget myChatWidget(
       children: [
         Padding(
           padding: EdgeInsets.only(right: safeAreaWidth * 0.01),
-          child: Text(
-            textAlign: TextAlign.end,
-            DateFormat('HH:mm').format(dateTime),
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: safeAreaWidth / 40,
-            ),
+          child: nText(
+            DateFormat('HH:mm').format(messeageData.dateTime),
+            color: Colors.white,
+            fontSize: safeAreaWidth / 40,
+            bold: 700,
           ),
         ),
         Container(
@@ -48,14 +51,11 @@ Widget myChatWidget(
           ),
           child: Padding(
             padding: EdgeInsets.all(safeAreaWidth * 0.03),
-            child: Text(
-              messeageText,
-              style: TextStyle(
-                fontFamily: "Normal",
-                fontVariations: const [FontVariation("wght", 700)],
-                color: Colors.white,
-                fontSize: safeAreaWidth / 30,
-              ),
+            child: nText(
+              messeageData.message,
+              color: Colors.white,
+              fontSize: safeAreaWidth / 30,
+              bold: 700,
             ),
           ),
         ),
@@ -66,9 +66,8 @@ Widget myChatWidget(
 
 Widget recipientChatWidget(
   BuildContext context, {
-  required String messeageText,
-  required Uint8List img,
-  required DateTime dateTime,
+  required MessageData messeageData,
+  required UserData userData,
 }) {
   final safeAreaHeight = safeHeight(context);
   final safeAreaWidth = MediaQuery.of(context).size.width;
@@ -76,6 +75,7 @@ Widget recipientChatWidget(
   return Padding(
     padding: EdgeInsets.only(
       top: safeAreaHeight * 0.01,
+      bottom: safeAreaHeight * 0.01,
       left: safeAreaWidth * 0.03,
       right: safeAreaWidth * 0.03,
     ),
@@ -87,11 +87,15 @@ Widget recipientChatWidget(
           child: Container(
             width: safeAreaHeight * 0.04,
             height: safeAreaHeight * 0.04,
-            decoration: BoxDecoration(
-              image:
-                  DecorationImage(image: MemoryImage(img), fit: BoxFit.cover),
-              shape: BoxShape.circle,
-            ),
+            decoration: userData.imgList.isEmpty
+                ? null
+                : BoxDecoration(
+                    image: DecorationImage(
+                      image: MemoryImage(userData.imgList.first),
+                      fit: BoxFit.cover,
+                    ),
+                    shape: BoxShape.circle,
+                  ),
           ),
         ),
         Expanded(
@@ -111,26 +115,21 @@ Widget recipientChatWidget(
                 ),
                 child: Padding(
                   padding: EdgeInsets.all(safeAreaWidth * 0.03),
-                  child: Text(
-                    messeageText,
-                    style: TextStyle(
-                      fontFamily: "Normal",
-                      fontVariations: const [FontVariation("wght", 700)],
-                      color: Colors.white,
-                      fontSize: safeAreaWidth / 30,
-                    ),
+                  child: nText(
+                    messeageData.message,
+                    color: Colors.white,
+                    fontSize: safeAreaWidth / 30,
+                    bold: 700,
                   ),
                 ),
               ),
               Padding(
                 padding: EdgeInsets.only(left: safeAreaWidth * 0.01),
-                child: Text(
-                  textAlign: TextAlign.end,
-                  DateFormat('HH:mm').format(dateTime),
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: safeAreaWidth / 40,
-                  ),
+                child: nText(
+                  DateFormat('HH:mm').format(messeageData.dateTime),
+                  color: Colors.white,
+                  fontSize: safeAreaWidth / 40,
+                  bold: 700,
                 ),
               ),
             ],
@@ -251,4 +250,128 @@ Widget textFieldWidget({
       ),
     ),
   );
+}
+
+String formatDateLabel(DateTime date) {
+  final now = DateTime.now();
+  final today = DateTime(now.year, now.month, now.day);
+  final yesterday = today.subtract(const Duration(days: 1));
+
+  if (date.isAtSameMomentAs(today)) {
+    return '今日';
+  } else if (date.isAtSameMomentAs(yesterday)) {
+    return '昨日';
+  } else {
+    return '${date.year}/${date.month.toString().padLeft(2, '0')}/${date.day.toString().padLeft(2, '0')}';
+  }
+}
+
+Widget dateLabelWidget(BuildContext context, DateTime date) {
+  final safeAreaHeight = safeHeight(context);
+  final safeAreaWidth = MediaQuery.of(context).size.width;
+  return Padding(
+    padding: EdgeInsets.only(
+      top: safeAreaHeight * 0.03,
+      bottom: safeAreaHeight * 0.02,
+    ),
+    child: Container(
+      padding: const EdgeInsets.all(5.0),
+      width: safeAreaWidth * 0.25,
+      decoration: BoxDecoration(
+        color: Colors.grey.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(50),
+      ),
+      child: nText(
+        formatDateLabel(date),
+        color: Colors.white.withOpacity(0.3),
+        fontSize: safeAreaWidth / 30,
+        bold: 700,
+      ),
+    ),
+  );
+}
+
+class MainImgWidget extends HookConsumerWidget {
+  const MainImgWidget({
+    super.key,
+    required this.userData,
+  });
+  final UserData userData;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isTapEvent = useState<bool>(false);
+    final safeAreaHeight = safeHeight(context);
+    return GestureDetector(
+      onTap: () {
+        isTapEvent.value = false;
+        Navigator.push<Widget>(
+          context,
+          PageRouteBuilder(
+            transitionDuration: const Duration(milliseconds: 500),
+            pageBuilder: (_, __, ___) =>
+                SwiperPage(isMyData: false, index: 0, storyList: [userData]),
+          ),
+        );
+      },
+      onTapDown: (TapDownDetails downDetails) {
+        isTapEvent.value = true;
+      },
+      onTapCancel: () {
+        isTapEvent.value = false;
+      },
+      child: Hero(
+        tag: userData.id,
+        child: Container(
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: userData.isView ? Colors.grey.withOpacity(0.5) : null,
+            gradient: userData.isView
+                ? null
+                : const LinearGradient(
+                    begin: FractionalOffset.topRight,
+                    end: FractionalOffset.bottomLeft,
+                    colors: [
+                      Color.fromARGB(255, 4, 15, 238),
+                      Color.fromARGB(255, 6, 120, 255),
+                      Color.fromARGB(255, 4, 200, 255),
+                    ],
+                  ),
+          ),
+          child: Padding(
+            padding: EdgeInsets.all(safeAreaHeight * 0.0035),
+            child: Container(
+              alignment: Alignment.center,
+              height: double.infinity,
+              width: double.infinity,
+              decoration: const BoxDecoration(
+                color: blackColor,
+                shape: BoxShape.circle,
+              ),
+              child: Padding(
+                padding: EdgeInsets.all(safeAreaHeight * 0.004),
+                child: Container(
+                  height: double.infinity,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    shape: BoxShape.circle,
+                    image: userData.imgList.isEmpty
+                        ? null
+                        : DecorationImage(
+                            image: MemoryImage(
+                              userData.imgList.first,
+                            ),
+                            fit: BoxFit.cover,
+                          ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
