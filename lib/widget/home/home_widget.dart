@@ -19,19 +19,19 @@ class OnStory extends HookConsumerWidget {
     required this.userData,
     required this.onTap,
     required this.index,
-    required this.height,
-    required this.width,
+    required this.isNearby,
   });
   final UserData userData;
   final void Function() onTap;
   final int index;
-  final double height;
-  final double width;
   final bool isMyData;
+  final bool isNearby;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isTapEvent = useState<bool>(false);
+    final safeAreaWidth = MediaQuery.of(context).size.width;
+    final safeAreaHeight = safeHeight(context);
     useEffect(
       () {
         var cancelled = false;
@@ -39,10 +39,10 @@ class OnStory extends HookConsumerWidget {
           Future(() async {
             if (userData.imgList.isEmpty) {
               final getData = await imgMainGet(userData);
-              if (cancelled) return; // もしキャンセルされたら、ここで処理を終了
+              if (cancelled) return;
               if (getData != null) {
                 final notifier = ref.read(storyListNotifierProvider.notifier);
-                notifier.mainImgUpDate(getData);
+                notifier.dataUpDate(getData);
               }
             }
           });
@@ -54,7 +54,7 @@ class OnStory extends HookConsumerWidget {
       [],
     );
     return Padding(
-      padding: EdgeInsets.only(right: height * 0.03),
+      padding: EdgeInsets.only(right: safeAreaHeight * 0.02),
       child: GestureDetector(
         onTap: () {
           isTapEvent.value = false;
@@ -70,37 +70,42 @@ class OnStory extends HookConsumerWidget {
           tag: userData.id,
           child: Container(
             alignment: Alignment.center,
-            height: height * 0.13,
-            width: height * 0.105,
+            height: safeAreaHeight * 0.13,
+            width: safeAreaHeight * 0.105,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Expanded(
                   child: Padding(
                     padding: EdgeInsets.all(
-                      isTapEvent.value ? width * 0.008 : 0,
+                      isTapEvent.value ? safeAreaWidth * 0.008 : 0,
                     ),
                     child: Container(
                       alignment: Alignment.center,
-                      height: height * 0.105,
-                      width: height * 0.105,
-                      decoration: const BoxDecoration(
+                      height: safeAreaHeight * 0.105,
+                      width: safeAreaHeight * 0.105,
+                      decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        gradient: LinearGradient(
-                          begin: FractionalOffset.topRight,
-                          end: FractionalOffset.bottomLeft,
-                          colors: [
-                            Color.fromARGB(255, 4, 15, 238),
-                            Color.fromARGB(255, 6, 120, 255),
-                            Color.fromARGB(255, 4, 200, 255),
-                          ],
-                        ),
+                        color: userData.isView
+                            ? Colors.grey.withOpacity(0.5)
+                            : null,
+                        gradient: userData.isView
+                            ? null
+                            : const LinearGradient(
+                                begin: FractionalOffset.topRight,
+                                end: FractionalOffset.bottomLeft,
+                                colors: [
+                                  Color.fromARGB(255, 4, 15, 238),
+                                  Color.fromARGB(255, 6, 120, 255),
+                                  Color.fromARGB(255, 4, 200, 255),
+                                ],
+                              ),
                       ),
                       child: Stack(
                         alignment: Alignment.center,
                         children: [
                           Padding(
-                            padding: EdgeInsets.all(height * 0.004),
+                            padding: EdgeInsets.all(safeAreaHeight * 0.0035),
                             child: Container(
                               alignment: Alignment.center,
                               height: double.infinity,
@@ -110,7 +115,7 @@ class OnStory extends HookConsumerWidget {
                                 shape: BoxShape.circle,
                               ),
                               child: Padding(
-                                padding: EdgeInsets.all(height * 0.0035),
+                                padding: EdgeInsets.all(safeAreaHeight * 0.004),
                                 child: Container(
                                   height: double.infinity,
                                   width: double.infinity,
@@ -137,8 +142,8 @@ class OnStory extends HookConsumerWidget {
                                 onTap: () {},
                                 child: Container(
                                   alignment: Alignment.center,
-                                  height: height * 0.038,
-                                  width: height * 0.038,
+                                  height: safeAreaHeight * 0.038,
+                                  width: safeAreaHeight * 0.038,
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     shape: BoxShape.circle,
@@ -153,31 +158,33 @@ class OnStory extends HookConsumerWidget {
                                   child: Icon(
                                     Icons.add,
                                     color: blueColor,
-                                    size: width / 18,
+                                    size: safeAreaWidth / 18,
                                   ),
                                 ),
                               ),
                             ),
                           } else ...{
-                            Align(
-                              alignment: Alignment.bottomRight,
-                              child: Container(
-                                alignment: Alignment.center,
-                                height: height * 0.03,
-                                width: height * 0.03,
-                                decoration: BoxDecoration(
-                                  color: greenColor,
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: greenColor.withOpacity(0.5),
-                                      blurRadius: 10,
-                                      spreadRadius: 1.0,
-                                    ),
-                                  ],
+                            if (isNearby) ...{
+                              Align(
+                                alignment: Alignment.bottomRight,
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  height: safeAreaHeight * 0.03,
+                                  width: safeAreaHeight * 0.03,
+                                  decoration: BoxDecoration(
+                                    color: greenColor,
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: greenColor.withOpacity(0.5),
+                                        blurRadius: 10,
+                                        spreadRadius: 1.0,
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
+                            },
                           },
                         ],
                       ),
@@ -185,11 +192,11 @@ class OnStory extends HookConsumerWidget {
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(top: height * 0.005),
+                  padding: EdgeInsets.only(top: safeAreaHeight * 0.005),
                   child: nText(
                     userData.name,
                     color: Colors.white.withOpacity(0.9),
-                    fontSize: width / 35,
+                    fontSize: safeAreaWidth / 35,
                     bold: 500,
                   ),
                 ),

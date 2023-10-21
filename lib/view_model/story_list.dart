@@ -42,7 +42,23 @@ class StoryListNotifier extends _$StoryListNotifier {
     }
   }
 
-  Future<void> mainImgUpDate(UserData newUserData) async {
+  Future<void> dataUpDate(UserData newUserData) async {
+    final int index =
+        state.value!.indexWhere((userData) => userData.id == newUserData.id);
+    if (index != -1) {
+      final setList = [...state.value!];
+      setList[index] = newUserData;
+      final isLocalWrite = await writeStoryData(setList);
+      if (isLocalWrite) {
+        state = const AsyncValue.loading();
+        state = await AsyncValue.guard(() async {
+          return setList;
+        });
+      }
+    }
+  }
+
+  Future<void> isViwUpDate(UserData newUserData) async {
     final int index =
         state.value!.indexWhere((userData) => userData.id == newUserData.id);
     if (index != -1) {

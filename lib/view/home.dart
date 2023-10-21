@@ -3,6 +3,8 @@ import 'package:bubu_app/component/text.dart';
 import 'package:bubu_app/constant/color.dart';
 import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/utility.dart';
+import 'package:bubu_app/view/home/swiper.dart';
+import 'package:bubu_app/view_model/device_list.dart';
 import 'package:bubu_app/view_model/story_list.dart';
 import 'package:bubu_app/widget/home/home_widget.dart';
 import 'package:flutter/material.dart';
@@ -17,65 +19,67 @@ class HomePage extends HookConsumerWidget {
     final safeAreaHeight = safeHeight(context);
     final safeAreaWidth = MediaQuery.of(context).size.width;
     final storyList = ref.watch(storyListNotifierProvider);
+    final deviceList = ref.watch(deviseListNotifierProvider);
     final storyListWhen = storyList.when(
-      data: (value) => Column(
-        children: [
-          Align(
-            alignment: Alignment.centerRight,
-            child: Padding(
-              padding: EdgeInsets.only(
-                bottom: safeAreaHeight * 0.01,
-                right: safeAreaWidth * 0.03,
-              ),
-              child: nText(
-                "今日すれ違った数：${value.length}人",
-                color: Colors.white,
-                fontSize: safeAreaWidth / 35,
-                bold: 500,
+      data: (value) {
+        final setData = sortUserData(value, deviceList);
+        return Column(
+          children: [
+            Align(
+              alignment: Alignment.centerRight,
+              child: Padding(
+                padding: EdgeInsets.only(
+                  bottom: safeAreaHeight * 0.01,
+                  right: safeAreaWidth * 0.03,
+                ),
+                child: nText(
+                  "今日すれ違った数：${value.length}人",
+                  color: Colors.white,
+                  fontSize: safeAreaWidth / 35,
+                  bold: 500,
+                ),
               ),
             ),
-          ),
-          SizedBox(
-            width: safeAreaWidth * 1,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  SizedBox(
-                    width: safeAreaWidth * 0.02,
-                  ),
-                  for (int i = 0; i < value.length + 1; i++) ...{
-                    OnStory(
-                      // key: ValueKey(" ${deviceList.value[i]} $i"),
-                      userData: i == 0 ? userData : value[i - 1],
-                      isMyData: i == 0,
-                      index: i,
-                      height: safeAreaHeight,
-                      width: safeAreaWidth,
-                      onTap: () {
-                        // final castUserData = toMapCast(userData);
-                        // final setList = [
-                        //   castUserData,
-                        //   ...value,
-                        // ];
-                        // Navigator.push<Widget>(
-                        //   context,
-                        //   PageRouteBuilder(
-                        //     transitionDuration:
-                        //         const Duration(milliseconds: 500),
-                        //     pageBuilder: (_, __, ___) =>
-                        //         SwiperPage(index: i, storyList: [userData]),
-                        //   ),
-                        // );
-                      },
+            SizedBox(
+              width: safeAreaWidth * 1,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: safeAreaWidth * 0.02,
                     ),
-                  },
-                ],
+                    for (int i = 0; i < setData.length + 1; i++) ...{
+                      OnStory(
+                        // key: ValueKey(" ${deviceList.value[i]} $i"),
+                        userData: i == 0 ? userData : setData[i - 1],
+                        isMyData: i == 0,
+                        isNearby:
+                            i > 0 && deviceList.contains(setData[i - 1].id),
+                        index: i,
+                        onTap: () {
+                          Navigator.push<Widget>(
+                            context,
+                            PageRouteBuilder(
+                              transitionDuration:
+                                  const Duration(milliseconds: 500),
+                              pageBuilder: (_, __, ___) => SwiperPage(
+                                isMyData: i == 0,
+                                index: i,
+                                storyList: i == 0 ? [userData] : setData,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    },
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
-      ),
+          ],
+        );
+      },
       error: (e, s) => storyErrorWidget(
         context,
       ),
@@ -248,4 +252,24 @@ class HomePage extends HookConsumerWidget {
       ),
     );
   }
+}
+
+List<UserData> sortUserData(List<UserData> data, List<String> idList) {
+  final List<UserData> list1 = [];
+  final List<UserData> list2 = [];
+  final List<UserData> list3 = [];
+  final List<UserData> list4 = [];
+
+  for (final user in data) {
+    if (idList.contains(user.id) && !user.isView) {
+      list1.add(user);
+    } else if (idList.contains(user.id) && user.isView) {
+      list2.add(user);
+    } else if (!idList.contains(user.id) && !user.isView) {
+      list3.add(user);
+    } else if (!idList.contains(user.id) && user.isView) {
+      list4.add(user);
+    }
+  }
+  return [...list1, ...list2, ...list3, ...list4];
 }

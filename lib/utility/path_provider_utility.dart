@@ -64,9 +64,14 @@ Future<bool> writeStoryData(List<UserData> data) async {
   try {
     final list = [];
     for (final item in data) {
+      final toBase64 = item.imgList.map((data) => base64Encode(data)).toList();
       final setData = <String, dynamic>{
+        "img": toBase64,
         "id": item.id,
         "name": item.name,
+        "birthday": item.birthday,
+        "family": item.family,
+        "isGetData": item.isGetData,
         "isView": item.isView,
         "acquisitionAt": item.acquisitionAt.toString(),
       };
@@ -92,19 +97,21 @@ Future<List<UserData>> readStoryData() async {
     );
 
     for (final item in storyList) {
+      final imgListDecode = (item["img"] as List<dynamic>)
+          .map((dynamic base64String) => base64Decode(base64String as String))
+          .toList();
       final setData = UserData(
-        imgList: [],
+        imgList: imgListDecode,
         id: item["id"] as String,
         name: item["name"] as String,
-        birthday: "",
-        family: "",
-        isGetData: false,
+        birthday: item["birthday"] as String,
+        family: item["family"] as String,
+        isGetData: item["isGetData"] as bool,
         isView: item["isView"] as bool,
         acquisitionAt: DateTime.parse(
           item["acquisitionAt"] as String,
         ),
       );
-
       list.add(setData);
     }
     return list;

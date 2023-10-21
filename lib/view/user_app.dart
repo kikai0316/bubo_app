@@ -22,9 +22,10 @@ class UserApp extends HookConsumerWidget {
     final safeAreaWidth = MediaQuery.of(context).size.width;
     final loadingNotifier = ref.watch(loadingNotifierProvider);
     final selectInt = useState<int>(0);
-
+    final isBottomsheet = useState<bool>(false);
     final notifier = ref.watch(userDataNotifierProvider);
     Future<void> showNotImgPage(BuildContext context, UserData userData) async {
+      isBottomsheet.value = true;
       await Future<void>.delayed(const Duration(seconds: 1));
       // ignore: use_build_context_synchronously
       bottomSheet(
@@ -40,7 +41,7 @@ class UserApp extends HookConsumerWidget {
     final notifierWhen = notifier.when(
       data: (data) {
         if (data != null) {
-          if (data.imgList.isEmpty) {
+          if (data.imgList.isEmpty && !isBottomsheet.value) {
             showNotImgPage(context, data);
             return null;
           } else {

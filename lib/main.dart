@@ -22,6 +22,7 @@ class MyApp extends HookConsumerWidget {
   });
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // FirebaseAuth.instance.signOut();
     final User? user = FirebaseAuth.instance.currentUser;
     final notifier = ref.watch(userDataNotifierProvider);
     final notifierWhen = notifier.when(

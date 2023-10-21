@@ -1,8 +1,12 @@
-import 'dart:typed_data';
 import 'package:bubu_app/component/text.dart';
+import 'package:bubu_app/constant/color.dart';
 import 'package:bubu_app/model/user_data.dart';
+import 'package:bubu_app/utility/firebase_utility.dart';
 import 'package:bubu_app/utility/utility.dart';
 import 'package:bubu_app/view/home/message_sheet.dart';
+import 'package:bubu_app/view_model/device_list.dart';
+import 'package:bubu_app/view_model/story_list.dart';
+import 'package:bubu_app/view_model/user_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_carousel_slider/carousel_slider.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -16,35 +20,23 @@ class SwiperPage extends HookConsumerWidget {
     super.key,
     required this.index,
     required this.storyList,
+    required this.isMyData,
   });
   final int index;
-  // final List<Map<String, dynamic>> storyList;
+  final bool isMyData;
   final List<UserData> storyList;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final pageIndex = useState<int>(index + 1);
     final safeAreaHeight = safeHeight(context);
+    final deviceList = ref.watch(deviseListNotifierProvider);
     final safeAreaWidth = MediaQuery.of(context).size.width;
     final isMove = useState<bool>(false);
+
     final scrollBack = useState<double>(0);
-    final imgList = useState<List<List<Uint8List>>>([]);
-
-    Future<void> compressImage() async {
-      for (int i = 0; i < storyList.length; i++) {
-        // final List<Uint8List> list = [];
-        // for (int a = 0; a < storyList[i].imgList.length; a++) {
-        //   final compressedResult = await FlutterImageCompress.compressWithList(
-        //     storyList[i].imgList[a],
-        //     quality: 50, // 0-100間で圧縮の品質を指定します。ここでは70%の品質で圧縮しています。
-        //   );
-        //   list.add(Uint8List.fromList(compressedResult));
-        // }
-        imgList.value = [...imgList.value, storyList[i].imgList];
-      }
-    }
-
+    final dataList = useState<List<UserData>>([...storyList]);
     bool isNotScreen(int index) {
-      if (index == 0 || index == storyList.length + 1) {
+      if (index == 0 || index == dataList.value.length + 1) {
         return true;
       } else {
         return false;
@@ -57,17 +49,49 @@ class SwiperPage extends HookConsumerWidget {
       isMove.value = false;
     }
 
+    Future<void> fetchAndUpdate(int index) async {
+      final getImg = await imgOtherGet(dataList.value[index]);
+      if (getImg != null && !dataList.value[index].isGetData) {
+        if (context.mounted) {
+          final notifier = ref.read(storyListNotifierProvider.notifier);
+          notifier.dataUpDate(getImg);
+          dataList.value[index] = getImg;
+          dataList.value = [...dataList.value];
+        }
+      }
+    }
+
+    Future<void> getOthers(int dataIndex) async {
+      if (!dataList.value[dataIndex].isGetData) {
+        fetchAndUpdate(dataIndex);
+      }
+      if (dataIndex + 1 < dataList.value.length &&
+          !dataList.value[dataIndex + 1].isGetData) {
+        fetchAndUpdate(dataIndex + 1);
+      }
+      if (dataIndex - 1 >= 0 && !dataList.value[dataIndex - 1].isGetData) {
+        fetchAndUpdate(dataIndex - 1);
+      } else if (dataIndex + 2 < dataList.value.length &&
+          !dataList.value[dataIndex + 2].isGetData) {
+        fetchAndUpdate(dataIndex + 2);
+      }
+    }
+
     useEffect(
       () {
-        compressImage();
+        getOthers(index);
         void listener() {
-          if (scrollController.offset < -60) {
-            if (scrollBack.value > scrollController.offset) {
-              scrollBack.value = scrollController.offset;
-            } else {
-              Navigator.pop(context);
-              scrollController.removeListener(listener);
+          try {
+            if (scrollController.offset < -60) {
+              if (scrollBack.value > scrollController.offset) {
+                scrollBack.value = scrollController.offset;
+              } else {
+                Navigator.pop(context);
+                scrollController.removeListener(listener);
+              }
             }
+          } catch (e) {
+            return;
           }
         }
 
@@ -80,7 +104,11 @@ class SwiperPage extends HookConsumerWidget {
     );
 
     return Hero(
-      tag: storyList.first.id,
+      tag: pageIndex.value == 0
+          ? dataList.value[0].id
+          : pageIndex.value == dataList.value.length + 1
+              ? dataList.value[dataList.value.length - 1].id
+              : dataList.value[pageIndex.value - 1].id,
       child: Stack(
         children: [
           Scaffold(
@@ -91,14 +119,16 @@ class SwiperPage extends HookConsumerWidget {
               child: CarouselSlider.builder(
                 controller: controller,
                 initialPage: index + 1,
-                onSlideChanged: (value) {
+                onSlideChanged: (value) async {
                   if (isNotScreen(value)) {
                     Navigator.pop(context);
+                  } else {
+                    getOthers(value - 1);
                   }
                   pageIndex.value = value;
                 },
                 slideTransform: const CubeTransform(),
-                itemCount: imgList.value.length + 2,
+                itemCount: dataList.value.length + 2,
                 slideBuilder: (index) {
                   if (isNotScreen(index)) {
                     return Container(
@@ -106,7 +136,7 @@ class SwiperPage extends HookConsumerWidget {
                       color: Colors.black,
                     );
                   } else {
-                    return imgList.value.isEmpty
+                    return dataList.value.isEmpty
                         ? Container()
                         : SingleChildScrollView(
                             controller: scrollController,
@@ -116,7 +146,10 @@ class SwiperPage extends HookConsumerWidget {
                                   height: safeAreaHeight * 0.93,
                                   width: safeAreaWidth * 1,
                                   child: OnSwiper(
-                                    data: imgList.value[index - 1],
+                                    isMyData: isMyData,
+                                    isNearby: deviceList
+                                        .contains(dataList.value[index - 1].id),
+                                    data: dataList.value[index - 1],
                                     onNext: () {
                                       moveAnimation();
                                       controller.nextPage(
@@ -221,11 +254,15 @@ class SwiperPage extends HookConsumerWidget {
 class OnSwiper extends HookConsumerWidget {
   const OnSwiper({
     super.key,
+    required this.isMyData,
+    required this.isNearby,
     required this.data,
     required this.onNext,
     required this.onBack,
   });
-  final List<Uint8List> data;
+  final UserData data;
+  final bool isMyData;
+  final bool isNearby;
   final void Function() onNext;
   final void Function() onBack;
 
@@ -233,54 +270,65 @@ class OnSwiper extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final safeAreaWidth = MediaQuery.of(context).size.width;
     final safeAreaHeight = safeHeight(context);
-    final imgIndex = useState<int>(0);
-    // precacheImages(context, data.imgList);
+    final imgIndex = useState<int>(data.isView ? data.imgList.length - 1 : 0);
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        image: DecorationImage(
-          image: MemoryImage(data[imgIndex.value]),
-          fit: BoxFit.cover,
-        ),
+        image: data.isGetData
+            ? DecorationImage(
+                image: MemoryImage(data.imgList[imgIndex.value]),
+                fit: BoxFit.cover,
+              )
+            : null,
         borderRadius: BorderRadius.circular(15),
       ),
       child: Stack(
         children: [
-          // for (int i = 0; i < data.imgList.length; i++) ...{
-          //   Opacity(
-          //     opacity: i == imgIndex.value ? 1 : 0,
-          //     child: Container(
-          //       width: double.infinity,
-          //       decoration: BoxDecoration(
-          //         image: DecorationImage(
-          //           image: MemoryImage(data.imgList[i]),
-          //           fit: BoxFit.cover,
-          //         ),
-          //         borderRadius: BorderRadius.circular(15),
-          //       ),
-          //     ),
-          //   )
-          // },
           Row(
             children: [
               for (int i = 0; i < 2; i++) ...{
                 Expanded(
                   child: GestureDetector(
-                    onTap: () {
-                      if (i == 0) {
-                        if (imgIndex.value > 0) {
-                          imgIndex.value--;
-                        } else {
-                          onBack();
-                        }
-                      } else {
-                        if (imgIndex.value < data.length - 1) {
-                          imgIndex.value++;
-                        } else {
-                          onNext();
-                        }
-                      }
-                    },
+                    onTap: context.mounted
+                        ? () {
+                            if (i == 0) {
+                              if (imgIndex.value > 0) {
+                                imgIndex.value--;
+                              } else {
+                                onBack();
+                              }
+                            } else {
+                              if (imgIndex.value < data.imgList.length - 1) {
+                                imgIndex.value++;
+                                if (imgIndex.value == data.imgList.length - 1) {
+                                  final setData = UserData(
+                                    imgList: data.imgList,
+                                    id: data.id,
+                                    name: data.name,
+                                    acquisitionAt: data.acquisitionAt,
+                                    isGetData: data.isGetData,
+                                    isView: true,
+                                    birthday: data.birthday,
+                                    family: data.family,
+                                  );
+                                  if (isMyData) {
+                                    final notifier = ref.read(
+                                      userDataNotifierProvider.notifier,
+                                    );
+                                    notifier.isViewupData();
+                                  } else {
+                                    final notifier = ref.read(
+                                      storyListNotifierProvider.notifier,
+                                    );
+                                    notifier.dataUpDate(setData);
+                                  }
+                                }
+                              } else {
+                                onNext();
+                              }
+                            }
+                          }
+                        : null,
                     child: Container(
                       height: double.infinity,
                       color: Colors.black.withOpacity(0),
@@ -314,26 +362,36 @@ class OnSwiper extends HookConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        for (int i = 0; i < data.length; i++) ...{
-                          Expanded(
-                            child: Opacity(
-                              opacity: i == imgIndex.value ? 1 : 0.4,
-                              child: Container(
-                                height: safeAreaHeight * 0.005,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(50),
+                    if (!data.isGetData) ...{
+                      Container(
+                        height: safeAreaHeight * 0.005,
+                        decoration: BoxDecoration(
+                          color: Colors.grey,
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                      ),
+                    } else ...{
+                      Row(
+                        children: [
+                          for (int i = 0; i < data.imgList.length; i++) ...{
+                            Expanded(
+                              child: Opacity(
+                                opacity: i == imgIndex.value ? 1 : 0.4,
+                                child: Container(
+                                  height: safeAreaHeight * 0.005,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(50),
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                          if (i < data.length - 1)
-                            SizedBox(width: safeAreaWidth * 0.01),
-                        },
-                      ],
-                    ),
+                            if (i < data.imgList.length - 1)
+                              SizedBox(width: safeAreaWidth * 0.01),
+                          },
+                        ],
+                      ),
+                    },
                     SizedBox(height: safeAreaHeight * 0.01),
                     FittedBox(
                       fit: BoxFit.fitWidth,
@@ -346,21 +404,21 @@ class OnSwiper extends HookConsumerWidget {
                               children: [
                                 Container(
                                   constraints: BoxConstraints(
-                                    maxWidth: safeAreaWidth * 0.6,
+                                    maxWidth: safeAreaWidth * 0.7,
                                   ),
                                   child: nTextWithShadow(
                                     // data.name,
-                                    "ああああああああああああああああ",
+                                    "あああああああああああああああああ",
                                     color: Colors.white,
-                                    fontSize: safeAreaWidth / 22,
-                                    bold: 400,
+                                    fontSize: safeAreaWidth / 16,
+                                    bold: 700,
                                   ),
                                 ),
                                 nTextWithShadow(
                                   "（ 21 ）",
                                   color: Colors.white,
                                   fontSize: safeAreaWidth / 26,
-                                  bold: 400,
+                                  bold: 700,
                                 ),
                               ],
                             ),
@@ -389,6 +447,28 @@ class OnSwiper extends HookConsumerWidget {
               ),
             ),
           ),
+          if (!isMyData)
+            Align(
+              alignment: Alignment.bottomRight,
+              child: Padding(
+                padding: EdgeInsets.all(safeAreaWidth * 0.03),
+                child: Container(
+                  alignment: Alignment.center,
+                  height: safeAreaHeight * 0.04,
+                  width: safeAreaWidth * 0.3,
+                  decoration: BoxDecoration(
+                    color: isNearby ? greenColor : Colors.grey,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: nText(
+                    "付近いいます",
+                    color: isNearby ? Colors.white : Colors.black,
+                    fontSize: safeAreaWidth / 25,
+                    bold: 700,
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );

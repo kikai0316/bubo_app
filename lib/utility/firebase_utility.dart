@@ -73,22 +73,56 @@ Future<UserData?> myDataGet(String id) async {
 
 Future<UserData?> imgMainGet(UserData userData) async {
   try {
-    final List<Uint8List> imgList = [];
-    // final List<String> userDataList = [];
     final resultMain =
-        await FirebaseStorage.instance.ref("${userData.id}/main").listAll();
+        // await FirebaseStorage.instance.ref("${userData.id}/main").listAll();
+        await FirebaseStorage.instance
+            .ref("2WG8m5w5jyOUjgrLHfeGDnXxYX02/main")
+            .listAll();
     final mainImgGet = await resultMain.items.first.getData();
     if (mainImgGet != null) {
-      imgList.add(mainImgGet);
       final List<String> parts = resultMain.items.first.name.split('@');
       return UserData(
-        imgList: imgList,
+        imgList: [mainImgGet],
         id: userData.id,
         name: userData.name,
         birthday: parts[1],
         family: parts[2],
         isGetData: false,
-        isView: false,
+        isView: userData.isView,
+        acquisitionAt: userData.acquisitionAt,
+      );
+    } else {
+      return null;
+    }
+  } on FirebaseException {
+    return null;
+  }
+}
+
+Future<UserData?> imgOtherGet(UserData userData) async {
+  try {
+    final List<Uint8List> imgList = [];
+    final result =
+        // await FirebaseStorage.instance.ref("${userData.id}/others").listAll();
+        await FirebaseStorage.instance
+            .ref("2WG8m5w5jyOUjgrLHfeGDnXxYX02/others")
+            .listAll();
+    for (final ref in result.items) {
+      final Uint8List? getDate = await ref.getData();
+      if (getDate != null) {
+        imgList.add(getDate);
+      }
+    }
+
+    if (imgList.isNotEmpty) {
+      return UserData(
+        imgList: [...userData.imgList, ...imgList],
+        id: userData.id,
+        name: userData.name,
+        birthday: userData.birthday,
+        family: userData.family,
+        isGetData: true,
+        isView: userData.isView,
         acquisitionAt: userData.acquisitionAt,
       );
     } else {
