@@ -12,11 +12,52 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class NotImgPage extends HookConsumerWidget {
-  const NotImgPage({super.key, required this.userData, required this.onTap});
+// class NotImgPage extends HookConsumerWidget {
+//   const NotImgPage({
+//     super.key,
+//     required this.userData,
+//   });
+//   final UserData userData;
+//   @override
+//   Widget build(BuildContext context, WidgetRef ref) {
+//     final isLoading = useState<bool>(true);
+//     useEffect(
+//       () {
+//         var cancelled = false;
+//         Future(() async {
+//           await Future<void>.delayed(const Duration(seconds: 1));
+//           if (cancelled) return;
+//           isLoading.value = false;
+//           //ignore: use_build_context_synchronously
+//           bottomSheet(
+//             context,
+//             isPOP: false,
+//             page: NotImgSheet(
+//               userData: userData,
+//             ),
+//             isBackgroundColor: false,
+//           );
+//         });
+//         return () {
+//           cancelled = true;
+//         };
+//       },
+//       [],
+//     );
+//     return Scaffold(
+//       backgroundColor: blackColor,
+//       body:
+//           loadinPage(context: context, isLoading: isLoading.value, text: null),
+//     );
+//   }
+// }
 
+class NotImgSheet extends HookConsumerWidget {
+  const NotImgSheet({
+    super.key,
+    required this.userData,
+  });
   final UserData userData;
-  final void Function() onTap;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final safeAreaHeight = safeHeight(context);
@@ -49,15 +90,16 @@ class NotImgPage extends HookConsumerWidget {
           name: userData.name,
           birthday: userData.birthday,
           family: userData.family,
+          isGetData: true,
+          isView: false,
+          acquisitionAt: null,
         );
         final iswWite = await writeUserData(setData);
         if (iswWite) {
           final notifier = ref.read(userDataNotifierProvider.notifier);
           notifier.reLoad();
-          await Future<void>.delayed(const Duration(seconds: 1));
           // ignore: use_build_context_synchronously
           Navigator.pop(context);
-          onTap();
         } else {
           showSnackbar();
         }
@@ -138,7 +180,7 @@ class NotImgPage extends HookConsumerWidget {
                                             onSuccess: (value) =>
                                                 imgList.value = [
                                               ...imgList.value,
-                                              value
+                                              value,
                                             ],
                                             onError: () => errorSnackbar(
                                               context,
@@ -163,7 +205,7 @@ class NotImgPage extends HookConsumerWidget {
                                       imgList.value = [...imgList.value];
                                     },
                                   ),
-                                }
+                                },
                               ],
                             ),
                           ),
@@ -197,7 +239,7 @@ class NotImgPage extends HookConsumerWidget {
             context: context,
             isLoading: isLoading.value,
             text: upLoadMesse.value,
-          )
+          ),
         ],
       ),
     );

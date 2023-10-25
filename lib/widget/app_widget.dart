@@ -26,7 +26,7 @@ PreferredSizeWidget? appBarWidget(BuildContext context, String title) {
               size: safeAreaWidth / 13,
             ),
           ),
-        )
+        ),
       ],
     ),
     shape: const RoundedRectangleBorder(

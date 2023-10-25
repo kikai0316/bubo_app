@@ -19,4 +19,31 @@ class UserDataNotifier extends _$UserDataNotifier {
       return getData;
     });
   }
+
+  Future<void> isViewupData() async {
+    final setData = UserData(
+      imgList: state.value!.imgList,
+      id: state.value!.id,
+      name: state.value!.name,
+      birthday: state.value!.birthday,
+      family: state.value!.family,
+      isGetData: true,
+      isView: true,
+      acquisitionAt: null,
+    );
+    final iswWite = await writeUserData(setData);
+    if (iswWite) {
+      state = const AsyncValue.loading();
+      state = await AsyncValue.guard(() async {
+        return setData;
+      });
+    }
+  }
+
+  Future<void> resetDate() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      return null;
+    });
+  }
 }

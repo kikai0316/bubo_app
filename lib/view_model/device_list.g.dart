@@ -1,26 +1,27 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'user_data.dart';
+part of 'device_list.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$userDataNotifierHash() => r'e4183983da6e0dd37cdd42a900707ea78f26987d';
+String _$deviseListNotifierHash() =>
+    r'e8e95d52211640fc829cddad8181ee1e95a15628';
 
-/// See also [UserDataNotifier].
-@ProviderFor(UserDataNotifier)
-final userDataNotifierProvider =
-    AutoDisposeAsyncNotifierProvider<UserDataNotifier, UserData?>.internal(
-  UserDataNotifier.new,
-  name: r'userDataNotifierProvider',
+/// See also [DeviseListNotifier].
+@ProviderFor(DeviseListNotifier)
+final deviseListNotifierProvider =
+    AutoDisposeNotifierProvider<DeviseListNotifier, List<String>>.internal(
+  DeviseListNotifier.new,
+  name: r'deviseListNotifierProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$userDataNotifierHash,
+      : _$deviseListNotifierHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$UserDataNotifier = AutoDisposeAsyncNotifier<UserData?>;
+typedef _$DeviseListNotifier = AutoDisposeNotifier<List<String>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

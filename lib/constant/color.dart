@@ -12,3 +12,4 @@ const purpleColor = Color.fromARGB(255, 206, 204, 254);
 const greenColor2 = Color.fromARGB(255, 175, 228, 60);
 const redColor = Color.fromARGB(255, 255, 77, 65);
 const orangeColor = Color.fromARGB(255, 255, 128, 34);
+const blueColor2 = Color.fromARGB(255, 18, 99, 249);

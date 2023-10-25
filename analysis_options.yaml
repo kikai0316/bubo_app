@@ -5,8 +5,8 @@
 include: package:lint/strict.yaml # lint
 analyzer:
   strong-mode:
-    implicit-casts: false
-    implicit-dynamic: false
+    # implicit-casts: false
+    # implicit-dynamic: false
   exclude:
     - lib/**/*.g.dart
     - lib/**/*.gql.dart

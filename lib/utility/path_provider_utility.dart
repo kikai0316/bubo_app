@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:bubu_app/model/message_data.dart';
+import 'package:bubu_app/model/message_list_data.dart';
 import 'package:bubu_app/model/user_data.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -14,7 +16,9 @@ Future<File> _localFile(String fileName) async {
   return File('$path/$fileName');
 }
 
-Future<bool> writeUserData(UserData data) async {
+Future<bool> writeUserData(
+  UserData data,
+) async {
   try {
     final file = await _localFile("user");
     final toBase64 = data.imgList.map((data) => base64Encode(data)).toList();
@@ -23,7 +27,8 @@ Future<bool> writeUserData(UserData data) async {
       "name": data.name,
       "img": toBase64,
       "birthday": data.birthday,
-      "family": data.family
+      "family": data.family,
+      "isView": data.isView,
     };
     final jsonList = jsonEncode(setData);
     await file.writeAsString(jsonList);
@@ -47,6 +52,9 @@ Future<UserData?> readUserData() async {
       birthday: toDecode["birthday"] as String,
       family: "dsas",
       imgList: imgListDecode,
+      isGetData: true,
+      isView: toDecode["isView"] as bool,
+      acquisitionAt: null,
     );
     return setData;
   } catch (e) {
@@ -54,35 +62,149 @@ Future<UserData?> readUserData() async {
   }
 }
 
-Future<void> deleteUserData() async {
+Future<bool> writeStoryData(List<UserData> data) async {
   try {
-    final file = await _localFile("user");
-    file.delete();
+    final list = [];
+    for (final item in data) {
+      final toBase64 = item.imgList.map((data) => base64Encode(data)).toList();
+      final setData = <String, dynamic>{
+        "img": toBase64,
+        "id": item.id,
+        "name": item.name,
+        "birthday": item.birthday,
+        "family": item.family,
+        "isGetData": item.isGetData,
+        "isView": item.isView,
+        "acquisitionAt": item.acquisitionAt.toString(),
+      };
+      list.add(setData);
+    }
+    final file = await _localFile("story");
+    final jsonList = jsonEncode(list);
+    await file.writeAsString(jsonList);
+    return true;
   } catch (e) {
-    return;
+    return false;
   }
 }
 
-Future<UserData?> read() async {
+Future<List<UserData>> readStoryData() async {
   try {
-    final file = await _localFile("user");
-    if (await file.exists()) {
-      final jsonString = await file.readAsString();
-      final jsonData = jsonDecode(jsonString) as Map<String, dynamic>;
-      final imgListDecode = (jsonData["img"] as List<dynamic>)
+    final List<UserData> list = [];
+    final file = await _localFile("story");
+    final rawData = await file.readAsString();
+    final List<Map<String, dynamic>> storyList =
+        List<Map<String, dynamic>>.from(
+      jsonDecode(rawData) as Iterable<dynamic>,
+    );
+
+    for (final item in storyList) {
+      final imgListDecode = (item["img"] as List<dynamic>)
           .map((dynamic base64String) => base64Decode(base64String as String))
           .toList();
-      return UserData(
-        id: jsonData["id"] as String,
-        name: jsonData["name"] as String,
+      final setData = UserData(
         imgList: imgListDecode,
-        birthday: jsonData["birthday"] as String,
-        family: jsonData["family"] as String,
+        id: item["id"] as String,
+        name: item["name"] as String,
+        birthday: item["birthday"] as String,
+        family: item["family"] as String,
+        isGetData: item["isGetData"] as bool,
+        isView: item["isView"] as bool,
+        acquisitionAt: DateTime.parse(
+          item["acquisitionAt"] as String,
+        ),
       );
-    } else {
-      return null;
+      list.add(setData);
     }
+    return list;
   } catch (e) {
-    return null;
+    return [];
+  }
+}
+
+Future<bool> writeMessageData(List<MessageList> data) async {
+  try {
+    final list = [];
+    for (final item in data) {
+      final setData = <String, dynamic>{
+        "id": item.userData.id,
+        "name": item.userData.name,
+        "message": item.message
+            .map(
+              (m) => {
+                "isMyMessage": m.isMyMessage,
+                "message": m.message,
+                "isRead": m.isRead,
+                "dateTime": m.dateTime.toString(),
+              },
+            )
+            .toList(),
+      };
+      list.add(setData);
+    }
+    final file = await _localFile("message");
+    final jsonList = jsonEncode(list);
+    await file.writeAsString(jsonList);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+Future<List<MessageList>> readeMessageData() async {
+  try {
+    final List<MessageList> list = [];
+    final file = await _localFile("message");
+    final rawData = await file.readAsString();
+    final List<Map<String, dynamic>> storyList =
+        List<Map<String, dynamic>>.from(
+      jsonDecode(rawData) as Iterable<dynamic>,
+    );
+    for (final item in storyList) {
+      final messageListDecode =
+          (item["message"] as List<dynamic>).map((dynamic m) {
+        final Map<String, dynamic> cast = m as Map<String, dynamic>;
+        return MessageData(
+          isMyMessage: cast["isMyMessage"] as bool,
+          message: cast["message"] as String,
+          dateTime: DateTime.parse(
+            cast["dateTime"] as String,
+          ),
+          isRead: cast["isRead"] as bool,
+        );
+      }).toList();
+      final setData = MessageList(
+        userData: UserData(
+          id: item["id"] as String,
+          name: item["name"] as String,
+          imgList: [],
+          birthday: "",
+          family: "",
+          isGetData: false,
+          isView: false,
+          acquisitionAt: null,
+        ),
+        message: messageListDecode,
+      );
+      list.add(setData);
+    }
+    return list;
+  } catch (e) {
+    return [];
+  }
+}
+
+Future<bool> deleteAllFile(String id) async {
+  final fileName = ["user", "story", "message"];
+  try {
+    for (int i = 0; i < fileName.length; i++) {
+      final file = await _localFile(fileName[i]);
+      if (file.existsSync()) {
+        await file.delete();
+      }
+    }
+    return true;
+  } catch (e) {
+    return false;
   }
 }

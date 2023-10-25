@@ -112,10 +112,10 @@ class SingInSheetWidget extends HookConsumerWidget {
                                 fontSize: safeAreaWidth / 35,
                                 bold: 400,
                               ),
-                            )
+                            ),
                           },
                           if (errorMessage.value[i] != null) ...{
-                            errorText(errorMessage.value[i]!)
+                            errorText(errorMessage.value[i]!),
                           },
                         },
                         Padding(
@@ -132,11 +132,11 @@ class SingInSheetWidget extends HookConsumerWidget {
                           ),
                         ),
                         if (errorMessage.value[3] != null) ...{
-                          errorText(errorMessage.value[3]!)
+                          errorText(errorMessage.value[3]!),
                         },
                         SizedBox(
                           height: safeAreaHeight * 0.1,
-                        )
+                        ),
                       ],
                     ),
                   ),
@@ -161,6 +161,9 @@ class SingInSheetWidget extends HookConsumerWidget {
                             name: controllerList[2].text,
                             birthday: birthday.value!,
                             family: "",
+                            isGetData: true,
+                            isView: false,
+                            acquisitionAt: null,
                           );
                           onTap(
                             dataSet,
@@ -173,7 +176,7 @@ class SingInSheetWidget extends HookConsumerWidget {
                       },
                     ),
                   ),
-                )
+                ),
               ],
             ),
           ),

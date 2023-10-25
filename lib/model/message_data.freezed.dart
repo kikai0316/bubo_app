@@ -16,7 +16,7 @@ final _privateConstructorUsedError = UnsupportedError(
 
 /// @nodoc
 mixin _$MessageData {
-  UserData get userData => throw _privateConstructorUsedError;
+  bool get isMyMessage => throw _privateConstructorUsedError;
   String get message => throw _privateConstructorUsedError;
   DateTime get dateTime => throw _privateConstructorUsedError;
   bool get isRead => throw _privateConstructorUsedError;
@@ -32,10 +32,7 @@ abstract class $MessageDataCopyWith<$Res> {
           MessageData value, $Res Function(MessageData) then) =
       _$MessageDataCopyWithImpl<$Res, MessageData>;
   @useResult
-  $Res call(
-      {UserData userData, String message, DateTime dateTime, bool isRead});
-
-  $UserDataCopyWith<$Res> get userData;
+  $Res call({bool isMyMessage, String message, DateTime dateTime, bool isRead});
 }
 
 /// @nodoc
@@ -51,16 +48,16 @@ class _$MessageDataCopyWithImpl<$Res, $Val extends MessageData>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? userData = null,
+    Object? isMyMessage = null,
     Object? message = null,
     Object? dateTime = null,
     Object? isRead = null,
   }) {
     return _then(_value.copyWith(
-      userData: null == userData
-          ? _value.userData
-          : userData // ignore: cast_nullable_to_non_nullable
-              as UserData,
+      isMyMessage: null == isMyMessage
+          ? _value.isMyMessage
+          : isMyMessage // ignore: cast_nullable_to_non_nullable
+              as bool,
       message: null == message
           ? _value.message
           : message // ignore: cast_nullable_to_non_nullable
@@ -75,52 +72,40 @@ class _$MessageDataCopyWithImpl<$Res, $Val extends MessageData>
               as bool,
     ) as $Val);
   }
-
-  @override
-  @pragma('vm:prefer-inline')
-  $UserDataCopyWith<$Res> get userData {
-    return $UserDataCopyWith<$Res>(_value.userData, (value) {
-      return _then(_value.copyWith(userData: value) as $Val);
-    });
-  }
 }
 
 /// @nodoc
-abstract class _$$_MessageDataCopyWith<$Res>
+abstract class _$$MessageDataImplCopyWith<$Res>
     implements $MessageDataCopyWith<$Res> {
-  factory _$$_MessageDataCopyWith(
-          _$_MessageData value, $Res Function(_$_MessageData) then) =
-      __$$_MessageDataCopyWithImpl<$Res>;
+  factory _$$MessageDataImplCopyWith(
+          _$MessageDataImpl value, $Res Function(_$MessageDataImpl) then) =
+      __$$MessageDataImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {UserData userData, String message, DateTime dateTime, bool isRead});
-
-  @override
-  $UserDataCopyWith<$Res> get userData;
+  $Res call({bool isMyMessage, String message, DateTime dateTime, bool isRead});
 }
 
 /// @nodoc
-class __$$_MessageDataCopyWithImpl<$Res>
-    extends _$MessageDataCopyWithImpl<$Res, _$_MessageData>
-    implements _$$_MessageDataCopyWith<$Res> {
-  __$$_MessageDataCopyWithImpl(
-      _$_MessageData _value, $Res Function(_$_MessageData) _then)
+class __$$MessageDataImplCopyWithImpl<$Res>
+    extends _$MessageDataCopyWithImpl<$Res, _$MessageDataImpl>
+    implements _$$MessageDataImplCopyWith<$Res> {
+  __$$MessageDataImplCopyWithImpl(
+      _$MessageDataImpl _value, $Res Function(_$MessageDataImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? userData = null,
+    Object? isMyMessage = null,
     Object? message = null,
     Object? dateTime = null,
     Object? isRead = null,
   }) {
-    return _then(_$_MessageData(
-      userData: null == userData
-          ? _value.userData
-          : userData // ignore: cast_nullable_to_non_nullable
-              as UserData,
+    return _then(_$MessageDataImpl(
+      isMyMessage: null == isMyMessage
+          ? _value.isMyMessage
+          : isMyMessage // ignore: cast_nullable_to_non_nullable
+              as bool,
       message: null == message
           ? _value.message
           : message // ignore: cast_nullable_to_non_nullable
@@ -139,15 +124,15 @@ class __$$_MessageDataCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$_MessageData implements _MessageData {
-  const _$_MessageData(
-      {required this.userData,
+class _$MessageDataImpl implements _MessageData {
+  const _$MessageDataImpl(
+      {required this.isMyMessage,
       required this.message,
       required this.dateTime,
       required this.isRead});
 
   @override
-  final UserData userData;
+  final bool isMyMessage;
   @override
   final String message;
   @override
@@ -157,16 +142,16 @@ class _$_MessageData implements _MessageData {
 
   @override
   String toString() {
-    return 'MessageData(userData: $userData, message: $message, dateTime: $dateTime, isRead: $isRead)';
+    return 'MessageData(isMyMessage: $isMyMessage, message: $message, dateTime: $dateTime, isRead: $isRead)';
   }
 
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_MessageData &&
-            (identical(other.userData, userData) ||
-                other.userData == userData) &&
+            other is _$MessageDataImpl &&
+            (identical(other.isMyMessage, isMyMessage) ||
+                other.isMyMessage == isMyMessage) &&
             (identical(other.message, message) || other.message == message) &&
             (identical(other.dateTime, dateTime) ||
                 other.dateTime == dateTime) &&
@@ -175,24 +160,24 @@ class _$_MessageData implements _MessageData {
 
   @override
   int get hashCode =>
-      Object.hash(runtimeType, userData, message, dateTime, isRead);
+      Object.hash(runtimeType, isMyMessage, message, dateTime, isRead);
 
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_MessageDataCopyWith<_$_MessageData> get copyWith =>
-      __$$_MessageDataCopyWithImpl<_$_MessageData>(this, _$identity);
+  _$$MessageDataImplCopyWith<_$MessageDataImpl> get copyWith =>
+      __$$MessageDataImplCopyWithImpl<_$MessageDataImpl>(this, _$identity);
 }
 
 abstract class _MessageData implements MessageData {
   const factory _MessageData(
-      {required final UserData userData,
+      {required final bool isMyMessage,
       required final String message,
       required final DateTime dateTime,
-      required final bool isRead}) = _$_MessageData;
+      required final bool isRead}) = _$MessageDataImpl;
 
   @override
-  UserData get userData;
+  bool get isMyMessage;
   @override
   String get message;
   @override
@@ -201,6 +186,6 @@ abstract class _MessageData implements MessageData {
   bool get isRead;
   @override
   @JsonKey(ignore: true)
-  _$$_MessageDataCopyWith<_$_MessageData> get copyWith =>
+  _$$MessageDataImplCopyWith<_$MessageDataImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

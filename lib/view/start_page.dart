@@ -11,6 +11,7 @@ import 'package:bubu_app/utility/snack_bar_utility.dart';
 import 'package:bubu_app/utility/utility.dart';
 import 'package:bubu_app/view/login/login_sheet.dart';
 import 'package:bubu_app/view/login/singin_sheet.dart';
+import 'package:bubu_app/view/user_app.dart';
 import 'package:bubu_app/view_model/user_data.dart';
 import 'package:bubu_app/widget/login/login_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -43,13 +44,14 @@ class StartPage extends HookConsumerWidget {
       isLoading.value = false;
       if (isSuccess) {
         // ignore: use_build_context_synchronously
-        //後
-        // Navigator.push<Widget>(
-        //   context,
-        //   MaterialPageRoute(
-        //     builder: (context) => const UserApp(),
-        //   ),
-        // );
+        Navigator.push<Widget>(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const UserApp(
+              initPage: 0,
+            ),
+          ),
+        );
       } else {
         showSnackbar("エラーが発生しました。");
       }
@@ -62,7 +64,7 @@ class StartPage extends HookConsumerWidget {
             .signInWithEmailAndPassword(email: email, password: password);
         final User? user = FirebaseAuth.instance.currentUser;
         if (user != null) {
-          final UserData? getData = await getImg(user.uid);
+          final UserData? getData = await myDataGet(user.uid);
           if (getData != null) {
             nextPage(getData);
           } else {
@@ -99,6 +101,9 @@ class StartPage extends HookConsumerWidget {
             name: userData.name,
             birthday: userData.birthday,
             family: "fdsaaa",
+            isGetData: true,
+            isView: false,
+            acquisitionAt: null,
           );
           nextPage(dataSet);
         } else {
@@ -209,14 +214,14 @@ class StartPage extends HookConsumerWidget {
                     ),
                     SizedBox(
                       height: safeAreaHeight * 0.02,
-                    )
+                    ),
                   ],
                 ),
               ),
             ),
           ),
         ),
-        loadinPage(context: context, isLoading: isLoading.value, text: null)
+        loadinPage(context: context, isLoading: isLoading.value, text: null),
       ],
     );
   }

@@ -66,7 +66,7 @@ class MessageBottomSheet extends HookConsumerWidget {
                             hintStyle: TextStyle(
                               fontFamily: "Normal",
                               fontVariations: const [
-                                FontVariation("wght", 700)
+                                FontVariation("wght", 700),
                               ],
                               color: Colors.white,
                               fontSize: safeAreaWidth / 28,
@@ -89,13 +89,13 @@ class MessageBottomSheet extends HookConsumerWidget {
                               bold: 700,
                             ),
                           ),
-                        )
+                        ),
                     ],
                   ),
                 ),
               ),
             ),
-            SizedBox(height: keyboardHeight)
+            SizedBox(height: keyboardHeight),
           ],
         ),
       ),

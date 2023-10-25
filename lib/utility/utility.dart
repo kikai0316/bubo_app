@@ -1,7 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:ui';
+import 'package:bubu_app/component/text.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -33,7 +37,7 @@ void bottomSheet(
           )
         : null,
     builder: (context) => page,
-  ).then((value) => ScaffoldMessenger.of(context).hideCurrentSnackBar());
+  );
 }
 
 Future getMobileImage({
@@ -47,7 +51,9 @@ Future getMobileImage({
       final List<int> imageBytes = await File(pickedFile.path).readAsBytes();
       final String base64Image = base64Encode(imageBytes);
       final Uint8List unit8 = base64Decode(base64Image);
-      onSuccess(unit8);
+      final compressedResult =
+          await FlutterImageCompress.compressWithList(unit8, quality: 0);
+      onSuccess(Uint8List.fromList(compressedResult));
     }
   } catch (e) {
     onError();
@@ -72,5 +78,75 @@ EdgeInsetsGeometry xPadding(
   return EdgeInsets.only(
     left: safeAreaWidth * 0.03,
     right: safeAreaWidth * 0.03,
+  );
+}
+
+void precacheImages(
+  BuildContext context,
+  List<Uint8List> imageList,
+) {
+  for (final imageData in imageList) {
+    final imageProvider = MemoryImage(imageData);
+    precacheImage(imageProvider, context);
+  }
+}
+
+void showAlertDialog(
+  BuildContext context, {
+  required void Function()? ontap,
+  required String title,
+  required String? subTitle,
+  required String? buttonText,
+}) {
+  final safeAreaHeight = safeHeight(context);
+  final safeAreaWidth = MediaQuery.of(context).size.width;
+  showDialog<void>(
+    context: context,
+    builder: (BuildContext context) => CupertinoAlertDialog(
+      title: nText(
+        title,
+        color: Colors.black,
+        fontSize: safeAreaWidth / 25,
+        bold: 700,
+      ),
+      content: subTitle != null
+          ? Padding(
+              padding: EdgeInsets.only(top: safeAreaHeight * 0.01),
+              child: Text(
+                subTitle,
+                style: TextStyle(
+                  decoration: TextDecoration.none,
+                  fontFamily: "Normal",
+                  fontVariations: const [FontVariation("wght", 400)],
+                  color: Colors.black.withOpacity(0.7),
+                  fontWeight: FontWeight.w100,
+                  fontSize: safeAreaWidth / 32,
+                ),
+              ),
+            )
+          : null,
+      actions: <CupertinoDialogAction>[
+        CupertinoDialogAction(
+          isDefaultAction: true,
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: Text(
+            "キャンセル",
+            style: TextStyle(fontSize: safeAreaWidth / 25),
+          ),
+        ),
+        if (buttonText != null) ...{
+          CupertinoDialogAction(
+            isDestructiveAction: true,
+            onPressed: ontap,
+            child: Text(
+              buttonText,
+              style: TextStyle(fontSize: safeAreaWidth / 25),
+            ),
+          ),
+        },
+      ],
+    ),
   );
 }

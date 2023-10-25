@@ -22,18 +22,18 @@ class MyApp extends HookConsumerWidget {
   });
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // FirebaseAuth.instance.signOut();
     final User? user = FirebaseAuth.instance.currentUser;
     final notifier = ref.watch(userDataNotifierProvider);
     final notifierWhen = notifier.when(
-      data: (data) => user != null
-          ? UserApp(
-              userData: data!,
+      data: (data) => user != null && data != null
+          ? const UserApp(
+              initPage: 0,
             )
           : const StartPage(),
       error: (e, s) => const StartPage(),
       loading: () => const WithIconInLoadingPage(),
     );
-
     return MaterialApp(debugShowCheckedModeBanner: false, home: notifierWhen);
   }
 }

@@ -21,6 +21,9 @@ mixin _$UserData {
   String get name => throw _privateConstructorUsedError;
   String get birthday => throw _privateConstructorUsedError;
   String get family => throw _privateConstructorUsedError;
+  bool get isGetData => throw _privateConstructorUsedError;
+  bool get isView => throw _privateConstructorUsedError;
+  DateTime? get acquisitionAt => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $UserDataCopyWith<UserData> get copyWith =>
@@ -37,7 +40,10 @@ abstract class $UserDataCopyWith<$Res> {
       String id,
       String name,
       String birthday,
-      String family});
+      String family,
+      bool isGetData,
+      bool isView,
+      DateTime? acquisitionAt});
 }
 
 /// @nodoc
@@ -58,6 +64,9 @@ class _$UserDataCopyWithImpl<$Res, $Val extends UserData>
     Object? name = null,
     Object? birthday = null,
     Object? family = null,
+    Object? isGetData = null,
+    Object? isView = null,
+    Object? acquisitionAt = freezed,
   }) {
     return _then(_value.copyWith(
       imgList: null == imgList
@@ -80,15 +89,28 @@ class _$UserDataCopyWithImpl<$Res, $Val extends UserData>
           ? _value.family
           : family // ignore: cast_nullable_to_non_nullable
               as String,
+      isGetData: null == isGetData
+          ? _value.isGetData
+          : isGetData // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isView: null == isView
+          ? _value.isView
+          : isView // ignore: cast_nullable_to_non_nullable
+              as bool,
+      acquisitionAt: freezed == acquisitionAt
+          ? _value.acquisitionAt
+          : acquisitionAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
     ) as $Val);
   }
 }
 
 /// @nodoc
-abstract class _$$_UserDataCopyWith<$Res> implements $UserDataCopyWith<$Res> {
-  factory _$$_UserDataCopyWith(
-          _$_UserData value, $Res Function(_$_UserData) then) =
-      __$$_UserDataCopyWithImpl<$Res>;
+abstract class _$$UserDataImplCopyWith<$Res>
+    implements $UserDataCopyWith<$Res> {
+  factory _$$UserDataImplCopyWith(
+          _$UserDataImpl value, $Res Function(_$UserDataImpl) then) =
+      __$$UserDataImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call(
@@ -96,15 +118,18 @@ abstract class _$$_UserDataCopyWith<$Res> implements $UserDataCopyWith<$Res> {
       String id,
       String name,
       String birthday,
-      String family});
+      String family,
+      bool isGetData,
+      bool isView,
+      DateTime? acquisitionAt});
 }
 
 /// @nodoc
-class __$$_UserDataCopyWithImpl<$Res>
-    extends _$UserDataCopyWithImpl<$Res, _$_UserData>
-    implements _$$_UserDataCopyWith<$Res> {
-  __$$_UserDataCopyWithImpl(
-      _$_UserData _value, $Res Function(_$_UserData) _then)
+class __$$UserDataImplCopyWithImpl<$Res>
+    extends _$UserDataCopyWithImpl<$Res, _$UserDataImpl>
+    implements _$$UserDataImplCopyWith<$Res> {
+  __$$UserDataImplCopyWithImpl(
+      _$UserDataImpl _value, $Res Function(_$UserDataImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -115,8 +140,11 @@ class __$$_UserDataCopyWithImpl<$Res>
     Object? name = null,
     Object? birthday = null,
     Object? family = null,
+    Object? isGetData = null,
+    Object? isView = null,
+    Object? acquisitionAt = freezed,
   }) {
-    return _then(_$_UserData(
+    return _then(_$UserDataImpl(
       imgList: null == imgList
           ? _value._imgList
           : imgList // ignore: cast_nullable_to_non_nullable
@@ -137,19 +165,34 @@ class __$$_UserDataCopyWithImpl<$Res>
           ? _value.family
           : family // ignore: cast_nullable_to_non_nullable
               as String,
+      isGetData: null == isGetData
+          ? _value.isGetData
+          : isGetData // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isView: null == isView
+          ? _value.isView
+          : isView // ignore: cast_nullable_to_non_nullable
+              as bool,
+      acquisitionAt: freezed == acquisitionAt
+          ? _value.acquisitionAt
+          : acquisitionAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
     ));
   }
 }
 
 /// @nodoc
 
-class _$_UserData implements _UserData {
-  const _$_UserData(
+class _$UserDataImpl implements _UserData {
+  const _$UserDataImpl(
       {required final List<Uint8List> imgList,
       required this.id,
       required this.name,
       required this.birthday,
-      required this.family})
+      required this.family,
+      required this.isGetData,
+      required this.isView,
+      required this.acquisitionAt})
       : _imgList = imgList;
 
   final List<Uint8List> _imgList;
@@ -168,23 +211,34 @@ class _$_UserData implements _UserData {
   final String birthday;
   @override
   final String family;
+  @override
+  final bool isGetData;
+  @override
+  final bool isView;
+  @override
+  final DateTime? acquisitionAt;
 
   @override
   String toString() {
-    return 'UserData(imgList: $imgList, id: $id, name: $name, birthday: $birthday, family: $family)';
+    return 'UserData(imgList: $imgList, id: $id, name: $name, birthday: $birthday, family: $family, isGetData: $isGetData, isView: $isView, acquisitionAt: $acquisitionAt)';
   }
 
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_UserData &&
+            other is _$UserDataImpl &&
             const DeepCollectionEquality().equals(other._imgList, _imgList) &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.birthday, birthday) ||
                 other.birthday == birthday) &&
-            (identical(other.family, family) || other.family == family));
+            (identical(other.family, family) || other.family == family) &&
+            (identical(other.isGetData, isGetData) ||
+                other.isGetData == isGetData) &&
+            (identical(other.isView, isView) || other.isView == isView) &&
+            (identical(other.acquisitionAt, acquisitionAt) ||
+                other.acquisitionAt == acquisitionAt));
   }
 
   @override
@@ -194,13 +248,16 @@ class _$_UserData implements _UserData {
       id,
       name,
       birthday,
-      family);
+      family,
+      isGetData,
+      isView,
+      acquisitionAt);
 
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_UserDataCopyWith<_$_UserData> get copyWith =>
-      __$$_UserDataCopyWithImpl<_$_UserData>(this, _$identity);
+  _$$UserDataImplCopyWith<_$UserDataImpl> get copyWith =>
+      __$$UserDataImplCopyWithImpl<_$UserDataImpl>(this, _$identity);
 }
 
 abstract class _UserData implements UserData {
@@ -209,7 +266,10 @@ abstract class _UserData implements UserData {
       required final String id,
       required final String name,
       required final String birthday,
-      required final String family}) = _$_UserData;
+      required final String family,
+      required final bool isGetData,
+      required final bool isView,
+      required final DateTime? acquisitionAt}) = _$UserDataImpl;
 
   @override
   List<Uint8List> get imgList;
@@ -222,7 +282,13 @@ abstract class _UserData implements UserData {
   @override
   String get family;
   @override
+  bool get isGetData;
+  @override
+  bool get isView;
+  @override
+  DateTime? get acquisitionAt;
+  @override
   @JsonKey(ignore: true)
-  _$$_UserDataCopyWith<_$_UserData> get copyWith =>
+  _$$UserDataImplCopyWith<_$UserDataImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

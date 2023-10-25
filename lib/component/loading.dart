@@ -35,7 +35,7 @@ Widget loadinPage({
                 bold: 600,
               ),
             ),
-          }
+          },
         ],
       ),
     ),
@@ -74,4 +74,31 @@ class WithIconInLoadingPage extends HookConsumerWidget {
       ),
     );
   }
+}
+
+Widget messageLoading(BuildContext context) {
+  final safeAreaHeight = safeHeight(context);
+  return Align(
+    alignment: Alignment.topCenter,
+    child: Padding(
+      padding: EdgeInsets.only(top: safeAreaHeight * 0.05),
+      child: LoadingAnimationWidget.staggeredDotsWave(
+        color: Colors.white,
+        size: MediaQuery.of(context).size.width / 12,
+      ),
+    ),
+  );
+}
+
+Widget storyLoadingWidget(BuildContext context) {
+  final safeAreaHeight = safeHeight(context);
+  return Container(
+    alignment: Alignment.center,
+    height: safeAreaHeight * 0.13,
+    width: double.infinity,
+    child: LoadingAnimationWidget.staggeredDotsWave(
+      color: Colors.white,
+      size: MediaQuery.of(context).size.width / 13,
+    ),
+  );
 }

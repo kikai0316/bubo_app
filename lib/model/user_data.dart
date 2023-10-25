@@ -12,5 +12,8 @@ class UserData with _$UserData {
     required String name,
     required String birthday,
     required String family,
+    required bool isGetData,
+    required bool isView,
+    required DateTime? acquisitionAt,
   }) = _UserData;
 }
