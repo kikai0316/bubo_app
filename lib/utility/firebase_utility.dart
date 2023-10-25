@@ -126,3 +126,41 @@ Future<UserData?> imgOtherGet(UserData userData) async {
     return null;
   }
 }
+
+Future<bool> userDataUpData(UserData userData) async {
+  try {
+    final storagedb = FirebaseStorage.instance;
+    final result = await storagedb.ref("${userData.id}/main").listAll();
+    for (final ref in result.items) {
+      await ref.delete();
+    }
+    await storagedb
+        .ref(
+          '${userData.id}/main/${"${userData.name}@${userData.birthday.split(' / ').join()}@${userData.family}@0"} ',
+        )
+        .putData(userData.imgList.first);
+
+    return true;
+  } on FirebaseException {
+    return false;
+  }
+}
+
+Future<bool> accountDelete(
+  UserData userData,
+) async {
+  try {
+    final storagedb = FirebaseStorage.instance;
+    final resultMain = await storagedb.ref("${userData.id}/main").listAll();
+    for (final ref in resultMain.items) {
+      await ref.delete();
+    }
+    final resultOthers = await storagedb.ref("${userData.id}/others").listAll();
+    for (final ref in resultOthers.items) {
+      await ref.delete();
+    }
+    return true;
+  } on FirebaseException {
+    return false;
+  }
+}

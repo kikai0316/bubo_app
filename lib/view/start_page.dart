@@ -47,8 +47,8 @@ class StartPage extends HookConsumerWidget {
         Navigator.push<Widget>(
           context,
           MaterialPageRoute(
-            builder: (context) => UserApp(
-              userData: userData,
+            builder: (context) => const UserApp(
+              initPage: 0,
             ),
           ),
         );

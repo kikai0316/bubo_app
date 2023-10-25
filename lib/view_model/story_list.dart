@@ -70,6 +70,13 @@ class StoryListNotifier extends _$StoryListNotifier {
       });
     }
   }
+
+  Future<void> resetDate() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      return [];
+    });
+  }
 }
 
 Future<List<UserData>> hasExceeded24Hours(List<UserData> data) async {

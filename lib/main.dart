@@ -27,8 +27,8 @@ class MyApp extends HookConsumerWidget {
     final notifier = ref.watch(userDataNotifierProvider);
     final notifierWhen = notifier.when(
       data: (data) => user != null && data != null
-          ? UserApp(
-              userData: data,
+          ? const UserApp(
+              initPage: 0,
             )
           : const StartPage(),
       error: (e, s) => const StartPage(),

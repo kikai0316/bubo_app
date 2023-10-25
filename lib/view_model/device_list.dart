@@ -90,4 +90,10 @@ class DeviseListNotifier extends _$DeviseListNotifier {
       },
     );
   }
+
+  Future<void> resetData() async {
+    await nearbyService.stopAdvertisingPeer();
+    await nearbyService.stopBrowsingForPeers();
+    state = [];
+  }
 }

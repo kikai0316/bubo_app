@@ -3,6 +3,7 @@ import 'package:bubu_app/component/loading.dart';
 import 'package:bubu_app/component/text.dart';
 import 'package:bubu_app/constant/color.dart';
 import 'package:bubu_app/model/user_data.dart';
+import 'package:bubu_app/utility/screen_transition_utility.dart';
 import 'package:bubu_app/utility/utility.dart';
 import 'package:bubu_app/view/home/swiper.dart';
 import 'package:bubu_app/view/user_app.dart';
@@ -61,20 +62,14 @@ class HomePage extends HookConsumerWidget {
                         isNearby:
                             i > 0 && deviceList.contains(setData[i - 1].id),
                         index: i,
-                        onTap: () {
-                          Navigator.push<Widget>(
-                            context,
-                            PageRouteBuilder(
-                              transitionDuration:
-                                  const Duration(milliseconds: 500),
-                              pageBuilder: (_, __, ___) => SwiperPage(
-                                isMyData: i == 0,
-                                index: i,
-                                storyList: i == 0 ? [userData] : setData,
-                              ),
-                            ),
-                          );
-                        },
+                        onTap: () => screenTransitionHero(
+                          context,
+                          SwiperPage(
+                            isMyData: i == 0,
+                            index: i,
+                            storyList: i == 0 ? [userData] : setData,
+                          ),
+                        ),
                       ),
                     },
                   ],
@@ -106,8 +101,8 @@ class HomePage extends HookConsumerWidget {
       loading: () => messageLoading(context),
       error: (e, s) => messageError(
         context,
-        UserApp(
-          userData: userData,
+        const UserApp(
+          initPage: 0,
         ),
       ),
     );

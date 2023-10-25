@@ -16,24 +16,24 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class UserApp extends HookConsumerWidget {
-  const UserApp({super.key, required this.userData});
-  final UserData userData;
+  const UserApp({super.key, required this.initPage});
+  final int initPage;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final safeAreaHeight = safeHeight(context);
     final safeAreaWidth = MediaQuery.of(context).size.width;
     final loadingNotifier = ref.watch(loadingNotifierProvider);
-    final selectInt = useState<int>(0);
-    final isBottomsheet = useState<bool>(false);
+    final selectInt = useState<int>(initPage);
     final notifier = ref.watch(userDataNotifierProvider);
-    Future<void> showNotImgPage(BuildContext context, UserData userData) async {
-      isBottomsheet.value = true;
+    final bottomsheetValue = useState<UserData?>(null);
+
+    Future<void> showNotImgPage(UserData userData) async {
       await Future<void>.delayed(const Duration(seconds: 1));
       // ignore: use_build_context_synchronously
       bottomSheet(
         context,
         isPOP: false,
-        page: NotImgPage(
+        page: NotImgSheet(
           userData: userData,
         ),
         isBackgroundColor: false,
@@ -43,13 +43,13 @@ class UserApp extends HookConsumerWidget {
     final notifierWhen = notifier.when(
       data: (data) {
         if (data != null) {
-          if (data.imgList.isEmpty && !isBottomsheet.value) {
-            showNotImgPage(context, data);
+          if (data.imgList.isEmpty) {
+            bottomsheetValue.value = data;
             return null;
           } else {
             return selectInt.value == 0
                 ? HomePage(userData: data)
-                : const AccountPage();
+                : AccountPage(userData: data);
           }
         } else {
           return errorWidget(
@@ -61,6 +61,15 @@ class UserApp extends HookConsumerWidget {
         context,
       ),
       loading: () => loadinPage(isLoading: true, text: null, context: context),
+    );
+    useEffect(
+      () {
+        if (notifierWhen == null && bottomsheetValue.value != null) {
+          showNotImgPage(bottomsheetValue.value!);
+        }
+        return null;
+      },
+      [],
     );
 
     return WillPopScope(
@@ -120,11 +129,7 @@ class UserApp extends HookConsumerWidget {
               ),
             ),
           ),
-          loadinPage(
-            context: context,
-            isLoading: loadingNotifier,
-            text: "アップロード中...",
-          ),
+          loadinPage(context: context, isLoading: loadingNotifier, text: null),
         ],
       ),
     );

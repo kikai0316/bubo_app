@@ -194,35 +194,17 @@ Future<List<MessageList>> readeMessageData() async {
   }
 }
 
-Future<void> deleteUserData() async {
+Future<bool> deleteAllFile(String id) async {
+  final fileName = ["user", "story", "message"];
   try {
-    final file = await _localFile("user");
-    file.delete();
+    for (int i = 0; i < fileName.length; i++) {
+      final file = await _localFile(fileName[i]);
+      if (file.existsSync()) {
+        await file.delete();
+      }
+    }
+    return true;
   } catch (e) {
-    return;
+    return false;
   }
 }
-
-// Future<UserData?> read() async {
-//   try {
-//     final file = await _localFile("user");
-//     if (await file.exists()) {
-//       final jsonString = await file.readAsString();
-//       final jsonData = jsonDecode(jsonString) as Map<String, dynamic>;
-//       final imgListDecode = (jsonData["img"] as List<dynamic>)
-//           .map((dynamic base64String) => base64Decode(base64String as String))
-//           .toList();
-//       return UserData(
-//         id: jsonData["id"] as String,
-//         name: jsonData["name"] as String,
-//         imgList: imgListDecode,
-//         birthday: jsonData["birthday"] as String,
-//         family: jsonData["family"] as String,
-//       );
-//     } else {
-//       return null;
-//     }
-//   } catch (e) {
-//     return null;
-//   }
-// }

@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 void screenTransition(BuildContext context, Widget page) {
   Navigator.of(context).push<Widget>(
@@ -38,6 +38,26 @@ void screenTransitionToTop(BuildContext context, Widget page) {
           child: child,
         );
       },
+    ),
+  );
+}
+
+void screenTransitionNormal(BuildContext context, Widget page) {
+  Navigator.of(context).push(
+    MaterialPageRoute(
+      builder: (context) {
+        return page; // 遷移先の画面widgetを指定
+      },
+    ),
+  );
+}
+
+void screenTransitionHero(BuildContext context, Widget page) {
+  Navigator.push<Widget>(
+    context,
+    PageRouteBuilder(
+      transitionDuration: const Duration(milliseconds: 500),
+      pageBuilder: (_, __, ___) => page,
     ),
   );
 }

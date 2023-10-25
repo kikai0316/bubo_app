@@ -49,4 +49,11 @@ class MessageListNotifier extends _$MessageListNotifier {
       }
     }
   }
+
+  Future<void> resetDate() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      return [];
+    });
+  }
 }

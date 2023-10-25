@@ -46,13 +46,11 @@ class OnMessage extends HookConsumerWidget {
       color: Colors.transparent,
       borderRadius: BorderRadius.circular(15),
       child: InkWell(
-        onTap: () => Navigator.push<Widget>(
+        onTap: () => screenTransitionNormal(
           context,
-          MaterialPageRoute(
-            builder: (context) => MessageScreenPage(
-              myData: myData,
-              messageUserData: messageData.userData,
-            ),
+          MessageScreenPage(
+            myData: myData,
+            messageUserData: messageData.userData,
           ),
         ),
         child: Container(
