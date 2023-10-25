@@ -3,7 +3,7 @@ import 'package:bubu_app/component/text.dart';
 import 'package:bubu_app/constant/color.dart';
 import 'package:bubu_app/utility/screen_transition_utility.dart';
 import 'package:bubu_app/utility/utility.dart';
-import 'package:bubu_app/view/start_page.dart';
+import 'package:bubu_app/view/login.dart';
 import 'package:flutter/material.dart';
 
 Widget errorWidget(

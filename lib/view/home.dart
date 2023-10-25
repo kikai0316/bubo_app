@@ -13,6 +13,7 @@ import 'package:bubu_app/view_model/story_list.dart';
 import 'package:bubu_app/widget/home/home_message_widget.dart';
 import 'package:bubu_app/widget/home/home_story_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class HomePage extends HookConsumerWidget {
@@ -61,12 +62,11 @@ class HomePage extends HookConsumerWidget {
                         isMyData: i == 0,
                         isNearby:
                             i > 0 && deviceList.contains(setData[i - 1].id),
-                        index: i,
                         onTap: () => screenTransitionHero(
                           context,
                           SwiperPage(
                             isMyData: i == 0,
-                            index: i,
+                            index: i == 0 ? 0 : i - 1,
                             storyList: i == 0 ? [userData] : setData,
                           ),
                         ),
@@ -105,6 +105,15 @@ class HomePage extends HookConsumerWidget {
           initPage: 0,
         ),
       ),
+    );
+
+    useEffect(
+      () {
+        final notifier = ref.read(deviseListNotifierProvider.notifier);
+        notifier.initNearbyService(userData);
+        return null;
+      },
+      [],
     );
 
     return Scaffold(

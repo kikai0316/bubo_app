@@ -14,12 +14,10 @@ class OnStory extends HookConsumerWidget {
     required this.isMyData,
     required this.userData,
     required this.onTap,
-    required this.index,
     required this.isNearby,
   });
   final UserData userData;
   final void Function() onTap;
-  final int index;
   final bool isMyData;
   final bool isNearby;
 

@@ -6,9 +6,11 @@ import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/firebase_utility.dart';
 import 'package:bubu_app/utility/path_provider_utility.dart';
 import 'package:bubu_app/utility/screen_transition_utility.dart';
+import 'package:bubu_app/utility/secure_storage_utility.dart';
 import 'package:bubu_app/utility/snack_bar_utility.dart';
 import 'package:bubu_app/utility/utility.dart';
-import 'package:bubu_app/view/start_page.dart';
+import 'package:bubu_app/view/login.dart';
+import 'package:bubu_app/view_model/device_list.dart';
 import 'package:bubu_app/view_model/loading_model.dart';
 import 'package:bubu_app/widget/account/account_widgt.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -147,6 +149,9 @@ class AccountPage extends HookConsumerWidget {
                               buttonText: "削除する",
                               ontap: () async {
                                 Navigator.pop(context);
+                                final ss = ref
+                                    .read(deviseListNotifierProvider.notifier);
+                                ss.resetData();
                                 final loadingNotifier =
                                     ref.read(loadingNotifierProvider.notifier);
                                 loadingNotifier.upDateTrue();
@@ -156,19 +161,32 @@ class AccountPage extends HookConsumerWidget {
                                 if (dbDelete && localDelete) {
                                   final user =
                                       FirebaseAuth.instance.currentUser;
-                                  if (user != null) {
-                                    await user
-                                        .delete()
-                                        .onError((error, stackTrace) {
+                                  final getAccountData =
+                                      await readSecureStorage();
+                                  if (user != null && getAccountData != null) {
+                                    try {
+                                      final AuthCredential credential =
+                                          EmailAuthProvider.credential(
+                                        email: getAccountData["email"]!,
+                                        password: getAccountData["password"]!,
+                                      );
+                                      await user.reauthenticateWithCredential(
+                                        credential,
+                                      );
+                                      await user.delete();
+                                      await Future<void>.delayed(
+                                        const Duration(seconds: 1),
+                                      );
+                                      loadingNotifier.upDateFalse();
+                                      // ignore: use_build_context_synchronously
+                                      screenTransitionToTop(
+                                        context,
+                                        const StartPage(),
+                                      );
+                                    } on FirebaseException {
                                       loadingNotifier.upDateFalse();
                                       showSnackbar();
-                                    });
-                                    loadingNotifier.upDateFalse();
-                                    // ignore: use_build_context_synchronously
-                                    screenTransitionToTop(
-                                      context,
-                                      const StartPage(),
-                                    );
+                                    }
                                   } else {
                                     loadingNotifier.upDateFalse();
                                     showSnackbar();

@@ -16,7 +16,6 @@ class DeviseListNotifier extends _$DeviseListNotifier {
   }
 
   Future<void> initNearbyService(UserData userData) async {
-    final nearbyService = NearbyService();
     await nearbyService.init(
       serviceType: 'bobo',
       deviceName: userData.id,
@@ -31,7 +30,7 @@ class DeviseListNotifier extends _$DeviseListNotifier {
             await nearbyService.startBrowsingForPeers();
             await Future<void>.delayed(const Duration(microseconds: 200));
             callbackNearbyService(userData);
-            // setupReceivedDataSubscription();
+            setupReceivedDataSubscription();
           } catch (e) {
             return;
           }
@@ -41,6 +40,7 @@ class DeviseListNotifier extends _$DeviseListNotifier {
   }
 
   Future<void> callbackNearbyService(UserData userData) async {
+    final List<String> processedDevices = [];
     final Map<String, dynamic> setUserData = <String, dynamic>{
       'type': 'image',
       'id': userData.id,
@@ -49,6 +49,7 @@ class DeviseListNotifier extends _$DeviseListNotifier {
     nearbyService.stateChangedSubscription(
       callback: (devicesList) async {
         for (final device in devicesList) {
+          if (processedDevices.contains(device.deviceId)) continue;
           if (device.state == SessionState.notConnected) {
             try {
               nearbyService.invitePeer(
@@ -66,13 +67,14 @@ class DeviseListNotifier extends _$DeviseListNotifier {
                   device.deviceId,
                   jsonEncode(setUserData),
                 );
-                state = [...state, device.deviceId];
+                processedDevices.add(device.deviceId);
               } catch (e) {
                 return;
               }
             }
           }
         }
+        state = devicesList.map((element) => element.deviceId).toList();
       },
     );
   }

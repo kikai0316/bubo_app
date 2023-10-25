@@ -7,11 +7,14 @@ import 'package:bubu_app/constant/url.dart';
 import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/firebase_utility.dart';
 import 'package:bubu_app/utility/path_provider_utility.dart';
+import 'package:bubu_app/utility/secure_storage_utility.dart';
 import 'package:bubu_app/utility/snack_bar_utility.dart';
 import 'package:bubu_app/utility/utility.dart';
 import 'package:bubu_app/view/login/login_sheet.dart';
 import 'package:bubu_app/view/login/singin_sheet.dart';
 import 'package:bubu_app/view/user_app.dart';
+import 'package:bubu_app/view_model/message_list.dart';
+import 'package:bubu_app/view_model/story_list.dart';
 import 'package:bubu_app/view_model/user_data.dart';
 import 'package:bubu_app/widget/login/login_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -30,6 +33,7 @@ class StartPage extends HookConsumerWidget {
     final safeAreaWidth = MediaQuery.of(context).size.width;
     final isLoading = useState<bool>(false);
     void showSnackbar(String text) {
+      isLoading.value = false;
       errorSnackbar(
         context,
         text: text,
@@ -39,8 +43,13 @@ class StartPage extends HookConsumerWidget {
 
     Future<void> nextPage(UserData userData) async {
       final isSuccess = await writeUserData(userData);
-      final notifier = ref.read(userDataNotifierProvider.notifier);
-      notifier.reLoad();
+      final userDataNotifier = ref.read(userDataNotifierProvider.notifier);
+      final storyListNotifier = ref.read(storyListNotifierProvider.notifier);
+      final messageListNotifier =
+          ref.read(messageListNotifierProvider.notifier);
+      await userDataNotifier.reLoad();
+      await storyListNotifier.reLoad();
+      await messageListNotifier.reLoad();
       isLoading.value = false;
       if (isSuccess) {
         // ignore: use_build_context_synchronously
@@ -65,18 +74,17 @@ class StartPage extends HookConsumerWidget {
         final User? user = FirebaseAuth.instance.currentUser;
         if (user != null) {
           final UserData? getData = await myDataGet(user.uid);
-          if (getData != null) {
+          final writeAccountData =
+              await writeSecureStorage(email: email, password: password);
+          if (getData != null && writeAccountData) {
             nextPage(getData);
           } else {
-            isLoading.value = false;
             showSnackbar("エラーが発生しました。");
           }
         } else {
-          isLoading.value = false;
           showSnackbar("エラーが発生しました。");
         }
       } catch (e) {
-        isLoading.value = false;
         showSnackbar("アカウントが見つかりませんでした。");
       }
     }
@@ -84,17 +92,19 @@ class StartPage extends HookConsumerWidget {
     Future<void> singInUp(
       UserData userData,
       String email,
-      String passwprd,
+      String password,
     ) async {
       final FirebaseAuth auth = FirebaseAuth.instance;
       try {
         isLoading.value = true;
         await auth.createUserWithEmailAndPassword(
           email: email,
-          password: passwprd,
+          password: password,
         );
         final User? user = auth.currentUser;
-        if (user != null) {
+        final writeAccountData =
+            await writeSecureStorage(email: email, password: password);
+        if (user != null && writeAccountData) {
           final dataSet = UserData(
             imgList: [],
             id: user.uid,

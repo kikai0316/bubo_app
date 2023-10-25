@@ -108,20 +108,16 @@ Future<UserData?> imgOtherGet(UserData userData) async {
       }
     }
 
-    if (imgList.isNotEmpty) {
-      return UserData(
-        imgList: [...userData.imgList, ...imgList],
-        id: userData.id,
-        name: userData.name,
-        birthday: userData.birthday,
-        family: userData.family,
-        isGetData: true,
-        isView: userData.isView,
-        acquisitionAt: userData.acquisitionAt,
-      );
-    } else {
-      return null;
-    }
+    return UserData(
+      imgList: [...userData.imgList, ...imgList],
+      id: userData.id,
+      name: userData.name,
+      birthday: userData.birthday,
+      family: userData.family,
+      isGetData: true,
+      isView: userData.isView,
+      acquisitionAt: userData.acquisitionAt,
+    );
   } on FirebaseException {
     return null;
   }

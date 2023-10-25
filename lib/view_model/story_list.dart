@@ -8,7 +8,8 @@ class StoryListNotifier extends _$StoryListNotifier {
   @override
   Future<List<UserData>> build() async {
     final List<UserData> getData = await readStoryData();
-    return hasExceeded24Hours(getData);
+    final setData = await initHasExceeded24Hours(getData);
+    return setData;
   }
 
   Future<void> addData(Map<String, dynamic> data) async {
@@ -28,7 +29,7 @@ class StoryListNotifier extends _$StoryListNotifier {
           isView: false,
           acquisitionAt: DateTime.now(),
         );
-        final setList = [...state.value!, setUserData];
+        final setList = hasExceeded24Hours([...state.value!, setUserData]);
         final isLocalWrite = await writeStoryData(setList);
         if (isLocalWrite) {
           state = const AsyncValue.loading();
@@ -48,7 +49,7 @@ class StoryListNotifier extends _$StoryListNotifier {
     if (index != -1) {
       final setList = [...state.value!];
       setList[index] = newUserData;
-      final isLocalWrite = await writeStoryData(setList);
+      final isLocalWrite = await writeStoryData(hasExceeded24Hours(setList));
       if (isLocalWrite) {
         state = const AsyncValue.loading();
         state = await AsyncValue.guard(() async {
@@ -71,15 +72,17 @@ class StoryListNotifier extends _$StoryListNotifier {
     }
   }
 
-  Future<void> resetDate() async {
+  Future<void> reLoad() async {
+    final List<UserData> getData = await readStoryData();
+    final setData = await initHasExceeded24Hours(getData);
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      return [];
+      return setData;
     });
   }
 }
 
-Future<List<UserData>> hasExceeded24Hours(List<UserData> data) async {
+Future<List<UserData>> initHasExceeded24Hours(List<UserData> data) async {
   final DateTime now = DateTime.now();
   final DateTime twentyFourHoursAgo = now.subtract(const Duration(hours: 24));
   bool isEdit = false;
@@ -97,6 +100,22 @@ Future<List<UserData>> hasExceeded24Hours(List<UserData> data) async {
   }
   if (isEdit) {
     await writeStoryData(newData);
+  }
+  return newData;
+}
+
+List<UserData> hasExceeded24Hours(List<UserData> data) {
+  final DateTime now = DateTime.now();
+  final DateTime twentyFourHoursAgo = now.subtract(const Duration(hours: 24));
+  final List<UserData> newData = [...data];
+  for (int i = 0; i < newData.length; i++) {
+    if (newData[i].acquisitionAt == null) {
+      newData.removeAt(i);
+    } else {
+      if (newData[i].acquisitionAt!.isBefore(twentyFourHoursAgo)) {
+        newData.removeAt(i);
+      }
+    }
   }
   return newData;
 }

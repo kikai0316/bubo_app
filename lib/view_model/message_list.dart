@@ -50,10 +50,11 @@ class MessageListNotifier extends _$MessageListNotifier {
     }
   }
 
-  Future<void> resetDate() async {
+  Future<void> reLoad() async {
+    final getData = await readeMessageData();
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      return [];
+      return getData;
     });
   }
 }

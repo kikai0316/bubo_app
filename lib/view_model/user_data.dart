@@ -39,11 +39,4 @@ class UserDataNotifier extends _$UserDataNotifier {
       });
     }
   }
-
-  Future<void> resetDate() async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      return null;
-    });
-  }
 }
