@@ -295,8 +295,10 @@ class MainImgWidget extends HookConsumerWidget {
   const MainImgWidget({
     super.key,
     required this.userData,
+    required this.myUserData,
   });
   final UserData userData;
+  final UserData myUserData;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -309,8 +311,12 @@ class MainImgWidget extends HookConsumerWidget {
           context,
           PageRouteBuilder(
             transitionDuration: const Duration(milliseconds: 500),
-            pageBuilder: (_, __, ___) =>
-                SwiperPage(isMyData: false, index: 0, storyList: [userData]),
+            pageBuilder: (_, __, ___) => SwiperPage(
+              isMyData: false,
+              index: 0,
+              storyList: [userData],
+              myUserData: myUserData,
+            ),
           ),
         );
       },

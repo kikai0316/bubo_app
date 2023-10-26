@@ -160,11 +160,20 @@ Widget birthdayWidget(
   final DateTime now = DateTime.now();
   final DateTime twentyYearsAgo = DateTime(now.year - 20);
   DateTime parseDate(String input) {
-    final List<String> parts = input.split(' / ');
-    final int year = int.parse(parts[0]);
-    final int month = int.parse(parts[1]);
-    final int day = int.parse(parts[2]);
+    if (input.length != 8) {
+      return twentyYearsAgo;
+    }
+    final int year = int.parse(input.substring(0, 4));
+    final int month = int.parse(input.substring(4, 6));
+    final int day = int.parse(input.substring(6, 8));
     return DateTime(year, month, day);
+  }
+
+  String formatDateString(String input) {
+    if (input.length != 8) {
+      return "取得エラー";
+    }
+    return "${input.substring(0, 4)} / ${input.substring(4, 6)} / ${input.substring(6, 8)}";
   }
 
   return Material(
@@ -181,7 +190,7 @@ Widget birthdayWidget(
           locale: LocaleType.jp,
           onConfirm: (date) {
             final dataSet =
-                '${date.year} / ${date.month.toString().padLeft(2, '0')} / ${date.day.toString().padLeft(2, '0')}';
+                '${date.year}${date.month.toString().padLeft(2, '0')}${date.day.toString().padLeft(2, '0')}';
             onDataSet(dataSet);
           },
         );
@@ -214,7 +223,8 @@ Widget birthdayWidget(
                   ),
                 ),
                 TextSpan(
-                  text: "　${text ?? "-- / -- / --"}",
+                  text:
+                      "　${text != null ? formatDateString(text) : "-- / -- / --"}",
                   style: TextStyle(
                     fontFamily: "Normal",
                     fontVariations: const [FontVariation("wght", 700)],

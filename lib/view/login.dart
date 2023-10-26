@@ -130,6 +130,12 @@ class StartPage extends HookConsumerWidget {
       }
     }
 
+    // useEffect(() {
+    //   final notifier = ref.read(deviseListNotifierProvider.notifier);
+    //   notifier.resetData();
+    //   return null;
+    // });
+
     return Stack(
       children: [
         Scaffold(

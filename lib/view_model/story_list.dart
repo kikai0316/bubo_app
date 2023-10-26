@@ -12,30 +12,64 @@ class StoryListNotifier extends _$StoryListNotifier {
     return setData;
   }
 
-  Future<void> addData(Map<String, dynamic> data) async {
+  // Future<void> fromDeviceList(List<Device> data) async {
+  //   final List<UserData> newData = [];
+  //   for (final device in data) {
+  //     final getData = device.deviceId.split('@@');
+  //     final int index =
+  //         state.value!.indexWhere((userData) => userData.id == getData[0]);
+  //     if (index == -1) {
+  //       newData.add(
+  //         UserData(
+  //           imgList: [],
+  //           id: getData[0],
+  //           name: getData[1],
+  //           birthday: "",
+  //           family: "",
+  //           isGetData: false,
+  //           isView: false,
+  //           acquisitionAt: DateTime.now(),
+  //         ),
+  //       );
+  //     }
+  //   }
+  //   if (newData.isNotEmpty) {
+  //     final setList = hasExceeded24Hours([...state.value!, ...newData]);
+  //     final isLocalWrite = await writeStoryData(setList);
+  //     if (isLocalWrite) {
+  //       state = const AsyncValue.loading();
+  //       state = await AsyncValue.guard(() async {
+  //         return setList;
+  //       });
+  //     }
+  //   }
+  // }
+
+  Future<void> addData(String data) async {
     try {
-      final userID = data['id'] as String;
-      final userNAME = data['name'] as String;
-      if (!state.value!.any(
-        (userData) => userData.id == userID,
-      )) {
-        final setUserData = UserData(
-          imgList: [],
-          id: userID,
-          name: userNAME,
-          birthday: "",
-          family: "",
-          isGetData: false,
-          isView: false,
-          acquisitionAt: DateTime.now(),
-        );
-        final setList = hasExceeded24Hours([...state.value!, setUserData]);
-        final isLocalWrite = await writeStoryData(setList);
-        if (isLocalWrite) {
-          state = const AsyncValue.loading();
-          state = await AsyncValue.guard(() async {
-            return setList;
-          });
+      final List<String> getString = data.split('@');
+      if (getString.length == 2) {
+        if (!state.value!.any(
+          (userData) => userData.id == getString[0],
+        )) {
+          final setUserData = UserData(
+            imgList: [],
+            id: getString[0],
+            name: getString[1],
+            birthday: "",
+            family: "",
+            isGetData: false,
+            isView: false,
+            acquisitionAt: DateTime.now(),
+          );
+          final setList = hasExceeded24Hours([...state.value!, setUserData]);
+          final isLocalWrite = await writeStoryData(setList);
+          if (isLocalWrite) {
+            state = const AsyncValue.loading();
+            state = await AsyncValue.guard(() async {
+              return setList;
+            });
+          }
         }
       }
     } catch (e) {

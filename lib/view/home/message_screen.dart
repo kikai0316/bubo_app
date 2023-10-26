@@ -5,6 +5,7 @@ import 'package:bubu_app/model/message_data.dart';
 import 'package:bubu_app/model/message_list_data.dart';
 import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/firebase_utility.dart';
+import 'package:bubu_app/utility/snack_bar_utility.dart';
 import 'package:bubu_app/utility/utility.dart';
 import 'package:bubu_app/view_model/device_list.dart';
 import 'package:bubu_app/view_model/message_list.dart';
@@ -125,21 +126,22 @@ class MessageScreenPage extends HookConsumerWidget {
                         context: context,
                         controller: controller,
                         onTap: () {
-                          final notifier =
-                              ref.read(messageListNotifierProvider.notifier);
                           if (controller.text.isNotEmpty) {
-                            final setMessage = MessageData(
-                              dateTime: DateTime.now(),
-                              isRead: true,
-                              isMyMessage: true,
+                            final notifier =
+                                ref.read(deviseListNotifierProvider.notifier);
+                            notifier.sendMessage(
+                              context,
                               message: controller.text,
+                              userData: messageUserData,
+                              myData: myData,
                             );
-                            final setData = MessageList(
-                              userData: getData.first.userData,
-                              message: [...getData.first.message, setMessage],
-                            );
-                            notifier.dataUpDate(setData);
                             controller.clear();
+                          } else {
+                            errorSnackbar(
+                              context,
+                              text: "空白のメッセージは送信できません。",
+                              padding: safeAreaHeight * 0.08,
+                            );
                           }
                         },
                       ),
@@ -242,6 +244,7 @@ class MessageScreenPage extends HookConsumerWidget {
                       height: safeAreaHeight * 0.065,
                       child: MainImgWidget(
                         userData: userData,
+                        myUserData: myData,
                       ),
                     ),
                   ),

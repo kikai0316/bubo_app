@@ -43,7 +43,7 @@ class AccountPage extends HookConsumerWidget {
                   top: safeAreaHeight * 0.03,
                   bottom: safeAreaHeight * 0.03,
                 ),
-                child: accountMain(context: context, data: userData),
+                child: AccountMain(userData: userData),
               ),
               Align(
                 alignment: Alignment.centerLeft,

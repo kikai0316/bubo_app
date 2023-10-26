@@ -2,6 +2,7 @@ import 'package:bubu_app/component/component.dart';
 import 'package:bubu_app/component/loading.dart';
 import 'package:bubu_app/component/text.dart';
 import 'package:bubu_app/constant/color.dart';
+import 'package:bubu_app/model/message_list_data.dart';
 import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/screen_transition_utility.dart';
 import 'package:bubu_app/utility/utility.dart';
@@ -65,6 +66,7 @@ class HomePage extends HookConsumerWidget {
                         onTap: () => screenTransitionHero(
                           context,
                           SwiperPage(
+                            myUserData: userData,
                             isMyData: i == 0,
                             index: i == 0 ? 0 : i - 1,
                             storyList: i == 0 ? [userData] : setData,
@@ -88,16 +90,33 @@ class HomePage extends HookConsumerWidget {
     );
 
     final messageListWhen = messageList.when(
-      data: (value) => Column(
-        children: [
-          for (int i = 0; i < value.length; i++) ...{
-            OnMessage(
-              messageData: value[i],
-              myData: userData,
+      data: (value) {
+        final setData = sortMessageListsByDate(value);
+        if (setData.isEmpty) {
+          return Center(
+            child: Padding(
+              padding: EdgeInsets.only(top: safeAreaHeight * 0.2),
+              child: nText(
+                "メッセージはありません。",
+                color: Colors.white.withOpacity(0.5),
+                fontSize: safeAreaWidth / 25,
+                bold: 700,
+              ),
             ),
-          },
-        ],
-      ),
+          );
+        } else {
+          return Column(
+            children: [
+              for (int i = 0; i < setData.length; i++) ...{
+                OnMessage(
+                  messageData: setData[i],
+                  myData: userData,
+                ),
+              },
+            ],
+          );
+        }
+      },
       loading: () => messageLoading(context),
       error: (e, s) => messageError(
         context,
@@ -353,4 +372,14 @@ List<UserData> sortUserData(List<UserData> data, List<String> idList) {
     }
   }
   return [...list1, ...list2, ...list3, ...list4];
+}
+
+List<MessageList> sortMessageListsByDate(List<MessageList> messageLists) {
+  final List<MessageList> sortedLists = List.from(messageLists);
+  sortedLists.sort((a, b) {
+    final DateTime dateA = a.message.last.dateTime;
+    final DateTime dateB = b.message.last.dateTime;
+    return dateB.compareTo(dateA);
+  });
+  return sortedLists;
 }

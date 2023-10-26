@@ -7,7 +7,9 @@ import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/screen_transition_utility.dart';
 import 'package:bubu_app/utility/utility.dart';
 import 'package:bubu_app/view/account/profile_setting.dart';
+import 'package:bubu_app/view_model/story_list.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 final settingTitle = ["バージョン", "利用規約", "プライバシーポリシー", "アカウント削除"];
 
@@ -62,109 +64,133 @@ Widget settingWidget({
   );
 }
 
-Widget accountMain({
-  required BuildContext context,
-  required UserData data,
-}) {
-  final safeAreaHeight = safeHeight(context);
-  final safeAreaWidth = MediaQuery.of(context).size.width;
+class AccountMain extends HookConsumerWidget {
+  const AccountMain({super.key, required this.userData});
+  final UserData userData;
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final safeAreaHeight = safeHeight(context);
+    final safeAreaWidth = MediaQuery.of(context).size.width;
+    final notifier = ref.watch(storyListNotifierProvider);
+    final int? notifierWhen = notifier.when(
+      data: (data) => countDataForToday(data),
+      error: (e, s) => null,
+      loading: () => null,
+    );
 
-  return Container(
-    width: safeAreaWidth * 0.9,
-    decoration: BoxDecoration(
-      color: blackColor,
-      borderRadius: BorderRadius.circular(20),
-    ),
-    child: Padding(
-      padding: EdgeInsets.only(
-        top: safeAreaWidth * 0.07,
-        left: safeAreaWidth * 0.05,
-        right: safeAreaWidth * 0.05,
+    return Container(
+      width: safeAreaWidth * 0.9,
+      decoration: BoxDecoration(
+        color: blackColor,
+        borderRadius: BorderRadius.circular(20),
       ),
-      child: Column(
-        children: [
-          Padding(
-            padding: EdgeInsets.only(bottom: safeAreaHeight * 0.01),
-            child: Container(
-              height: safeAreaHeight * 0.11,
-              width: safeAreaHeight * 0.11,
-              decoration: BoxDecoration(
-                color: Colors.black,
-                shape: BoxShape.circle,
-                image: DecorationImage(
-                  image: MemoryImage(
-                    data.imgList.first,
-                  ),
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-          ),
-          Align(
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              child: nText(
-                data.name,
-                color: Colors.white,
-                fontSize: safeAreaWidth / 20,
-                bold: 700,
-              ),
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.only(top: safeAreaHeight * 0.015),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                for (int i = 0; i < 2; i++) ...{
-                  SizedBox(
-                    width: safeAreaWidth * 0.4,
-                    child: Column(
-                      children: [
-                        nText(
-                          "1,000",
-                          color: Colors.white,
-                          fontSize: safeAreaWidth / 20,
-                          bold: 700,
-                        ),
-                        nText(
-                          i == 0 ? "これまでに出会った人数" : "今日出会った人数",
-                          color: Colors.grey,
-                          fontSize: safeAreaWidth / 40,
-                          bold: 400,
-                        ),
-                      ],
+      child: Padding(
+        padding: EdgeInsets.only(
+          top: safeAreaWidth * 0.07,
+          left: safeAreaWidth * 0.05,
+          right: safeAreaWidth * 0.05,
+        ),
+        child: Column(
+          children: [
+            Padding(
+              padding: EdgeInsets.only(bottom: safeAreaHeight * 0.01),
+              child: Container(
+                height: safeAreaHeight * 0.11,
+                width: safeAreaHeight * 0.11,
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  shape: BoxShape.circle,
+                  image: DecorationImage(
+                    image: MemoryImage(
+                      userData.imgList.first,
                     ),
+                    fit: BoxFit.cover,
                   ),
-                },
-              ],
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.only(
-              top: safeAreaWidth * 0.06,
-              bottom: safeAreaWidth * 0.05,
-            ),
-            child: customButton(
-              context: context,
-              backgroundColor: Colors.white,
-              textColor: Colors.black,
-              text: "基本情報設定",
-              textSize: safeAreaWidth / 30,
-              height: safeAreaHeight * 0.06,
-              width: safeAreaWidth * 1,
-              onTap: () => screenTransitionNormal(
-                context,
-                ProfileSetting(
-                  userData: data,
                 ),
               ),
             ),
-          ),
-        ],
+            Align(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: nText(
+                  userData.name,
+                  color: Colors.white,
+                  fontSize: safeAreaWidth / 20,
+                  bold: 700,
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: safeAreaHeight * 0.015),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  for (int i = 0; i < 2; i++) ...{
+                    SizedBox(
+                      width: safeAreaWidth * 0.4,
+                      child: Column(
+                        children: [
+                          nText(
+                            i == 0 ? "1,000" : notifierWhen?.toString() ?? "-",
+                            color: Colors.white,
+                            fontSize: safeAreaWidth / 20,
+                            bold: 700,
+                          ),
+                          nText(
+                            i == 0 ? "これまでに出会った人数" : "今日出会った人数",
+                            color: Colors.grey,
+                            fontSize: safeAreaWidth / 40,
+                            bold: 400,
+                          ),
+                        ],
+                      ),
+                    ),
+                  },
+                ],
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(
+                top: safeAreaWidth * 0.06,
+                bottom: safeAreaWidth * 0.05,
+              ),
+              child: customButton(
+                context: context,
+                backgroundColor: Colors.white,
+                textColor: Colors.black,
+                text: "基本情報設定",
+                textSize: safeAreaWidth / 30,
+                height: safeAreaHeight * 0.06,
+                width: safeAreaWidth * 1,
+                onTap: () => screenTransitionNormal(
+                  context,
+                  ProfileSetting(
+                    userData: userData,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
-    ),
-  );
+    );
+  }
+
+  int countDataForToday(List<UserData> data) {
+    final DateTime now = DateTime.now();
+    final DateTime startOfDay = DateTime(now.year, now.month, now.day);
+    final DateTime endOfDay =
+        DateTime(now.year, now.month, now.day, 23, 59, 59);
+    int count = 0;
+    for (int i = 0; i < data.length; i++) {
+      if (data[i].acquisitionAt != null &&
+          data[i].acquisitionAt!.isAfter(startOfDay) &&
+          data[i].acquisitionAt!.isBefore(endOfDay)) {
+        count++;
+      }
+    }
+    return count;
+  }
 }
 
 Widget userNameSheet(
