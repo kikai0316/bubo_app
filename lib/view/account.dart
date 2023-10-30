@@ -13,6 +13,7 @@ import 'package:bubu_app/utility/utility.dart';
 import 'package:bubu_app/view/account/profile_setting.dart';
 import 'package:bubu_app/view/login.dart';
 import 'package:bubu_app/view_model/device_list.dart';
+import 'package:bubu_app/view_model/history_list.dart';
 import 'package:bubu_app/view_model/loading_model.dart';
 import 'package:bubu_app/view_model/story_list.dart';
 import 'package:bubu_app/widget/account/account_widgt.dart';
@@ -28,9 +29,15 @@ class AccountPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final safeAreaHeight = safeHeight(context);
     final safeAreaWidth = MediaQuery.of(context).size.width;
-    final notifier = ref.watch(storyListNotifierProvider);
-    final int? notifierWhen = notifier.when(
+    final toDayNotifier = ref.watch(storyListNotifierProvider);
+    final historyNotifier = ref.watch(historyListNotifierProvider);
+    final int? toDayNotifierWhen = toDayNotifier.when(
       data: (data) => countDataForToday(data),
+      error: (e, s) => null,
+      loading: () => null,
+    );
+    final int? historyNotifierWhen = historyNotifier.when(
+      data: (data) => data.length,
       error: (e, s) => null,
       loading: () => null,
     );
@@ -118,8 +125,11 @@ class AccountPage extends HookConsumerWidget {
                   top: safeAreaHeight * 0.02,
                   bottom: safeAreaHeight * 0.01,
                 ),
-                child:
-                    accountMainWidget(context, isEncounter: false, data: 1000),
+                child: accountMainWidget(
+                  context,
+                  isEncounter: false,
+                  data: historyNotifierWhen ?? 0,
+                ),
               ),
               Padding(
                 padding: EdgeInsets.only(
@@ -128,7 +138,7 @@ class AccountPage extends HookConsumerWidget {
                 child: accountMainWidget(
                   context,
                   isEncounter: true,
-                  data: notifierWhen ?? 0,
+                  data: toDayNotifierWhen ?? 0,
                 ),
               ),
               Align(

@@ -13,7 +13,7 @@ part 'device_list.g.dart';
 
 final nearbyService = NearbyService();
 
-@Riverpod(keepAlive: false)
+@Riverpod(keepAlive: true)
 class DeviseListNotifier extends _$DeviseListNotifier {
   @override
   List<String> build() {

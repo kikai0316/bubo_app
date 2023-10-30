@@ -1,5 +1,6 @@
 import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/path_provider_utility.dart';
+import 'package:bubu_app/view_model/history_list.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'story_list.g.dart';
 
@@ -31,6 +32,9 @@ class StoryListNotifier extends _$StoryListNotifier {
             acquisitionAt: DateTime.now(),
           );
           final setList = hasExceeded24Hours([...state.value!, setUserData]);
+          final historyNotifier =
+              ref.read(historyListNotifierProvider.notifier);
+          historyNotifier.add(getString[0]);
           final isLocalWrite = await writeStoryData(setList);
           if (isLocalWrite) {
             state = const AsyncValue.loading();

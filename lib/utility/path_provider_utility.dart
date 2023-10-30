@@ -64,6 +64,30 @@ Future<UserData?> readUserData() async {
   }
 }
 
+Future<void> writeHistoryData(String data) async {
+  try {
+    final getData = await readHistoryData();
+    final file = await _localFile("history");
+    final jsonList = jsonEncode([...getData, data]);
+    await file.writeAsString(jsonList);
+  } catch (e) {
+    return;
+  }
+}
+
+Future<List<String>> readHistoryData() async {
+  try {
+    final file = await _localFile("history");
+    final rawData = await file.readAsString();
+    final List<String> storyList = List<String>.from(
+      jsonDecode(rawData) as Iterable<dynamic>,
+    );
+    return storyList;
+  } catch (e) {
+    return [];
+  }
+}
+
 Future<bool> writeStoryData(List<UserData> data) async {
   try {
     final list = [];

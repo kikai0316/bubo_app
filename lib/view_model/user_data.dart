@@ -4,7 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'user_data.g.dart';
 
-@Riverpod(keepAlive: false)
+@Riverpod(keepAlive: true)
 class UserDataNotifier extends _$UserDataNotifier {
   @override
   Future<UserData?> build() async {
