@@ -53,3 +53,47 @@ Widget errorWidget(
     ),
   );
 }
+
+Widget searchUserWidget(
+  BuildContext context, {
+  required bool isOnSearch,
+  required void Function() onTap,
+}) {
+  final safeAreaHeight = safeHeight(context);
+  final safeAreaWidth = MediaQuery.of(context).size.width;
+  return InkWell(
+    onTap: onTap,
+    borderRadius: BorderRadius.circular(50),
+    child: Container(
+      height: safeAreaHeight * 0.08,
+      width: safeAreaHeight * 0.08,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: isOnSearch ? blueColor2 : const Color.fromARGB(255, 40, 45, 60),
+        boxShadow: [
+          BoxShadow(
+            color: (isOnSearch ? blueColor2 : Colors.black).withOpacity(0.3),
+            blurRadius: 10,
+            spreadRadius: 1.0,
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            isOnSearch ? Icons.sensors : Icons.sensors_off,
+            color: Colors.white,
+            size: safeAreaWidth / 15,
+          ),
+          nText(
+            isOnSearch ? "探索中" : "停止",
+            color: Colors.white,
+            fontSize: safeAreaWidth / 40,
+            bold: 700,
+          ),
+        ],
+      ),
+    ),
+  );
+}

@@ -12,39 +12,6 @@ class StoryListNotifier extends _$StoryListNotifier {
     return setData;
   }
 
-  // Future<void> fromDeviceList(List<Device> data) async {
-  //   final List<UserData> newData = [];
-  //   for (final device in data) {
-  //     final getData = device.deviceId.split('@@');
-  //     final int index =
-  //         state.value!.indexWhere((userData) => userData.id == getData[0]);
-  //     if (index == -1) {
-  //       newData.add(
-  //         UserData(
-  //           imgList: [],
-  //           id: getData[0],
-  //           name: getData[1],
-  //           birthday: "",
-  //           family: "",
-  //           isGetData: false,
-  //           isView: false,
-  //           acquisitionAt: DateTime.now(),
-  //         ),
-  //       );
-  //     }
-  //   }
-  //   if (newData.isNotEmpty) {
-  //     final setList = hasExceeded24Hours([...state.value!, ...newData]);
-  //     final isLocalWrite = await writeStoryData(setList);
-  //     if (isLocalWrite) {
-  //       state = const AsyncValue.loading();
-  //       state = await AsyncValue.guard(() async {
-  //         return setList;
-  //       });
-  //     }
-  //   }
-  // }
-
   Future<void> addData(String data) async {
     try {
       final List<String> getString = data.split('@');

@@ -36,10 +36,10 @@ class ProfileSetting extends HookConsumerWidget {
       user?.email ?? "取得エラー",
     ];
     DateTime parseDate(String input) {
-      final List<String> parts = input.split(' / ');
-      final int year = int.parse(parts[0]);
-      final int month = int.parse(parts[1]);
-      final int day = int.parse(parts[2]);
+      final year = int.parse(input.substring(0, 4));
+      final month = int.parse(input.substring(4, 6));
+      final day = int.parse(input.substring(6, 8));
+
       return DateTime(year, month, day);
     }
 

@@ -114,6 +114,7 @@ class NotImgPage extends HookConsumerWidget {
                               opacity: imgList.value.length < 3 ? 1 : 0.3,
                               child: upWidget(
                                 context,
+                                isBlack: false,
                                 onTap: () async {
                                   if (imgList.value.length < 3) {
                                     isLoading.value = true;
@@ -181,7 +182,11 @@ class NotImgPage extends HookConsumerWidget {
   }
 }
 
-Widget upWidget(BuildContext context, {required void Function()? onTap}) {
+Widget upWidget(
+  BuildContext context, {
+  required void Function()? onTap,
+  required bool isBlack,
+}) {
   final safeAreaHeight = safeHeight(context);
   final safeAreaWidth = MediaQuery.of(context).size.width;
   return Material(
@@ -196,7 +201,7 @@ Widget upWidget(BuildContext context, {required void Function()? onTap}) {
         width: safeAreaWidth * 0.25,
         decoration: BoxDecoration(
           border: Border.all(
-            color: Colors.white,
+            color: isBlack ? Colors.black : Colors.white,
           ),
           borderRadius: BorderRadius.circular(10),
         ),
@@ -205,7 +210,7 @@ Widget upWidget(BuildContext context, {required void Function()? onTap}) {
           children: [
             Icon(
               Icons.add,
-              color: Colors.white,
+              color: isBlack ? Colors.black : Colors.white,
               size: safeAreaWidth / 15,
             ),
             Padding(
@@ -213,7 +218,7 @@ Widget upWidget(BuildContext context, {required void Function()? onTap}) {
               child: nText(
                 "画像を追加",
                 fontSize: safeAreaWidth / 30,
-                color: Colors.white,
+                color: isBlack ? Colors.black : Colors.white,
                 bold: 700,
               ),
             ),

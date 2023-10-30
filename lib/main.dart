@@ -52,9 +52,7 @@ class MyApp extends HookConsumerWidget {
               if (snapshot.data == null) {
                 return const StartPage();
               } else {
-                return const UserApp(
-                  initPage: 0,
-                );
+                return const UserApp(initPage: 0);
               }
             }
           },

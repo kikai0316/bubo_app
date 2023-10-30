@@ -7,7 +7,7 @@ part of 'message_list.dart';
 // **************************************************************************
 
 String _$messageListNotifierHash() =>
-    r'5f29c2d490d860accc9f8914c86347b187a48b5d';
+    r'2cf52504a8fe6938ca805e0697c518abe91ea27a';
 
 /// See also [MessageListNotifier].
 @ProviderFor(MessageListNotifier)

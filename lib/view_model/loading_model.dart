@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'loading_model.g.dart';
@@ -5,15 +6,12 @@ part 'loading_model.g.dart';
 @Riverpod(keepAlive: false)
 class LoadingNotifier extends _$LoadingNotifier {
   @override
-  bool build() {
-    return false;
+  Widget? build() {
+    return null;
   }
 
-  void upDateTrue() {
-    state = true;
-  }
-
-  void upDateFalse() {
-    state = false;
+  // ignore: use_setters_to_change_properties
+  void upData(Widget? newData) {
+    state = newData;
   }
 }

@@ -63,7 +63,7 @@ class UserApp extends HookConsumerWidget {
                   body: notifierWhen,
                   bottomNavigationBar: Container(
                     alignment: Alignment.topCenter,
-                    height: safeAreaHeight * 0.09,
+                    height: safeAreaHeight * 0.1,
                     decoration: BoxDecoration(
                       color: blackColor,
                       border: Border(
@@ -90,7 +90,9 @@ class UserApp extends HookConsumerWidget {
                                   children: [
                                     Icon(
                                       pageList[i].icon,
-                                      size: safeAreaWidth / 14,
+                                      size: i == 1
+                                          ? safeAreaWidth / 12
+                                          : safeAreaWidth / 14,
                                       color: Colors.white,
                                     ),
                                     nText(
@@ -109,11 +111,9 @@ class UserApp extends HookConsumerWidget {
                     ),
                   ),
                 ),
-                loadinPage(
-                  context: context,
-                  isLoading: loadingNotifier,
-                  text: null,
-                ),
+                if (loadingNotifier != null) ...{
+                  loadingNotifier,
+                },
               ],
             ),
     );
@@ -123,11 +123,11 @@ class UserApp extends HookConsumerWidget {
 final List<BottomData> pageList = [
   BottomData(
     Icons.home,
-    "Home",
+    "ホーム",
   ),
   BottomData(
     Icons.person,
-    "Account",
+    "アカウント",
   ),
 ];
 

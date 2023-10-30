@@ -143,7 +143,7 @@ Future<bool> userDataUpData(UserData userData) async {
   }
 }
 
-Future<bool> accountDelete(
+Future<bool> dbImgAllDelete(
   UserData userData,
 ) async {
   try {
@@ -155,6 +155,39 @@ Future<bool> accountDelete(
     final resultOthers = await storagedb.ref("${userData.id}/others").listAll();
     for (final ref in resultOthers.items) {
       await ref.delete();
+    }
+    return true;
+  } on FirebaseException {
+    return false;
+  }
+}
+
+Future<bool> comparisonUpLoad({
+  required UserData userData,
+  required List<Uint8List> newImgList,
+  required void Function(int) onStream,
+}) async {
+  try {
+    final storagedb = FirebaseStorage.instance;
+    if (userData.imgList.first != newImgList.first) {
+      await storagedb
+          .ref(
+            '${userData.id}/main/${"${userData.name}@${userData.birthday}@${userData.family}@0"} ',
+          )
+          .putData(newImgList.first);
+    }
+    onStream(1);
+    final resultOthers = await storagedb.ref("${userData.id}/others").listAll();
+    for (final ref in resultOthers.items) {
+      await ref.delete();
+    }
+    for (int i = 1; i < newImgList.length; i++) {
+      await storagedb
+          .ref(
+            '${userData.id}/others/${"${userData.name}@${userData.birthday}@${userData.family}@$i"} ',
+          )
+          .putData(newImgList[i]);
+      onStream(i);
     }
     return true;
   } on FirebaseException {
