@@ -28,6 +28,7 @@ Future<bool> writeUserData(
       "img": toBase64,
       "birthday": data.birthday,
       "family": data.family,
+      "instagram": data.instagram,
       "isView": data.isView,
     };
     final jsonList = jsonEncode(setData);
@@ -51,6 +52,7 @@ Future<UserData?> readUserData() async {
       name: toDecode["name"] as String,
       birthday: toDecode["birthday"] as String,
       family: "dsas",
+      instagram: toDecode["instagram"] as String,
       imgList: imgListDecode,
       isGetData: true,
       isView: toDecode["isView"] as bool,
@@ -73,6 +75,7 @@ Future<bool> writeStoryData(List<UserData> data) async {
         "name": item.name,
         "birthday": item.birthday,
         "family": item.family,
+        "instagram": item.instagram,
         "isGetData": item.isGetData,
         "isView": item.isView,
         "acquisitionAt": item.acquisitionAt.toString(),
@@ -108,6 +111,7 @@ Future<List<UserData>> readStoryData() async {
         name: item["name"] as String,
         birthday: item["birthday"] as String,
         family: item["family"] as String,
+        instagram: item["instagram"] as String,
         isGetData: item["isGetData"] as bool,
         isView: item["isView"] as bool,
         acquisitionAt: DateTime.parse(
@@ -180,6 +184,7 @@ Future<List<MessageList>> readeMessageData() async {
           imgList: [],
           birthday: "",
           family: "",
+          instagram: "",
           isGetData: false,
           isView: false,
           acquisitionAt: null,

@@ -13,13 +13,13 @@ Future<bool> upLoadImg({
       if (i == 0) {
         await storagedb
             .ref(
-              '${userData.id}/main/${"${userData.name}@${userData.birthday.split(' / ').join()}@${userData.family}@$i"} ',
+              '${userData.id}/main/${"${userData.name}@${userData.birthday}@${userData.family}@${userData.instagram}@$i"} ',
             )
             .putData(imgList[i]);
       } else {
         await storagedb
             .ref(
-              '${userData.id}/others/${"${userData.name}@${userData.birthday.split(' / ').join()}@${userData.family}@$i"} ',
+              '${userData.id}/others/$i',
             )
             .putData(imgList[i]);
       }
@@ -59,6 +59,7 @@ Future<UserData?> myDataGet(String id) async {
         name: userDataList[0],
         birthday: userDataList[1],
         family: userDataList[2],
+        instagram: userDataList[3],
         isGetData: true,
         isView: false,
         acquisitionAt: null,
@@ -85,6 +86,7 @@ Future<UserData?> imgMainGet(UserData userData) async {
           name: parts[0],
           birthday: parts[1],
           family: parts[2],
+          instagram: parts[3],
           isGetData: false,
           isView: userData.isView,
           acquisitionAt: userData.acquisitionAt,
@@ -115,6 +117,7 @@ Future<UserData?> imgOtherGet(UserData userData) async {
       name: userData.name,
       birthday: userData.birthday,
       family: userData.family,
+      instagram: userData.instagram,
       isGetData: true,
       isView: userData.isView,
       acquisitionAt: userData.acquisitionAt,
@@ -133,10 +136,9 @@ Future<bool> userDataUpData(UserData userData) async {
     }
     await storagedb
         .ref(
-          '${userData.id}/main/${"${userData.name}@${userData.birthday.split(' / ').join()}@${userData.family}@0"} ',
+          '${userData.id}/main/${"${userData.name}@${userData.birthday}@${userData.family}@${userData.instagram}@0"} ',
         )
         .putData(userData.imgList.first);
-
     return true;
   } on FirebaseException {
     return false;

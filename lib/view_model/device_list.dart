@@ -104,6 +104,7 @@ class DeviseListNotifier extends _$DeviseListNotifier {
               name: receivedData['name'] as String,
               birthday: "",
               family: "",
+              instagram: "",
               isGetData: false,
               isView: false,
               acquisitionAt: null,

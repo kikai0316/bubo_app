@@ -67,6 +67,7 @@ class OnSwiper extends HookConsumerWidget {
                                     isView: true,
                                     birthday: data.birthday,
                                     family: data.family,
+                                    instagram: data.instagram,
                                   );
                                   if (isMyData) {
                                     final notifier = ref.read(

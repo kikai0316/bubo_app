@@ -240,3 +240,70 @@ Widget birthdayWidget(
     ),
   );
 }
+
+Widget instagramTextField(
+  BuildContext context, {
+  required bool isError,
+  required TextEditingController? controller,
+  required void Function(String)? onChanged,
+}) {
+  final safeAreaHeight = safeHeight(context);
+  final safeAreaWidth = MediaQuery.of(context).size.width;
+  return Container(
+    width: safeAreaWidth * 0.9,
+    decoration: BoxDecoration(
+      border: Border.all(color: isError ? Colors.red : Colors.grey),
+      borderRadius: BorderRadius.circular(50),
+    ),
+    child: Padding(
+      padding: xPadding(context),
+      child: Row(
+        children: [
+          Padding(
+            padding: EdgeInsets.only(
+              right: safeAreaWidth * 0.03,
+              left: safeAreaWidth * 0.01,
+            ),
+            child: Container(
+              width: safeAreaHeight * 0.035,
+              height: safeAreaHeight * 0.035,
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage("assets/img/Instagram2.png"),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: TextFormField(
+              controller: controller,
+              onChanged: onChanged,
+              // ignore: avoid_bool_literals_in_conditional_expressions
+              textAlign: TextAlign.left,
+              style: TextStyle(
+                fontFamily: "Normal",
+                fontVariations: const [FontVariation("wght", 400)],
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+                fontSize: safeAreaWidth / 28,
+              ),
+              decoration: InputDecoration(
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                hintText: "InstagramのユーザーIDを入力...",
+                hintStyle: TextStyle(
+                  fontFamily: "Normal",
+                  fontVariations: const [FontVariation("wght", 400)],
+                  color: Colors.grey,
+                  fontWeight: FontWeight.bold,
+                  fontSize: safeAreaWidth / 34,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}

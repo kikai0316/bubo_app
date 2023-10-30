@@ -11,6 +11,7 @@ class UserData with _$UserData {
     required String id,
     required String name,
     required String birthday,
+    required String instagram,
     required String family,
     required bool isGetData,
     required bool isView,

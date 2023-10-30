@@ -25,6 +25,7 @@ class StoryListNotifier extends _$StoryListNotifier {
             name: getString[1],
             birthday: "",
             family: "",
+            instagram: "",
             isGetData: false,
             isView: false,
             acquisitionAt: DateTime.now(),

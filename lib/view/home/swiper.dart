@@ -36,9 +36,6 @@ class SwiperPage extends HookConsumerWidget {
     final message = useState<String?>(null);
     final scrollBack = useState<double>(0);
     final dataList = useState<List<UserData>>([...storyList]);
-    final isNearby = deviceList.contains(
-      dataList.value[pageIndex.value - 1].id,
-    );
     bool isNotScreen(int index) {
       if (index == 0 || index == dataList.value.length + 1) {
         return true;
@@ -47,6 +44,10 @@ class SwiperPage extends HookConsumerWidget {
       }
     }
 
+    final isNearby = !isNotScreen(pageIndex.value) &&
+        deviceList.contains(
+          dataList.value[pageIndex.value - 1].id,
+        );
     Future<void> moveAnimation() async {
       isMove.value = true;
       await Future<void>.delayed(const Duration(milliseconds: 300));
@@ -208,8 +209,11 @@ class SwiperPage extends HookConsumerWidget {
                                         children: [
                                           for (int i = 0; i < 2; i++) ...{
                                             Opacity(
-                                              opacity:
-                                                  !isNearby && i == 1 ? 0.5 : 1,
+                                              opacity: !isMyData &&
+                                                      !isNearby &&
+                                                      i == 1
+                                                  ? 0.5
+                                                  : 1,
                                               child: Material(
                                                 color:
                                                     Colors.black.withOpacity(0),

@@ -63,7 +63,7 @@ Future getMobileImage({
 Future openURL({required String url, required void Function()? onError}) async {
   final Uri setURL = Uri.parse(url);
   if (await canLaunchUrl(setURL)) {
-    await launchUrl(setURL);
+    await launchUrl(setURL, mode: LaunchMode.inAppWebView);
   } else {
     if (onError != null) {
       onError();

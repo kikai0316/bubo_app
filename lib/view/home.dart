@@ -34,7 +34,6 @@ class HomePage extends HookConsumerWidget {
         return Column(
           children: [
             Align(
-              // alignment: Alignment.centerRight,
               child: Padding(
                 padding: EdgeInsets.only(
                   bottom: safeAreaHeight * 0.01,
@@ -49,47 +48,6 @@ class HomePage extends HookConsumerWidget {
                 ),
               ),
             ),
-            // Padding(
-            //   padding: EdgeInsets.only(
-            //       left: safeAreaWidth * 0.02,
-            //       right: safeAreaWidth * 0.02,
-            //       top: safeAreaHeight * 0.02,
-            //       bottom: safeAreaHeight * 0.015),
-            //   child: Row(
-            //     mainAxisAlignment: MainAxisAlignment.end,
-            //     children: [
-            //       nText(
-            //         "付近に：${setData.length}人",
-            //         color: Colors.grey,
-            //         fontSize: safeAreaWidth / 30,
-            //         bold: 700,
-            //       ),
-            //       // GestureDetector(
-            //       //   onTap: () => screenTransitionNormal(
-            //       //     context,
-            //       //     StoryAllPage(
-            //       //       userData: userData,
-            //       //     ),
-            //       //   ),
-            //       //   child: Container(
-            //       //     alignment: Alignment.center,
-            //       //     height: safeAreaHeight * 0.04,
-            //       //     width: safeAreaWidth * 0.3,
-            //       //     decoration: BoxDecoration(
-            //       //       color: blueColor,
-            //       //       borderRadius: BorderRadius.circular(10),
-            //       //     ),
-            //       //     child: nText(
-            //       //       "24時間以内の出会い",
-            //       //       color: Colors.white,
-            //       //       fontSize: safeAreaWidth / 38,
-            //       //       bold: 700,
-            //       //     ),
-            //       //   ),
-            //       // )
-            //     ],
-            //   ),
-            // ),
             SizedBox(
               width: safeAreaWidth * 1,
               child: SingleChildScrollView(
@@ -102,7 +60,6 @@ class HomePage extends HookConsumerWidget {
                     for (int i = 0; i < setData.length + 1; i++) ...{
                       OnStory(
                         isImgOnly: false,
-                        // key: ValueKey(" ${deviceList.value[i]} $i"),
                         userData: i == 0 ? userData : setData[i - 1],
                         isMyData: i == 0,
                         isNearby: true,
@@ -210,7 +167,7 @@ class HomePage extends HookConsumerWidget {
       floatingActionButton: Padding(
         padding: EdgeInsets.only(bottom: safeAreaHeight * 0.1),
         child: FloatingActionButton(
-          backgroundColor: greenColor2,
+          backgroundColor: blueColor,
           onPressed: () => screenTransitionNormal(
             context,
             StoryAllPage(

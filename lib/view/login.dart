@@ -111,6 +111,7 @@ class StartPage extends HookConsumerWidget {
             name: userData.name,
             birthday: userData.birthday,
             family: "fdsaaa",
+            instagram: userData.instagram,
             isGetData: true,
             isView: false,
             acquisitionAt: null,

@@ -51,6 +51,7 @@ class NotImgPage extends HookConsumerWidget {
           name: userData.name,
           birthday: userData.birthday,
           family: userData.family,
+          instagram: userData.instagram,
           isGetData: true,
           isView: false,
           acquisitionAt: null,

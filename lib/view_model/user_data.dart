@@ -27,6 +27,7 @@ class UserDataNotifier extends _$UserDataNotifier {
       name: state.value!.name,
       birthday: state.value!.birthday,
       family: state.value!.family,
+      instagram: state.value!.instagram,
       isGetData: true,
       isView: true,
       acquisitionAt: null,

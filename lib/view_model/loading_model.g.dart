@@ -6,7 +6,7 @@ part of 'loading_model.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$loadingNotifierHash() => r'c32c612bd54c520c8b301c84d6a2d48ffc6c41e6';
+String _$loadingNotifierHash() => r'034a6e64547d951009027f02c75b714bbfbcad6a';
 
 /// See also [LoadingNotifier].
 @ProviderFor(LoadingNotifier)

@@ -61,7 +61,7 @@ class AccountPage extends HookConsumerWidget {
                   child: Column(
                     children: [
                       SizedBox(
-                        height: safeAreaHeight * 0.11,
+                        height: safeAreaHeight * 0.105,
                         child: OnStory(
                           isImgOnly: true,
                           isMyData: true,
@@ -73,12 +73,40 @@ class AccountPage extends HookConsumerWidget {
                       Padding(
                         padding: EdgeInsets.only(
                           top: safeAreaHeight * 0.01,
+                          bottom: safeAreaHeight * 0.015,
                         ),
                         child: nText(
                           userData.name,
                           color: Colors.white,
                           fontSize: safeAreaWidth / 20,
                           bold: 700,
+                        ),
+                      ),
+                      Material(
+                        color: Colors.grey.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(10),
+                        child: InkWell(
+                          onTap: () => screenTransitionNormal(
+                            context,
+                            ProfileSetting(
+                              userData: userData,
+                            ),
+                          ),
+                          borderRadius: BorderRadius.circular(10),
+                          child: Container(
+                            alignment: Alignment.center,
+                            height: safeAreaHeight * 0.05,
+                            width: safeAreaWidth * 0.4,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: nText(
+                              "プロフィールを編集",
+                              color: Colors.white,
+                              fontSize: safeAreaWidth / 30,
+                              bold: 700,
+                            ),
+                          ),
                         ),
                       ),
                     ],
@@ -130,18 +158,10 @@ class AccountPage extends HookConsumerWidget {
                 ),
                 child: Column(
                   children: [
-                    for (int i = 0; i < 5; i++) ...{
+                    for (int i = 0; i < 4; i++) ...{
                       settingWidget(
                         onTap: () {
                           if (i == 0) {
-                            screenTransitionNormal(
-                              context,
-                              ProfileSetting(
-                                userData: userData,
-                              ),
-                            );
-                          }
-                          if (i == 1) {
                             showAlertDialog(
                               context,
                               title: "バージョン",
@@ -150,13 +170,13 @@ class AccountPage extends HookConsumerWidget {
                               ontap: null,
                             );
                           }
-                          if (i == 2) {
+                          if (i == 1) {
                             openURL(url: termsURL, onError: null);
                           }
-                          if (i == 3) {
+                          if (i == 2) {
                             openURL(url: privacyURL, onError: null);
                           }
-                          if (i == 4) {
+                          if (i == 3) {
                             showAlertDialog(
                               context,
                               title: "アカウント削除",
@@ -221,10 +241,10 @@ class AccountPage extends HookConsumerWidget {
                           }
                         },
                         context: context,
-                        isRedTitle: i == 4,
+                        isRedTitle: i == 3,
                         iconText: settingTitle[i],
                         isOnlyTopRadius: i == 0,
-                        isOnlyBottomRadius: i == 4,
+                        isOnlyBottomRadius: i == 3,
                         trailing: Icon(
                           Icons.arrow_forward_ios,
                           color: Colors.white.withOpacity(0.8),

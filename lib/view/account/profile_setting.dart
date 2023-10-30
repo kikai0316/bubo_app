@@ -28,10 +28,12 @@ class ProfileSetting extends HookConsumerWidget {
     final safeAreaWidth = MediaQuery.of(context).size.width;
     final isLoading = useState<bool>(false);
     final editName = useState<String>(userData.name);
+    final editInstagram = useState<String>(userData.instagram);
     final editBirthday = useState<String>(userData.birthday);
     final User? user = FirebaseAuth.instance.currentUser;
     final dataList = [
       editName.value,
+      editInstagram.value,
       editBirthday.value,
       user?.email ?? "取得エラー",
     ];
@@ -45,6 +47,7 @@ class ProfileSetting extends HookConsumerWidget {
 
     bool isDataCheck() {
       if (userData.name == editName.value &&
+          userData.instagram == editInstagram.value &&
           userData.birthday == editBirthday.value) {
         return true;
       } else {
@@ -122,7 +125,7 @@ class ProfileSetting extends HookConsumerWidget {
                               children: [
                                 for (int i = 0; i < dataList.length; i++) ...{
                                   Opacity(
-                                    opacity: i != 2 ? 1 : 0.3,
+                                    opacity: i != 3 ? 1 : 0.3,
                                     child: settingWidget(
                                       isOnlyBottomRadius:
                                           i == dataList.length - 1,
@@ -156,7 +159,7 @@ class ProfileSetting extends HookConsumerWidget {
                                                 ),
                                               ),
                                             ),
-                                            if (i != 2)
+                                            if (i != 3)
                                               Icon(
                                                 Icons.arrow_forward_ios,
                                                 color: Colors.white
@@ -167,27 +170,34 @@ class ProfileSetting extends HookConsumerWidget {
                                         ),
                                       ),
                                       onTap: () {
-                                        if (i == 0) {
+                                        if (i < 2) {
                                           textController =
                                               TextEditingController(
-                                            text: editName.value,
+                                            text: i == 0
+                                                ? editName.value
+                                                : editInstagram.value,
                                           );
                                           bottomSheet(
                                             context,
                                             isPOP: true,
                                             isBackgroundColor: true,
-                                            page: userNameSheet(
-                                              context,
-                                              controller: textController,
+                                            page: UserEditSheet(
+                                              isUserName: i == 0,
+                                              controller: textController!,
                                               onTap: () {
-                                                editName.value =
-                                                    textController!.text;
+                                                if (i == 0) {
+                                                  editName.value =
+                                                      textController!.text;
+                                                } else {
+                                                  editInstagram.value =
+                                                      textController!.text;
+                                                }
                                                 Navigator.pop(context);
                                               },
                                             ),
                                           );
                                         }
-                                        if (i == 1) {
+                                        if (i == 2) {
                                           primaryFocus?.unfocus();
                                           DatePicker.showDatePicker(
                                             context,
@@ -235,6 +245,7 @@ class ProfileSetting extends HookConsumerWidget {
                             name: editName.value,
                             birthday: editBirthday.value,
                             family: userData.family,
+                            instagram: editInstagram.value,
                             isGetData: userData.isGetData,
                             isView: userData.isView,
                             acquisitionAt: userData.acquisitionAt,
@@ -280,6 +291,7 @@ class ProfileSetting extends HookConsumerWidget {
 
 final profileSettingTitle = [
   "ユーザー名",
+  "Instagram",
   "生年月日",
   "メールアドレス",
 ];

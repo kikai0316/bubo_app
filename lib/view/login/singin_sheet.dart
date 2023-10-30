@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:bubu_app/component/button.dart';
 import 'package:bubu_app/component/text.dart';
+import 'package:bubu_app/constant/color.dart';
 import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/utility.dart';
 import 'package:bubu_app/widget/app_widget.dart';
@@ -11,7 +12,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class SingInSheetWidget extends HookConsumerWidget {
   SingInSheetWidget({super.key, required this.onTap});
-  final controllerList = List.generate(3, (index) => TextEditingController());
+  final controllerList = List.generate(4, (index) => TextEditingController());
   final void Function(UserData, String, String) onTap;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -25,7 +26,7 @@ class SingInSheetWidget extends HookConsumerWidget {
       Icons.person,
     ];
     final errorMessage =
-        useState<List<String?>>(List.generate(4, (index) => null));
+        useState<List<String?>>(List.generate(5, (index) => null));
     Widget errorText(String text) {
       return Padding(
         padding: EdgeInsets.only(top: safeAreaHeight * 0.005),
@@ -39,30 +40,38 @@ class SingInSheetWidget extends HookConsumerWidget {
     }
 
     bool isCheck() {
-      errorMessage.value = List.generate(4, (index) => null);
+      errorMessage.value = List.generate(5, (index) => null);
       bool isError = true;
       final isEmail = RegExp(
         r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
       ).hasMatch(controllerList[0].text);
-      final isPassword = RegExp(
-        r"^[a-zA-Z\d]+$",
-      ).hasMatch(controllerList[1].text);
-      // final RegExp(r"[!@#$%^&*(),.?\":{}|<>]").hasMatch(password)
 
       if (!isEmail || controllerList[0].text.isEmpty) {
         errorMessage.value[0] = "メールアドレスの形式が正しくありません";
         isError = false;
       }
-      if (controllerList[1].text.length < 7 || !isPassword) {
-        errorMessage.value[1] = "条件に合ったパスワードを設定してください";
+      if (controllerList[1].text.isEmpty) {
+        errorMessage.value[1] = "パスワードを入力してください。";
         isError = false;
       }
       if (controllerList[2].text.isEmpty) {
         errorMessage.value[2] = "ユーザー名を入力してください";
         isError = false;
       }
+      if (controllerList[2].text.contains('@')) {
+        errorMessage.value[2] = "ユーザー名に「@」を含めないでください。";
+        isError = false;
+      }
+      if (controllerList[3].text.isEmpty) {
+        errorMessage.value[3] = "InstagramのユーザーIDを入力してください。";
+        isError = false;
+      }
+      if (!RegExp(r'^[a-z0-9_.]+$').hasMatch(controllerList[3].text)) {
+        errorMessage.value[3] = "正確なInstagramのユーザーIDを入力してください。";
+        isError = false;
+      }
       if (birthday.value == null || birthday.value!.isEmpty) {
-        errorMessage.value[3] = "誕生日を入力してください";
+        errorMessage.value[4] = "誕生日を入力してください";
         isError = false;
       }
       errorMessage.value = [...errorMessage.value];
@@ -70,7 +79,7 @@ class SingInSheetWidget extends HookConsumerWidget {
     }
 
     return SizedBox(
-      height: safeAreaHeight * 0.9,
+      height: safeAreaHeight * 0.95,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: appBarWidget(
@@ -89,7 +98,7 @@ class SingInSheetWidget extends HookConsumerWidget {
                         for (int i = 0; i < 3; i++) ...{
                           Padding(
                             padding:
-                                EdgeInsets.only(top: safeAreaHeight * 0.03),
+                                EdgeInsets.only(top: safeAreaHeight * 0.02),
                             child: LoginTextField(
                               icon: iconList[i],
                               isError: errorMessage.value[i] != null,
@@ -102,12 +111,12 @@ class SingInSheetWidget extends HookConsumerWidget {
                               },
                             ),
                           ),
-                          if (i == 1) ...{
+                          if (i == 2 && errorMessage.value[2] == null) ...{
                             Padding(
                               padding:
                                   EdgeInsets.only(top: safeAreaHeight * 0.005),
                               child: nText(
-                                "アルファベットの大文字・小文字,半角数字を使用して7文字以上",
+                                "ユーザー名に「@」を含めないでください。",
                                 color: Colors.grey,
                                 fontSize: safeAreaWidth / 35,
                                 bold: 400,
@@ -119,20 +128,64 @@ class SingInSheetWidget extends HookConsumerWidget {
                           },
                         },
                         Padding(
-                          padding: EdgeInsets.only(top: safeAreaHeight * 0.03),
-                          child: birthdayWidget(
+                          padding: EdgeInsets.only(top: safeAreaHeight * 0.02),
+                          child: instagramTextField(
                             context,
                             isError: errorMessage.value[3] != null,
-                            text: birthday.value,
-                            onDataSet: (value) {
+                            controller: controllerList[3],
+                            onChanged: (value) {
                               errorMessage.value[3] = null;
                               errorMessage.value = [...errorMessage.value];
-                              birthday.value = value;
                             },
                           ),
                         ),
                         if (errorMessage.value[3] != null) ...{
                           errorText(errorMessage.value[3]!),
+                        },
+                        Padding(
+                          padding: EdgeInsets.only(top: safeAreaHeight * 0.005),
+                          child: GestureDetector(
+                            onTap: () => openURL(
+                              url:
+                                  "https://instagram.com/${controllerList[3].text}",
+                              onError: () => errorMessage.value[3] =
+                                  "エラーが発生しました。再試行してください。",
+                            ),
+                            child: Opacity(
+                              opacity: controllerList[3].text.isEmpty ? 0.3 : 1,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  nText(
+                                    "アカウント確認する",
+                                    color: blueColor,
+                                    fontSize: safeAreaWidth / 35,
+                                    bold: 700,
+                                  ),
+                                  const Icon(
+                                    Icons.navigate_next,
+                                    color: blueColor,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(top: safeAreaHeight * 0.02),
+                          child: birthdayWidget(
+                            context,
+                            isError: errorMessage.value[4] != null,
+                            text: birthday.value,
+                            onDataSet: (value) {
+                              errorMessage.value[4] = null;
+                              errorMessage.value = [...errorMessage.value];
+                              birthday.value = value;
+                            },
+                          ),
+                        ),
+                        if (errorMessage.value[4] != null) ...{
+                          errorText(errorMessage.value[4]!),
                         },
                         SizedBox(
                           height: safeAreaHeight * 0.1,
@@ -161,6 +214,7 @@ class SingInSheetWidget extends HookConsumerWidget {
                             name: controllerList[2].text,
                             birthday: birthday.value!,
                             family: "",
+                            instagram: controllerList[3].text,
                             isGetData: true,
                             isView: false,
                             acquisitionAt: null,
