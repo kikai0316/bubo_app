@@ -6,7 +6,7 @@ import 'package:bubu_app/model/message_list_data.dart';
 import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/screen_transition_utility.dart';
 import 'package:bubu_app/utility/utility.dart';
-import 'package:bubu_app/view/account/story_all_page.dart';
+import 'package:bubu_app/view/home/story_all_page.dart';
 import 'package:bubu_app/view/home/swiper.dart';
 import 'package:bubu_app/view/user_app.dart';
 import 'package:bubu_app/view_model/device_list.dart';

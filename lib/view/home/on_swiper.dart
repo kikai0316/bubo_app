@@ -4,6 +4,7 @@ import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/utility.dart';
 import 'package:bubu_app/view/home/message_sheet.dart';
 import 'package:bubu_app/view_model/device_list.dart';
+import 'package:bubu_app/view_model/history_list.dart';
 import 'package:bubu_app/view_model/story_list.dart';
 import 'package:bubu_app/view_model/user_data.dart';
 import 'package:bubu_app/widget/home/swiper_widget.dart';
@@ -36,6 +37,12 @@ class OnSwiper extends HookConsumerWidget {
     final message = useState<String?>(null);
     final isShowBottomSheet = useState<bool>(false);
     final deviceList = ref.watch(deviseListNotifierProvider);
+    final historyNotifier = ref.watch(historyListNotifierProvider);
+    final int historyNotifierWhen = historyNotifier.when(
+      data: (data) => data.where((item) => item == 'apple').length,
+      error: (e, s) => 0,
+      loading: () => 0,
+    );
     final isNearby = deviceList.contains(
       data.id,
     );
@@ -235,7 +242,6 @@ class OnSwiper extends HookConsumerWidget {
                       ),
                     ),
                   ),
-                  // if (!isMyData)
                   Align(
                     alignment: Alignment.bottomCenter,
                     child: Padding(
@@ -271,12 +277,14 @@ class OnSwiper extends HookConsumerWidget {
                                             bottom: safeAreaHeight * 0.005,
                                           ),
                                           child: nText(
-                                            isNearby
-                                                ? "このユーザーは付近にいます"
-                                                : "このユーザーは通信範囲外です",
-                                            color: isNearby
-                                                ? greenColor
-                                                : Colors.grey,
+                                            isMyData
+                                                ? "マイプロフィール"
+                                                : isNearby
+                                                    ? "このユーザーは付近にいます"
+                                                    : "このユーザーは通信範囲外です",
+                                            color: !isNearby || isMyData
+                                                ? Colors.grey
+                                                : greenColor,
                                             fontSize: safeAreaWidth / 40,
                                             bold: 700,
                                           ),
@@ -315,8 +323,11 @@ class OnSwiper extends HookConsumerWidget {
                                       for (int i = 0; i < 2; i++) ...{
                                         Expanded(
                                           child: Opacity(
-                                            opacity:
-                                                i == 1 && !isNearby ? 0.3 : 1,
+                                            opacity: i == 1 && !isNearby
+                                                ? 0.2
+                                                : isMyData
+                                                    ? 0.2
+                                                    : 1,
                                             child: Material(
                                               color: i == 0
                                                   ? blueColor2.withOpacity(0.2)
@@ -326,46 +337,51 @@ class OnSwiper extends HookConsumerWidget {
                                               child: InkWell(
                                                 onTap: i == 1 && !isNearby
                                                     ? null
-                                                    : () {
-                                                        if (i == 0) {
-                                                          showDialog<void>(
-                                                            context: context,
-                                                            builder: (
-                                                              BuildContext
-                                                                  context,
-                                                            ) =>
-                                                                Dialog(
-                                                              elevation: 0,
-                                                              backgroundColor:
-                                                                  Colors
-                                                                      .transparent,
-                                                              child:
-                                                                  InstagramGetDialog(
-                                                                userData: data,
-                                                              ),
-                                                            ),
-                                                          );
-                                                        }
-                                                        if (i == 1 &&
-                                                            isNearby) {
-                                                          bottomSheet(
-                                                            context,
-                                                            page:
-                                                                MessageBottomSheet(
-                                                              myUserData:
-                                                                  myData,
-                                                              userData: data,
-                                                              onTap: () =>
-                                                                  messageSend(
-                                                                "メッセージを送信しました",
-                                                              ),
-                                                            ),
-                                                            isPOP: true,
-                                                            isBackgroundColor:
-                                                                false,
-                                                          );
-                                                        }
-                                                      },
+                                                    : isMyData
+                                                        ? null
+                                                        : () {
+                                                            if (i == 0) {
+                                                              showDialog<void>(
+                                                                context:
+                                                                    context,
+                                                                builder: (
+                                                                  BuildContext
+                                                                      context,
+                                                                ) =>
+                                                                    Dialog(
+                                                                  elevation: 0,
+                                                                  backgroundColor:
+                                                                      Colors
+                                                                          .transparent,
+                                                                  child:
+                                                                      InstagramGetDialog(
+                                                                    userData:
+                                                                        data,
+                                                                  ),
+                                                                ),
+                                                              );
+                                                            }
+                                                            if (i == 1 &&
+                                                                isNearby) {
+                                                              bottomSheet(
+                                                                context,
+                                                                page:
+                                                                    MessageBottomSheet(
+                                                                  myUserData:
+                                                                      myData,
+                                                                  userData:
+                                                                      data,
+                                                                  onTap: () =>
+                                                                      messageSend(
+                                                                    "メッセージを送信しました",
+                                                                  ),
+                                                                ),
+                                                                isPOP: true,
+                                                                isBackgroundColor:
+                                                                    false,
+                                                              );
+                                                            }
+                                                          },
                                                 borderRadius:
                                                     BorderRadius.circular(10),
                                                 child: Container(
@@ -408,7 +424,12 @@ class OnSwiper extends HookConsumerWidget {
                       ),
                     ),
                   ),
-
+                  if (historyNotifierWhen > 1) ...{
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: EncountersWidget(count: historyNotifierWhen),
+                    ),
+                  },
                   if (message.value != null) ...{
                     messageWidget(
                       context,

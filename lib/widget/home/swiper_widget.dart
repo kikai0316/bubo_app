@@ -10,6 +10,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:vibration/vibration.dart';
 
 int? getAgeFromDateString(String dateString) {
   if (dateString.length != 8) {
@@ -61,27 +63,82 @@ Widget messageWidget(BuildContext context, String text, void Function() onTap) {
   );
 }
 
-// ignore: must_be_immutable
+class EncountersWidget extends HookConsumerWidget {
+  const EncountersWidget({
+    super.key,
+    required this.count,
+  });
+  final int count;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final safeAreaWidth = MediaQuery.of(context).size.width;
+    final safeAreaHeight = safeHeight(context);
+    useEffect(() {
+      Future(() async {
+        final isVibration = await Vibration.hasAmplitudeControl();
+        if (isVibration == true && context.mounted) {
+          Vibration.vibrate();
+        }
+      });
+      return null;
+    });
+    return Padding(
+      padding: EdgeInsets.only(
+        top: safeAreaHeight * 0.04,
+        left: safeAreaWidth * 0.03,
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          color: greenColor,
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Padding(
+          padding: EdgeInsets.only(
+            top: safeAreaHeight * 0.006,
+            bottom: safeAreaHeight * 0.006,
+            left: safeAreaWidth * 0.03,
+            right: safeAreaWidth * 0.03,
+          ),
+          child: nText(
+            "$count回目の出会い",
+            color: Colors.white,
+            fontSize: safeAreaWidth / 28,
+            bold: 700,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+late InterstitialAd interstitialAd;
+
 class InstagramGetDialog extends HookConsumerWidget {
-  InstagramGetDialog({
+  const InstagramGetDialog({
     super.key,
     required this.userData,
   });
   final UserData userData;
-  InterstitialAd? interstitialAd;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final safeAreaWidth = MediaQuery.of(context).size.width;
     final safeAreaHeight = safeHeight(context);
     final isCopy = useState<bool>(false);
     final notifier = ref.watch(ticketListNotifierProvider);
-    final isScreen = useState<bool>(false);
+    final isScreen = useState<bool?>(null);
     final isSetAd = useState<bool>(false);
     final timeText = useState<String?>(null);
     final isInitIntersititalAdCalled = useState<bool>(false);
     final notifierWhen = notifier.when(
       data: (data) {
-        isScreen.value = containsId(userData.id, data);
+        if (isScreen.value == null) {
+          final notifier = ref.read(ticketListNotifierProvider.notifier);
+          notifier.deleteAD();
+          isScreen.value = containsId(userData.id, data);
+        }
+
         return data;
       },
       error: (e, s) => const TicketList(free: [], ad: []),
@@ -103,19 +160,34 @@ class InstagramGetDialog extends HookConsumerWidget {
       }
     }
 
-    void getInstagramToNext() {
+    Future<void> getInstagramToNext(bool isFree) async {
       final setData = TicketList(
-        free: [
-          ...notifierWhen.free,
-          TicketData(
-            id: userData.id,
-            acquisitionAt: DateTime.now(),
-          ),
-        ],
-        ad: notifierWhen.ad,
+        free: isFree
+            ? [
+                ...notifierWhen.free,
+                TicketData(
+                  id: userData.id,
+                  acquisitionAt: DateTime.now()
+                      .subtract(const Duration(hours: 11, minutes: 59)),
+                ),
+              ]
+            : notifierWhen.free,
+        ad: isFree
+            ? notifierWhen.ad
+            : [
+                ...notifierWhen.ad,
+                TicketData(
+                  id: userData.id,
+                  acquisitionAt: DateTime.now(),
+                ),
+              ],
       );
       final notifier = ref.read(ticketListNotifierProvider.notifier);
       notifier.addData(setData);
+      final isVibration = await Vibration.hasAmplitudeControl();
+      if (isVibration == true) {
+        Vibration.vibrate();
+      }
       isScreen.value = true;
     }
 
@@ -127,11 +199,11 @@ class InstagramGetDialog extends HookConsumerWidget {
           onAdLoaded: (ad) {
             interstitialAd = ad;
             isSetAd.value = true;
-            interstitialAd!.fullScreenContentCallback =
+            interstitialAd.fullScreenContentCallback =
                 FullScreenContentCallback(
               onAdDismissedFullScreenContent: (ad) {
                 ad.dispose();
-                getInstagramToNext();
+                getInstagramToNext(false);
               },
               onAdFailedToShowFullScreenContent: (ad, error) {
                 ad.dispose();
@@ -139,7 +211,7 @@ class InstagramGetDialog extends HookConsumerWidget {
             );
           },
           onAdFailedToLoad: (errror) {
-            interstitialAd!.dispose();
+            interstitialAd.dispose();
           },
         ),
       );
@@ -154,14 +226,14 @@ class InstagramGetDialog extends HookConsumerWidget {
         var cancelled = false;
         final bool isTime = timeText.value == null &&
             notifierWhen.free.isNotEmpty &&
-            !isScreen.value;
+            isScreen.value == false;
         if (isTime) {
           Future(() async {
             while (isTime && !cancelled) {
               if (context.mounted) {
                 if (notifierWhen.free.isNotEmpty &&
                     !cancelled &&
-                    !isScreen.value) {
+                    isScreen.value == false) {
                   final String? getTime =
                       getRemainingTime(notifierWhen.free.first.acquisitionAt);
                   if (getTime == null) {
@@ -205,7 +277,7 @@ class InstagramGetDialog extends HookConsumerWidget {
             Column(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                if (!isScreen.value) ...{
+                if (isScreen.value != true) ...{
                   Expanded(
                     child: Container(
                       alignment: Alignment.center,
@@ -239,30 +311,47 @@ class InstagramGetDialog extends HookConsumerWidget {
                   for (int i = 0; i < 2; i++) ...{
                     Padding(
                       padding: EdgeInsets.only(top: safeAreaHeight * 0.02),
-                      child: Opacity(
-                        opacity:
-                            i == 1 && notifierWhen.free.length > 1 ? 0.3 : 1,
-                        child: button(
-                          context,
-                          title: titleText[i],
-                          onTap: () {
-                            if (i == 0) {
-                              try {
-                                if (isSetAd.value) {
-                                  interstitialAd!.show();
-                                }
-                              } catch (e) {
-                                return;
-                              }
-                            }
-                            if (i == 1 && notifierWhen.free.length < 2) {
-                              getInstagramToNext();
-                            }
-                          },
-                          backGroundColor:
-                              i == 0 ? Colors.transparent : blueColor2,
-                          textColor: i == 0 ? blueColor2 : Colors.white,
-                          border: i == 0 ? Border.all(color: blueColor2) : null,
+                      child: SizedBox(
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Opacity(
+                              opacity: i == 1 && notifierWhen.free.length > 1
+                                  ? 0.3
+                                  : i == 0 && !isSetAd.value
+                                      ? 0.2
+                                      : 1,
+                              child: button(
+                                context,
+                                title: titleText[i],
+                                onTap: () {
+                                  if (i == 0) {
+                                    try {
+                                      if (isSetAd.value) {
+                                        interstitialAd.show();
+                                      }
+                                    } catch (e) {
+                                      return;
+                                    }
+                                  }
+                                  if (i == 1 && notifierWhen.free.length < 2) {
+                                    getInstagramToNext(true);
+                                  }
+                                },
+                                backGroundColor:
+                                    i == 0 ? Colors.transparent : blueColor2,
+                                textColor: i == 0 ? blueColor2 : Colors.white,
+                                border: i == 0
+                                    ? Border.all(color: blueColor2)
+                                    : null,
+                              ),
+                            ),
+                            if (i == 0 && !isSetAd.value)
+                              LoadingAnimationWidget.staggeredDotsWave(
+                                color: Colors.black,
+                                size: MediaQuery.of(context).size.width / 20,
+                              ),
+                          ],
                         ),
                       ),
                     ),
@@ -348,13 +437,7 @@ class InstagramGetDialog extends HookConsumerWidget {
                   button(
                     context,
                     title: "とじる",
-                    onTap: () {
-                      // final notifier =
-                      //     ref.read(ticketListNotifierProvider.notifier);
-                      // notifier.addData(TicketList(free: [], ad: []));
-                    },
-                    // =>
-                    // Navigator.pop(context),
+                    onTap: () => Navigator.pop(context),
                     backGroundColor: Colors.transparent,
                     textColor: Colors.black,
                     border: Border.all(),
@@ -362,7 +445,7 @@ class InstagramGetDialog extends HookConsumerWidget {
                 },
               ],
             ),
-            if (!isScreen.value) ...{
+            if (isScreen.value != true) ...{
               Align(
                 alignment: Alignment.topRight,
                 child: GestureDetector(

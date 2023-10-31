@@ -119,9 +119,9 @@ class StoryAllPage extends HookConsumerWidget {
         elevation: 0,
         backgroundColor: Colors.transparent,
         title: nText(
-          "過去24時間以内の出会い",
+          "過去24時間の履歴",
           color: Colors.white,
-          fontSize: safeAreaWidth / 20,
+          fontSize: safeAreaWidth / 24,
           bold: 700,
         ),
         bottom: PreferredSize(

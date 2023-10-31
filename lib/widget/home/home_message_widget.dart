@@ -69,7 +69,7 @@ class OnMessage extends HookConsumerWidget {
                 backgroundColor: Colors.red,
                 foregroundColor: Colors.white,
                 icon: Icons.delete,
-                label: "delete",
+                // label: "delete",
               ),
             ],
           ),

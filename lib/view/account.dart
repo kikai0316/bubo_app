@@ -37,7 +37,12 @@ class AccountPage extends HookConsumerWidget {
       loading: () => null,
     );
     final int? historyNotifierWhen = historyNotifier.when(
-      data: (data) => data.length,
+      data: (data) {
+        return data
+            .where((element) => data.where((e) => e == element).length == 1)
+            .toList()
+            .length;
+      },
       error: (e, s) => null,
       loading: () => null,
     );

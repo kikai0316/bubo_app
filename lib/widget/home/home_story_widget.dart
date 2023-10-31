@@ -267,7 +267,7 @@ class OnStory extends HookConsumerWidget {
                     child: nText(
                       userData.name,
                       color: Colors.white.withOpacity(0.9),
-                      fontSize: safeAreaWidth / 35,
+                      fontSize: safeAreaWidth / 40,
                       bold: 500,
                     ),
                   ),
