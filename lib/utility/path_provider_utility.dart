@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:bubu_app/model/message_data.dart';
 import 'package:bubu_app/model/message_list_data.dart';
+import 'package:bubu_app/model/ticket_list.dart';
 import 'package:bubu_app/model/user_data.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -85,6 +86,69 @@ Future<List<String>> readHistoryData() async {
     return storyList;
   } catch (e) {
     return [];
+  }
+}
+
+Future<bool> writeTicketData(TicketList data) async {
+  try {
+    final freeList = data.free
+        .map(
+          (data) => {
+            "id": data.id,
+            "date": data.acquisitionAt.toString(),
+          },
+        )
+        .toList();
+    final ad = data.ad
+        .map(
+          (data) => {
+            "id": data.id,
+            "date": data.acquisitionAt.toString(),
+          },
+        )
+        .toList();
+    final setData = [freeList, ad];
+    final file = await _localFile("ticket");
+    final jsonList = jsonEncode(setData);
+    await file.writeAsString(jsonList);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+Future<TicketList> readTicketData() async {
+  try {
+    final file = await _localFile("ticket");
+    final rawData = await file.readAsString();
+    final List<dynamic> decodedJson = List<dynamic>.from(
+      jsonDecode(rawData) as Iterable<dynamic>,
+    );
+    final List<List<Map<String, dynamic>>> ticketyList =
+        decodedJson.map((dynamicList) {
+      return (dynamicList as List<dynamic>).map((mapItem) {
+        return mapItem as Map<String, dynamic>;
+      }).toList();
+    }).toList();
+    final free = ticketyList[0]
+        .map(
+          (Map<String, dynamic> value) => TicketData(
+            id: value["id"]! as String,
+            acquisitionAt: DateTime.parse(value["date"]! as String),
+          ),
+        )
+        .toList();
+    final ad = ticketyList[1]
+        .map(
+          (Map<String, dynamic> value) => TicketData(
+            id: value["id"]! as String,
+            acquisitionAt: DateTime.parse(value["date"]! as String),
+          ),
+        )
+        .toList();
+    return TicketList(free: free, ad: ad);
+  } catch (e) {
+    return const TicketList(free: [], ad: []);
   }
 }
 

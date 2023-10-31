@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 
-const whiteColor = Color.fromARGB(250, 250, 250, 250);
 const pinkColor = Color.fromARGB(255, 240, 0, 104);
-const settingBackColor = Color.fromARGB(255, 242, 241, 246);
+const whiteColor = Color.fromARGB(255, 242, 241, 246);
 const accountTextColor = Color.fromARGB(255, 23, 23, 23);
 const blueColor = Color.fromARGB(255, 2, 179, 255);
 const greenColor = Color.fromARGB(255, 48, 236, 54);

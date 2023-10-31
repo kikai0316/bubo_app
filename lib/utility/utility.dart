@@ -52,7 +52,7 @@ Future getMobileImage({
       final String base64Image = base64Encode(imageBytes);
       final Uint8List unit8 = base64Decode(base64Image);
       final compressedResult =
-          await FlutterImageCompress.compressWithList(unit8, quality: 0);
+          await FlutterImageCompress.compressWithList(unit8, quality: 50);
       onSuccess(Uint8List.fromList(compressedResult));
     }
   } catch (e) {

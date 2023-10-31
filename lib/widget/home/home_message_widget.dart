@@ -57,7 +57,7 @@ class OnMessage extends HookConsumerWidget {
         child: Slidable(
           key: ValueKey(messageData.userData.id),
           endActionPane: ActionPane(
-            extentRatio: 0.3,
+            extentRatio: 0.2,
             motion: const StretchMotion(),
             children: [
               SlidableAction(
@@ -91,8 +91,8 @@ class OnMessage extends HookConsumerWidget {
                     Padding(
                       padding: EdgeInsets.only(right: safeAreaWidth * 0.05),
                       child: Container(
-                        height: safeAreaHeight * 0.08,
-                        width: safeAreaHeight * 0.08,
+                        height: safeAreaHeight * 0.07,
+                        width: safeAreaHeight * 0.07,
                         decoration: BoxDecoration(
                           color: blackColor,
                           image: messageData.userData.imgList.isNotEmpty
@@ -122,7 +122,7 @@ class OnMessage extends HookConsumerWidget {
                             messageData.message[messageData.message.length - 1]
                                 .message,
                             color: Colors.grey,
-                            fontSize: safeAreaWidth / 30,
+                            fontSize: safeAreaWidth / 28,
                             bold: 500,
                           ),
                         ],

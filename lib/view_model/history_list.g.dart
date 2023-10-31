@@ -7,7 +7,7 @@ part of 'history_list.dart';
 // **************************************************************************
 
 String _$historyListNotifierHash() =>
-    r'3edffd58f5939a41fc35fbc3ae44727cead68520';
+    r'8f7371f4732ba1f8329458fc2f6185524cdcd748';
 
 /// See also [HistoryListNotifier].
 @ProviderFor(HistoryListNotifier)
