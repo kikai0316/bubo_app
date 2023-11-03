@@ -65,11 +65,10 @@ Future<UserData?> readUserData() async {
   }
 }
 
-Future<void> writeHistoryData(String data) async {
+Future<void> writeHistoryData(List<String> data) async {
   try {
-    final getData = await readHistoryData();
     final file = await _localFile("history");
-    final jsonList = jsonEncode([...getData, data]);
+    final jsonList = jsonEncode([data]);
     await file.writeAsString(jsonList);
   } catch (e) {
     return;

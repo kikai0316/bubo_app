@@ -44,7 +44,7 @@ class OnSwiper extends HookConsumerWidget {
         .toList();
     final historyNotifier = ref.watch(historyListNotifierProvider);
     final int historyNotifierWhen = historyNotifier.when(
-      data: (data) => data.where((item) => item == 'apple').length,
+      data: (value) => value.where((item) => item == data.id).length,
       error: (e, s) => 0,
       loading: () => 0,
     );
@@ -192,9 +192,19 @@ class OnSwiper extends HookConsumerWidget {
                   ),
                   Align(
                     alignment: Alignment.topCenter,
-                    child: SizedBox(
+                    child: Container(
                       height: safeAreaHeight * 0.1,
                       width: double.infinity,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: FractionalOffset.topCenter,
+                          end: FractionalOffset.bottomCenter,
+                          colors: [
+                            Colors.black.withOpacity(0.2),
+                            Colors.black.withOpacity(0),
+                          ],
+                        ),
+                      ),
                       child: Padding(
                         padding: EdgeInsets.only(
                           top: safeAreaHeight * 0.02,

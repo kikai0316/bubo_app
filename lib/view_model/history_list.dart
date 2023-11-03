@@ -20,7 +20,7 @@ class HistoryListNotifier extends _$HistoryListNotifier {
   }
 
   Future<void> add(String id) async {
-    await writeHistoryData(id);
+    await writeHistoryData([...state.value!, id]);
     final List<String> getData = await readHistoryData();
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
