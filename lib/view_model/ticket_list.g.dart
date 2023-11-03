@@ -7,7 +7,7 @@ part of 'ticket_list.dart';
 // **************************************************************************
 
 String _$ticketListNotifierHash() =>
-    r'589192c64df202fad2f0bd6b129767108c8c3597';
+    r'8efc0e8e3dfda6134b5853b7be4c389c9e9b0c06';
 
 /// See also [TicketListNotifier].
 @ProviderFor(TicketListNotifier)

@@ -20,9 +20,12 @@ class StoryAllPage extends HookConsumerWidget {
     final safeAreaWidth = MediaQuery.of(context).size.width;
     final storyList = ref.watch(storyListNotifierProvider);
     final deviceList = ref.watch(deviseListNotifierProvider);
+    final setDeviceList = (deviceList ?? [])
+        .map((element) => element.deviceId.split('@')[0])
+        .toList();
     final storyListWhen = storyList.when(
       data: (value) {
-        final setData = sortUserData(value, deviceList);
+        final setData = sortUserData(value, setDeviceList);
         return Align(
           alignment: Alignment.topCenter,
           child: setData.isEmpty
@@ -61,12 +64,11 @@ class StoryAllPage extends HookConsumerWidget {
                               for (int i = 0; i < 3; i++) ...{
                                 if ((i + a) < setData.length) ...{
                                   OnStory(
-                                    // key: ValueKey(" ${deviceList.value[i]} $i"),
                                     userData: setData[i + a],
                                     isMyData: false,
                                     isImgOnly: false,
-                                    isNearby:
-                                        deviceList.contains(setData[i + a].id),
+                                    isNearby: setDeviceList
+                                        .contains(setData[i + a].id),
                                     onTap: () => screenTransitionHero(
                                       context,
                                       SwiperPage(
@@ -81,7 +83,6 @@ class StoryAllPage extends HookConsumerWidget {
                                   Opacity(
                                     opacity: 0,
                                     child: OnStory(
-                                      // key: ValueKey(" ${deviceList.value[i]} $i"),
                                       userData: userData,
                                       isImgOnly: false,
                                       isMyData: false,

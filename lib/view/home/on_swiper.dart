@@ -1,3 +1,4 @@
+import 'package:bubu_app/component/loading.dart';
 import 'package:bubu_app/component/text.dart';
 import 'package:bubu_app/constant/color.dart';
 import 'package:bubu_app/model/user_data.dart';
@@ -36,14 +37,18 @@ class OnSwiper extends HookConsumerWidget {
     final imgIndex = useState<int>(data.isView ? data.imgList.length - 1 : 0);
     final message = useState<String?>(null);
     final isShowBottomSheet = useState<bool>(false);
+    final isLoading = useState<bool>(false);
     final deviceList = ref.watch(deviseListNotifierProvider);
+    final setDeviceList = (deviceList ?? [])
+        .map((element) => element.deviceId.split('@')[0])
+        .toList();
     final historyNotifier = ref.watch(historyListNotifierProvider);
     final int historyNotifierWhen = historyNotifier.when(
       data: (data) => data.where((item) => item == 'apple').length,
       error: (e, s) => 0,
       loading: () => 0,
     );
-    final isNearby = deviceList.contains(
+    final isNearby = setDeviceList.contains(
       data.id,
     );
     Future<void> messageSend(String text) async {
@@ -55,6 +60,27 @@ class OnSwiper extends HookConsumerWidget {
         if (context.mounted) {
           message.value = null;
         }
+      }
+    }
+
+    Future<void> sendMessage(String text) async {
+      isLoading.value = true;
+      final notifier = ref.read(deviseListNotifierProvider.notifier);
+      final isSend = await notifier.sendMessage(
+        message: text,
+        userData: data,
+        myData: myData,
+      );
+      if (isSend) {
+        isLoading.value = false;
+        messageSend(
+          "メッセージを送信しました",
+        );
+      } else {
+        isLoading.value = false;
+        messageSend(
+          "送信に失敗しました",
+        );
       }
     }
 
@@ -71,13 +97,7 @@ class OnSwiper extends HookConsumerWidget {
                   context: context,
                   elevation: 0,
                   backgroundColor: Colors.transparent,
-                  builder: (context) => MessageBottomSheet(
-                    myUserData: myData,
-                    userData: data,
-                    onTap: () => messageSend(
-                      "メッセージを送信しました",
-                    ),
-                  ),
+                  builder: (context) => MessageBottomSheet(onTap: sendMessage),
                 ).then((value) => isShowBottomSheet.value = false);
               }
             }
@@ -367,14 +387,8 @@ class OnSwiper extends HookConsumerWidget {
                                                                 context,
                                                                 page:
                                                                     MessageBottomSheet(
-                                                                  myUserData:
-                                                                      myData,
-                                                                  userData:
-                                                                      data,
-                                                                  onTap: () =>
-                                                                      messageSend(
-                                                                    "メッセージを送信しました",
-                                                                  ),
+                                                                  onTap:
+                                                                      sendMessage,
                                                                 ),
                                                                 isPOP: true,
                                                                 isBackgroundColor:
@@ -437,6 +451,11 @@ class OnSwiper extends HookConsumerWidget {
                       () => message.value = null,
                     ),
                   },
+                  loadinPage(
+                    context: context,
+                    isLoading: isLoading.value,
+                    text: "接続中...",
+                  ),
                 ],
               ),
             ),

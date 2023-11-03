@@ -12,6 +12,7 @@ import 'package:bubu_app/view_model/message_list.dart';
 import 'package:bubu_app/widget/home/home_message_widget.dart';
 import 'package:bubu_app/widget/home/message_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class MessageScreenPage extends HookConsumerWidget {
@@ -27,7 +28,12 @@ class MessageScreenPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final safeAreaHeight = safeHeight(context);
+    final safeAreaWidth = MediaQuery.of(context).size.width;
     final deviceList = ref.watch(deviseListNotifierProvider);
+    final isLoading = useState(false);
+    final setDeviceList = (deviceList ?? [])
+        .map((element) => element.deviceId.split('@')[0])
+        .toList();
     final messageList = ref.watch(messageListNotifierProvider);
     final messageListWhen = messageList.when(
       data: (value) {
@@ -62,7 +68,7 @@ class MessageScreenPage extends HookConsumerWidget {
             appBar: appber(
               context,
               userData: getData.first.userData,
-              isNearby: deviceList.contains(messageUserData.id),
+              isNearby: setDeviceList.contains(messageUserData.id),
             ),
             body: Stack(
               children: [
@@ -118,35 +124,67 @@ class MessageScreenPage extends HookConsumerWidget {
                 SafeArea(
                   child: Align(
                     alignment: Alignment.bottomCenter,
-                    child: Padding(
-                      padding: EdgeInsets.only(
-                        top: safeAreaHeight * 0.001,
-                      ),
-                      child: textFieldWidget(
-                        context: context,
-                        controller: controller,
-                        onTap: () {
-                          if (controller.text.isNotEmpty) {
-                            final notifier =
-                                ref.read(deviseListNotifierProvider.notifier);
-                            notifier.sendMessage(
-                              context,
-                              message: controller.text,
-                              userData: messageUserData,
-                              myData: myData,
-                            );
-                            controller.clear();
-                          } else {
-                            errorSnackbar(
-                              context,
-                              text: "空白のメッセージは送信できません。",
-                              padding: safeAreaHeight * 0.08,
-                            );
-                          }
-                        },
-                      ),
-                    ),
+                    child: setDeviceList.contains(messageUserData.id)
+                        ? Padding(
+                            padding: EdgeInsets.only(
+                              top: safeAreaHeight * 0.001,
+                            ),
+                            child: textFieldWidget(
+                              context: context,
+                              controller: controller,
+                              onTap: () async {
+                                if (setDeviceList
+                                    .contains(messageUserData.id)) {
+                                  if (controller.text.isNotEmpty) {
+                                    isLoading.value = true;
+                                    final notifier = ref.read(
+                                      deviseListNotifierProvider.notifier,
+                                    );
+                                    final isSend = await notifier.sendMessage(
+                                      message: controller.text,
+                                      userData: messageUserData,
+                                      myData: myData,
+                                    );
+                                    isLoading.value = false;
+                                    if (!isSend) {
+                                      // ignore: use_build_context_synchronously
+                                      errorSnackbar(
+                                        context,
+                                        text: "メッセージの送信に失敗しました。",
+                                        padding: safeAreaHeight * 0.08,
+                                      );
+                                    }
+                                    controller.clear();
+                                  } else {
+                                    errorSnackbar(
+                                      context,
+                                      text: "空白のメッセージは送信できません。",
+                                      padding: safeAreaHeight * 0.08,
+                                    );
+                                  }
+                                } else {
+                                  controller.clear();
+                                  errorSnackbar(
+                                    context,
+                                    text: "相手との距離が、通信範囲外です。",
+                                    padding: safeAreaHeight * 0.08,
+                                  );
+                                }
+                              },
+                            ),
+                          )
+                        : nText(
+                            "相手が通信範囲外です",
+                            color: Colors.white,
+                            fontSize: safeAreaWidth / 25,
+                            bold: 700,
+                          ),
                   ),
+                ),
+                loadinPage(
+                  context: context,
+                  isLoading: isLoading.value,
+                  text: "接続中...",
                 ),
               ],
             ),
@@ -158,7 +196,7 @@ class MessageScreenPage extends HookConsumerWidget {
         appBar: appber(
           context,
           userData: messageUserData,
-          isNearby: deviceList.contains(messageUserData.id),
+          isNearby: setDeviceList.contains(messageUserData.id),
         ),
         body: messageLoading(context),
       ),
@@ -167,7 +205,7 @@ class MessageScreenPage extends HookConsumerWidget {
         appBar: appber(
           context,
           userData: messageUserData,
-          isNearby: deviceList.contains(messageUserData.id),
+          isNearby: setDeviceList.contains(messageUserData.id),
         ),
         body: messageError(
           context,

@@ -17,6 +17,11 @@ import 'package:bubu_app/widget/home/home_story_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+// import 'package:timezone/data/latest.dart' as tz;
+// import 'package:timezone/timezone.dart' as tz;
+
+// final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+//     FlutterLocalNotificationsPlugin();
 
 class HomePage extends HookConsumerWidget {
   const HomePage({super.key, required this.userData});
@@ -28,9 +33,12 @@ class HomePage extends HookConsumerWidget {
     final storyList = ref.watch(storyListNotifierProvider);
     final messageList = ref.watch(messageListNotifierProvider);
     final deviceList = ref.watch(deviseListNotifierProvider);
+    final setDeviceList = (deviceList ?? [])
+        .map((element) => element.deviceId.split('@')[0])
+        .toList();
     final storyListWhen = storyList.when(
       data: (value) {
-        final setData = sortStoryList(value, deviceList);
+        final setData = sortStoryList(value, setDeviceList);
         return Column(
           children: [
             Align(
@@ -127,11 +135,13 @@ class HomePage extends HookConsumerWidget {
 
     useEffect(
       () {
-        final notifier = ref.read(deviseListNotifierProvider.notifier);
-        notifier.initNearbyService(userData);
+        if (deviceList == null) {
+          final notifier = ref.read(deviseListNotifierProvider.notifier);
+          notifier.initNearbyService(userData);
+        }
         return null;
       },
-      [],
+      [deviceList],
     );
 
     return Scaffold(

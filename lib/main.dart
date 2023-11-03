@@ -18,6 +18,23 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   MobileAds.instance.initialize();
+  // final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+  // FlutterLocalNotificationsPlugin();
+  // const DarwinInitializationSettings initializationSettingsIOS =
+  //     DarwinInitializationSettings(
+  //   requestAlertPermission: false,
+  //   requestBadgePermission: false,
+  //   requestSoundPermission: false,
+  // );
+  // const AndroidInitializationSettings initializationSettingsAndroid =
+  //     AndroidInitializationSettings('ic_notification');
+
+  // const InitializationSettings initializationSettings = InitializationSettings(
+  //   android: initializationSettingsAndroid,
+  //   iOS: initializationSettingsIOS,
+  // );
+  // await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  // await flutterLocalNotificationsPlugin.cancelAll();
   runApp(const ProviderScope(child: MyApp()));
 }
 

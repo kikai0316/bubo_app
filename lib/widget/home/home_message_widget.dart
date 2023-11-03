@@ -115,14 +115,14 @@ class OnMessage extends HookConsumerWidget {
                           nText(
                             messageData.userData.name,
                             color: Colors.white,
-                            fontSize: safeAreaWidth / 27,
+                            fontSize: safeAreaWidth / 30,
                             bold: 700,
                           ),
                           nText(
                             messageData.message[messageData.message.length - 1]
                                 .message,
                             color: Colors.grey,
-                            fontSize: safeAreaWidth / 28,
+                            fontSize: safeAreaWidth / 33,
                             bold: 500,
                           ),
                         ],
@@ -141,7 +141,7 @@ class OnMessage extends HookConsumerWidget {
                                   .dateTime,
                             ),
                             color: Colors.grey,
-                            fontSize: safeAreaWidth / 35,
+                            fontSize: safeAreaWidth / 40,
                             bold: 700,
                           ),
                           if (countUnreadMessages(messageData.message) > 0)

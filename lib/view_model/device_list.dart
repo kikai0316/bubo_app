@@ -1,12 +1,11 @@
+import 'dart:async';
 import 'dart:convert';
-
 import 'package:bubu_app/model/message_data.dart';
 import 'package:bubu_app/model/user_data.dart';
-import 'package:bubu_app/utility/snack_bar_utility.dart';
-import 'package:bubu_app/utility/utility.dart';
+import 'package:bubu_app/utility/notification_utility.dart';
 import 'package:bubu_app/view_model/message_list.dart';
 import 'package:bubu_app/view_model/story_list.dart';
-import 'package:flutter/material.dart';
+import 'package:bubu_app/view_model/user_data.dart';
 import 'package:flutter_nearby_connections/flutter_nearby_connections.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'device_list.g.dart';
@@ -16,8 +15,21 @@ final nearbyService = NearbyService();
 @Riverpod(keepAlive: true)
 class DeviseListNotifier extends _$DeviseListNotifier {
   @override
-  List<String> build() {
-    return [];
+  List<Device>? build() {
+    final notifierUser = ref.watch(userDataNotifierProvider);
+    final notifierUserWhen = notifierUser.when(
+      data: (value) {
+        if (value == null) {
+          return null;
+        } else {
+          initNearbyService(value);
+          return <Device>[];
+        }
+      },
+      error: (e, s) => null,
+      loading: () => null,
+    );
+    return notifierUserWhen;
   }
 
   Future<void> initNearbyService(UserData userData) async {
@@ -47,61 +59,40 @@ class DeviseListNotifier extends _$DeviseListNotifier {
   }
 
   Future<void> callbackNearbyService(UserData userData) async {
-    bool isRunning = false;
     nearbyService.stateChangedSubscription(
       callback: (devicesList) async {
-        if (!isRunning) {
-          isRunning = true;
-          for (final device in devicesList) {
-            if (device.state == SessionState.notConnected) {
-              try {
-                nearbyService.invitePeer(
-                  deviceID: device.deviceId,
-                  deviceName: device.deviceName,
-                );
-              } catch (e) {
-                return;
-              }
-            }
-            if (device.state == SessionState.connecting) {
-              final notifier = ref.read(storyListNotifierProvider.notifier);
-              notifier.addData(device.deviceId);
-            }
-          }
-          isRunning = false;
+        for (final device in devicesList) {
+          final notifier = ref.read(storyListNotifierProvider.notifier);
+          notifier.addData(device.deviceId);
         }
-        state = devicesList
-            .map((element) => element.deviceId.split('@')[0])
-            .toList();
-        // notifier.fromDeviceList(devicesList);
-        // print(state);
+        state = devicesList;
       },
     );
   }
 
-  void setupReceivedDataSubscription() {
+  Future<void> setupReceivedDataSubscription() async {
     nearbyService.dataReceivedSubscription(
-      callback: (dynamic data) {
+      callback: (dynamic data) async {
         final receivedData =
             // ignore: avoid_dynamic_calls
             jsonDecode(data['message'] as String) as Map<String, dynamic>;
-        // if (receivedData["type"] == 'image') {
-        //   final notifier = ref.read(storyListNotifierProvider.notifier);
-        //   notifier.addData(receivedData);
-        // }
         if (receivedData["type"] == 'message') {
+          final name = receivedData['name'] as String;
+          final id = receivedData['id'] as String;
+          final message = receivedData['message'] as String;
+          showNotification(name, message);
           final notifier = ref.read(messageListNotifierProvider.notifier);
           notifier.addMessage(
             messageData: MessageData(
               isMyMessage: false,
-              message: receivedData['message'] as String,
+              message: message,
               dateTime: DateTime.now(),
               isRead: false,
             ),
             userData: UserData(
               imgList: [],
-              id: receivedData['id'] as String,
-              name: receivedData['name'] as String,
+              id: id,
+              name: name,
               birthday: "",
               family: "",
               instagram: "",
@@ -118,16 +109,14 @@ class DeviseListNotifier extends _$DeviseListNotifier {
   Future<void> resetData() async {
     await nearbyService.stopAdvertisingPeer();
     await nearbyService.stopBrowsingForPeers();
-    state = [];
+    state = null;
   }
 
-  void sendMessage(
-    BuildContext context, {
+  Future<bool> sendMessage({
     required String message,
     required UserData userData,
     required UserData myData,
-  }) {
-    final safeAreaHeight = safeHeight(context);
+  }) async {
     final notifier = ref.read(messageListNotifierProvider.notifier);
     final Map<String, dynamic> setUserData = <String, dynamic>{
       'type': 'message',
@@ -135,26 +124,48 @@ class DeviseListNotifier extends _$DeviseListNotifier {
       'name': myData.name,
       'message': message,
     };
-    try {
-      nearbyService.sendMessage(
-        "${userData.id}@${userData.name}",
-        jsonEncode(setUserData),
+    bool isLoop = true;
+    while (isLoop) {
+      final Device foundDevice = (state ?? []).firstWhere(
+        (device) => device.deviceId.split('@')[0] == userData.id,
+        orElse: () => Device("", "", 0),
       );
-      notifier.addMessage(
-        messageData: MessageData(
-          isMyMessage: true,
-          message: message,
-          dateTime: DateTime.now(),
-          isRead: true,
-        ),
-        userData: userData,
-      );
-    } catch (e) {
-      errorSnackbar(
-        context,
-        text: "メッセージ送信中にエラーが発生しました",
-        padding: safeAreaHeight * 0.08,
-      );
+      if (foundDevice.deviceId != "") {
+        if (foundDevice.state == SessionState.notConnected) {
+          try {
+            nearbyService.invitePeer(
+              deviceID: foundDevice.deviceId,
+              deviceName: foundDevice.deviceName,
+            );
+            // ignore: empty_catches
+          } catch (e) {}
+        }
+        if (foundDevice.state == SessionState.connecting) {}
+        if (foundDevice.state == SessionState.connected) {
+          isLoop = false;
+          try {
+            nearbyService.sendMessage(
+              "${userData.id}@${userData.name}",
+              jsonEncode(setUserData),
+            );
+            notifier.addMessage(
+              messageData: MessageData(
+                isMyMessage: true,
+                message: message,
+                dateTime: DateTime.now(),
+                isRead: true,
+              ),
+              userData: userData,
+            );
+            return true;
+          } catch (e) {
+            isLoop = false;
+            return false;
+          }
+        }
+      }
+      await Future<void>.delayed(const Duration(milliseconds: 300));
     }
+    return false;
   }
 }
