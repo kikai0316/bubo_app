@@ -49,10 +49,7 @@ class OnMessage extends HookConsumerWidget {
       child: InkWell(
         onTap: () => screenTransitionNormal(
           context,
-          MessageScreenPage(
-            myData: myData,
-            messageUserData: messageData.userData,
-          ),
+          MessageScreenPage(id: messageData.userData.id),
         ),
         child: Slidable(
           key: ValueKey(messageData.userData.id),

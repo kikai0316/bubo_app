@@ -167,7 +167,7 @@ class OnStory extends HookConsumerWidget {
                         alignment: Alignment.center,
                         children: [
                           Padding(
-                            padding: EdgeInsets.all(safeAreaHeight * 0.0035),
+                            padding: EdgeInsets.all(safeAreaHeight * 0.003),
                             child: Container(
                               alignment: Alignment.center,
                               height: double.infinity,
@@ -177,7 +177,7 @@ class OnStory extends HookConsumerWidget {
                                 shape: BoxShape.circle,
                               ),
                               child: Padding(
-                                padding: EdgeInsets.all(safeAreaHeight * 0.004),
+                                padding: EdgeInsets.all(safeAreaHeight * 0.003),
                                 child: Container(
                                   height: double.infinity,
                                   width: double.infinity,

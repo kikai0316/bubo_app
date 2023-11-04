@@ -84,8 +84,36 @@ class OnSwiper extends HookConsumerWidget {
       }
     }
 
+    void isViweupData() {
+      final setData = UserData(
+        imgList: data.imgList,
+        id: data.id,
+        name: data.name,
+        acquisitionAt: data.acquisitionAt,
+        isGetData: data.isGetData,
+        isView: true,
+        birthday: data.birthday,
+        family: data.family,
+        instagram: data.instagram,
+      );
+      if (isMyData) {
+        final notifier = ref.read(
+          userDataNotifierProvider.notifier,
+        );
+        notifier.isViewupData();
+      } else {
+        final notifier = ref.read(
+          storyListNotifierProvider.notifier,
+        );
+        notifier.dataUpDate(setData);
+      }
+    }
+
     useEffect(
       () {
+        if (data.imgList.length == 1) {
+          isViweupData();
+        }
         void listener() {
           try {
             if (controller!.offset > 0 && !isShowBottomSheet.value) {
@@ -149,35 +177,13 @@ class OnSwiper extends HookConsumerWidget {
                                       if (imgIndex.value <
                                           data.imgList.length - 1) {
                                         imgIndex.value++;
-                                        if (imgIndex.value ==
-                                            data.imgList.length - 1) {
-                                          final setData = UserData(
-                                            imgList: data.imgList,
-                                            id: data.id,
-                                            name: data.name,
-                                            acquisitionAt: data.acquisitionAt,
-                                            isGetData: data.isGetData,
-                                            isView: true,
-                                            birthday: data.birthday,
-                                            family: data.family,
-                                            instagram: data.instagram,
-                                          );
-                                          if (isMyData) {
-                                            final notifier = ref.read(
-                                              userDataNotifierProvider.notifier,
-                                            );
-                                            notifier.isViewupData();
-                                          } else {
-                                            final notifier = ref.read(
-                                              storyListNotifierProvider
-                                                  .notifier,
-                                            );
-                                            notifier.dataUpDate(setData);
-                                          }
-                                        }
                                       } else {
                                         onNext();
                                       }
+                                    }
+                                    if (imgIndex.value ==
+                                        data.imgList.length - 1) {
+                                      isViweupData();
                                     }
                                   }
                                 : null,

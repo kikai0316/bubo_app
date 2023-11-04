@@ -1,4 +1,12 @@
+import 'package:another_flushbar/flushbar.dart';
+import 'package:bubu_app/component/text.dart';
+import 'package:bubu_app/constant/color.dart';
+import 'package:bubu_app/main.dart';
+import 'package:bubu_app/utility/screen_transition_utility.dart';
+import 'package:bubu_app/utility/utility.dart';
+import 'package:bubu_app/view/home/message_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 void errorSnackbar(
   BuildContext context, {
@@ -55,4 +63,81 @@ void errorSnackbar(
       ),
     ),
   );
+}
+
+void messageSnackbar({
+  required String name,
+  required String messageText,
+  required String id,
+}) {
+  final context = navigatorKey.currentState!.overlay!.context;
+  final safeAreaHeight = safeHeight(context);
+  final safeAreaWidth = MediaQuery.of(context).size.width;
+  HapticFeedback.vibrate();
+  Flushbar(
+    onTap: (value) =>
+        screenTransitionNormal(context, MessageScreenPage(id: id)),
+    backgroundColor: Colors.black,
+    padding: EdgeInsets.only(
+      left: safeAreaWidth * 0.03,
+      right: safeAreaWidth * 0.03,
+      top: safeAreaHeight * 0.01,
+      bottom: safeAreaHeight * 0.02,
+    ),
+    flushbarPosition: FlushbarPosition.TOP,
+    margin: EdgeInsets.only(
+      right: safeAreaWidth * 0.03,
+      left: safeAreaWidth * 0.03,
+    ),
+    borderRadius: BorderRadius.circular(15),
+    messageText: SizedBox(
+      // height: safeAreaHeight * 0.06,
+      width: safeAreaWidth * 1,
+      child: Padding(
+        padding: EdgeInsets.all(
+          safeAreaHeight * 0.01,
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  nText(
+                    "新着メッセージ",
+                    color: greenColor,
+                    fontSize: safeAreaWidth / 40,
+                    bold: 700,
+                  ),
+                  nText(
+                    name,
+                    color: Colors.white,
+                    fontSize: safeAreaWidth / 30,
+                    bold: 700,
+                  ),
+                  nText(
+                    messageText,
+                    color: Colors.grey,
+                    fontSize: safeAreaWidth / 35,
+                    bold: 700,
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(left: safeAreaWidth * 0.05),
+              child: nText(
+                "返信",
+                color: blueColor2,
+                fontSize: safeAreaWidth / 30,
+                bold: 700,
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+    duration: const Duration(seconds: 2),
+  ).show(context);
 }

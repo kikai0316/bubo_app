@@ -1,9 +1,9 @@
 import 'package:bubu_app/component/text.dart';
 import 'package:bubu_app/constant/img.dart';
 import 'package:bubu_app/utility/utility.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 Widget loadinPage({
   required BuildContext context,
@@ -16,14 +16,14 @@ Widget loadinPage({
     visible: isLoading,
     child: Container(
       alignment: Alignment.center,
-      color: Colors.black.withOpacity(0.5),
+      color: Colors.black.withOpacity(0.7),
       height: double.infinity,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          LoadingAnimationWidget.staggeredDotsWave(
+          CupertinoActivityIndicator(
             color: Colors.white,
-            size: MediaQuery.of(context).size.width / 12,
+            radius: safeAreaHeight * 0.02,
           ),
           if (text != null) ...{
             Padding(
@@ -58,17 +58,14 @@ class WithIconInLoadingPage extends HookConsumerWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Padding(
-            padding: EdgeInsets.only(bottom: safeAreaHeight * 0.03),
-            child: Container(
-              height: safeAreaHeight * 0.15,
-              width: safeAreaHeight * 0.15,
-              decoration: BoxDecoration(image: appLogoImg()),
-            ),
+          Container(
+            height: safeAreaHeight * 0.15,
+            width: safeAreaHeight * 0.15,
+            decoration: BoxDecoration(image: appLogoImg()),
           ),
-          LoadingAnimationWidget.staggeredDotsWave(
+          CupertinoActivityIndicator(
             color: Colors.white,
-            size: MediaQuery.of(context).size.width / 10,
+            radius: safeAreaHeight * 0.02,
           ),
         ],
       ),
@@ -82,9 +79,9 @@ Widget messageLoading(BuildContext context) {
     alignment: Alignment.topCenter,
     child: Padding(
       padding: EdgeInsets.only(top: safeAreaHeight * 0.05),
-      child: LoadingAnimationWidget.staggeredDotsWave(
+      child: CupertinoActivityIndicator(
         color: Colors.white,
-        size: MediaQuery.of(context).size.width / 12,
+        radius: safeAreaHeight * 0.02,
       ),
     ),
   );
@@ -96,9 +93,9 @@ Widget storyLoadingWidget(BuildContext context) {
     alignment: Alignment.center,
     height: safeAreaHeight * 0.13,
     width: double.infinity,
-    child: LoadingAnimationWidget.staggeredDotsWave(
+    child: CupertinoActivityIndicator(
       color: Colors.white,
-      size: MediaQuery.of(context).size.width / 13,
+      radius: safeAreaHeight * 0.02,
     ),
   );
 }

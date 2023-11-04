@@ -5,13 +5,12 @@ import 'package:bubu_app/model/ticket_list.dart';
 import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/utility.dart';
 import 'package:bubu_app/view_model/ticket_list.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:vibration/vibration.dart';
 
 int? getAgeFromDateString(String dateString) {
   if (dateString.length != 8) {
@@ -75,12 +74,7 @@ class EncountersWidget extends HookConsumerWidget {
     final safeAreaWidth = MediaQuery.of(context).size.width;
     final safeAreaHeight = safeHeight(context);
     useEffect(() {
-      Future(() async {
-        final isVibration = await Vibration.hasAmplitudeControl();
-        if (isVibration == true && context.mounted) {
-          Vibration.vibrate();
-        }
-      });
+      HapticFeedback.vibrate();
       return null;
     });
     return Padding(
@@ -184,10 +178,7 @@ class InstagramGetDialog extends HookConsumerWidget {
       );
       final notifier = ref.read(ticketListNotifierProvider.notifier);
       notifier.addData(setData);
-      final isVibration = await Vibration.hasAmplitudeControl();
-      if (isVibration == true) {
-        Vibration.vibrate();
-      }
+      HapticFeedback.vibrate();
       isScreen.value = true;
     }
 
@@ -347,9 +338,9 @@ class InstagramGetDialog extends HookConsumerWidget {
                               ),
                             ),
                             if (i == 0 && !isSetAd.value)
-                              LoadingAnimationWidget.staggeredDotsWave(
+                              CupertinoActivityIndicator(
                                 color: Colors.black,
-                                size: MediaQuery.of(context).size.width / 20,
+                                radius: safeAreaHeight * 0.02,
                               ),
                           ],
                         ),

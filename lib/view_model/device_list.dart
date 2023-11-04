@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:bubu_app/model/message_data.dart';
 import 'package:bubu_app/model/user_data.dart';
-import 'package:bubu_app/utility/notification_utility.dart';
+import 'package:bubu_app/utility/snack_bar_utility.dart';
 import 'package:bubu_app/view_model/message_list.dart';
 import 'package:bubu_app/view_model/story_list.dart';
 import 'package:bubu_app/view_model/user_data.dart';
@@ -80,7 +80,8 @@ class DeviseListNotifier extends _$DeviseListNotifier {
           final name = receivedData['name'] as String;
           final id = receivedData['id'] as String;
           final message = receivedData['message'] as String;
-          showNotification(name, message);
+
+          messageSnackbar(messageText: message, name: name, id: id);
           final notifier = ref.read(messageListNotifierProvider.notifier);
           notifier.addMessage(
             messageData: MessageData(
@@ -163,6 +164,9 @@ class DeviseListNotifier extends _$DeviseListNotifier {
             return false;
           }
         }
+      } else {
+        isLoop = false;
+        return false;
       }
       await Future<void>.delayed(const Duration(milliseconds: 300));
     }

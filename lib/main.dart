@@ -12,29 +12,15 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
   MobileAds.instance.initialize();
-  // final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-  // FlutterLocalNotificationsPlugin();
-  // const DarwinInitializationSettings initializationSettingsIOS =
-  //     DarwinInitializationSettings(
-  //   requestAlertPermission: false,
-  //   requestBadgePermission: false,
-  //   requestSoundPermission: false,
-  // );
-  // const AndroidInitializationSettings initializationSettingsAndroid =
-  //     AndroidInitializationSettings('ic_notification');
 
-  // const InitializationSettings initializationSettings = InitializationSettings(
-  //   android: initializationSettingsAndroid,
-  //   iOS: initializationSettingsIOS,
-  // );
-  // await flutterLocalNotificationsPlugin.initialize(initializationSettings);
-  // await flutterLocalNotificationsPlugin.cancelAll();
   runApp(const ProviderScope(child: MyApp()));
 }
 
@@ -44,7 +30,6 @@ class MyApp extends HookConsumerWidget {
   });
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // FirebaseAuth.instance.signOut();
     final User? user = FirebaseAuth.instance.currentUser;
     Future<UserData?> getSecureStorageData() async {
       await cacheSecureStorage();
@@ -59,6 +44,7 @@ class MyApp extends HookConsumerWidget {
       );
     } else {
       return MaterialApp(
+        navigatorKey: navigatorKey,
         debugShowCheckedModeBanner: false,
         home: FutureBuilder<UserData?>(
           future: getSecureStorageData(),
