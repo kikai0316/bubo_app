@@ -1,6 +1,8 @@
 import 'package:bubu_app/component/loading.dart';
 import 'package:bubu_app/component/text.dart';
 import 'package:bubu_app/constant/color.dart';
+import 'package:bubu_app/constant/emoji.dart';
+import 'package:bubu_app/constant/img.dart';
 import 'package:bubu_app/model/message_data.dart';
 import 'package:bubu_app/model/message_list_data.dart';
 import 'package:bubu_app/model/user_data.dart';
@@ -119,20 +121,31 @@ class MessageScreenPage extends HookConsumerWidget {
                                 if (!isNewDay) ...{
                                   dateLabelWidget(context, date),
                                 },
-                                if (getData
-                                    .first.message[newIndex].isMyMessage) ...{
-                                  myChatWidget(
-                                    context,
-                                    messeageData:
-                                        getData.first.message[newIndex],
-                                  ),
-                                } else ...{
-                                  recipientChatWidget(
+                                if (emojiData.containsKey(
+                                  getData.first.message[newIndex].message,
+                                )) ...{
+                                  emojiChatWidget(
                                     context,
                                     messeageData:
                                         getData.first.message[newIndex],
                                     userData: getData.first.userData,
                                   ),
+                                } else ...{
+                                  if (getData
+                                      .first.message[newIndex].isMyMessage) ...{
+                                    myChatWidget(
+                                      context,
+                                      messeageData:
+                                          getData.first.message[newIndex],
+                                    ),
+                                  } else ...{
+                                    recipientChatWidget(
+                                      context,
+                                      messeageData:
+                                          getData.first.message[newIndex],
+                                      userData: getData.first.userData,
+                                    ),
+                                  },
                                 },
                               ],
                             );
@@ -290,48 +303,55 @@ class MessageScreenPage extends HookConsumerWidget {
                       left: safeAreaWidth * 0.05,
                       right: safeAreaWidth * 0.03,
                     ),
-                    child: SizedBox(
+                    child: Container(
                       width: safeAreaHeight * 0.065,
                       height: safeAreaHeight * 0.065,
-                      child: MainImgWidget(
-                        userData: userData,
-                        myUserData: myUserData,
+                      decoration: BoxDecoration(
+                        image: userData.imgList.isEmpty ? notImg() : null,
+                        shape: BoxShape.circle,
                       ),
+                      child: userData.imgList.isNotEmpty
+                          ? MainImgWidget(
+                              userData: userData,
+                              myUserData: myUserData,
+                            )
+                          : null,
                     ),
                   ),
                   nText(
-                    userData.name,
+                    userData.imgList.isEmpty ? "Unknown" : userData.name,
                     color: Colors.white,
                     fontSize: safeAreaWidth / 23,
                     bold: 700,
                   ),
                 ],
               ),
-              GestureDetector(
-                onTap: () => showDialog<void>(
-                  context: context,
-                  builder: (
-                    BuildContext context,
-                  ) =>
-                      Dialog(
-                    elevation: 0,
-                    backgroundColor: Colors.transparent,
-                    child: InstagramGetDialog(
-                      userData: userData,
+              if (userData.imgList.isNotEmpty)
+                GestureDetector(
+                  onTap: () => showDialog<void>(
+                    context: context,
+                    builder: (
+                      BuildContext context,
+                    ) =>
+                        Dialog(
+                      elevation: 0,
+                      backgroundColor: Colors.transparent,
+                      child: InstagramGetDialog(
+                        userData: userData,
+                      ),
+                    ),
+                  ),
+                  child: Container(
+                    width: safeAreaHeight * 0.055,
+                    height: safeAreaHeight * 0.055,
+                    decoration: const BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage("assets/img/Instagram.png"),
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                 ),
-                child: Container(
-                  width: safeAreaHeight * 0.055,
-                  height: safeAreaHeight * 0.055,
-                  decoration: const BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage("assets/img/Instagram.png"),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-              ),
             ],
           ),
         ),

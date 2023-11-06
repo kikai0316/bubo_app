@@ -6,3 +6,10 @@ DecorationImage appLogoImg() {
     fit: BoxFit.cover,
   );
 }
+
+DecorationImage notImg() {
+  return const DecorationImage(
+    image: AssetImage("assets/img/not.png"),
+    fit: BoxFit.cover,
+  );
+}

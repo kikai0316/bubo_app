@@ -3,6 +3,7 @@ import 'package:bubu_app/constant/color.dart';
 import 'package:bubu_app/constant/dummy_data.dart';
 import 'package:bubu_app/model/ticket_list.dart';
 import 'package:bubu_app/model/user_data.dart';
+import 'package:bubu_app/utility/snack_bar_utility.dart';
 import 'package:bubu_app/utility/utility.dart';
 import 'package:bubu_app/view_model/ticket_list.dart';
 import 'package:flutter/cupertino.dart';
@@ -63,18 +64,16 @@ Widget messageWidget(BuildContext context, String text, void Function() onTap) {
 }
 
 class EncountersWidget extends HookConsumerWidget {
-  const EncountersWidget({
-    super.key,
-    required this.count,
-  });
+  const EncountersWidget({super.key, required this.count, required this.name});
   final int count;
+  final String name;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final safeAreaWidth = MediaQuery.of(context).size.width;
     final safeAreaHeight = safeHeight(context);
     useEffect(() {
-      HapticFeedback.vibrate();
+      encounterSnackbar(name: name, count: count);
       return null;
     });
     return Padding(

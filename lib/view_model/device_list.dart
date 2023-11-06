@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:bubu_app/constant/emoji.dart';
 import 'package:bubu_app/model/message_data.dart';
 import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/snack_bar_utility.dart';
@@ -61,11 +62,15 @@ class DeviseListNotifier extends _$DeviseListNotifier {
   Future<void> callbackNearbyService(UserData userData) async {
     nearbyService.stateChangedSubscription(
       callback: (devicesList) async {
-        for (final device in devicesList) {
+        final setDevicesList = [...devicesList];
+        if (devicesList.length > 20) {
+          devicesList.removeRange(20, devicesList.length);
+        }
+        for (final device in setDevicesList) {
           final notifier = ref.read(storyListNotifierProvider.notifier);
           notifier.addData(device.deviceId);
         }
-        state = devicesList;
+        state = setDevicesList;
       },
     );
   }
@@ -80,8 +85,12 @@ class DeviseListNotifier extends _$DeviseListNotifier {
           final name = receivedData['name'] as String;
           final id = receivedData['id'] as String;
           final message = receivedData['message'] as String;
-
-          messageSnackbar(messageText: message, name: name, id: id);
+          messageSnackbar(
+            messageText:
+                emojiData.containsKey(message) ? "リアクションがありました" : message,
+            name: name,
+            id: id,
+          );
           final notifier = ref.read(messageListNotifierProvider.notifier);
           notifier.addMessage(
             messageData: MessageData(

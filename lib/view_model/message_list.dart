@@ -26,7 +26,6 @@ class MessageListNotifier extends _$MessageListNotifier {
       setList[index] = setData;
       final isLocalWrite = await writeMessageData(setList);
       if (isLocalWrite) {
-        state = const AsyncValue.loading();
         state = await AsyncValue.guard(() async {
           return setList;
         });
@@ -43,7 +42,6 @@ class MessageListNotifier extends _$MessageListNotifier {
       setList[index] = newMessagerData;
       final isLocalWrite = await writeMessageData(setList);
       if (isLocalWrite) {
-        state = const AsyncValue.loading();
         state = await AsyncValue.guard(() async {
           return setList;
         });
@@ -60,7 +58,6 @@ class MessageListNotifier extends _$MessageListNotifier {
       setList.removeAt(index);
       final isLocalWrite = await writeMessageData(setList);
       if (isLocalWrite) {
-        state = const AsyncValue.loading();
         state = await AsyncValue.guard(() async {
           return setList;
         });
@@ -85,7 +82,6 @@ class MessageListNotifier extends _$MessageListNotifier {
       );
       final isLocalWrite = await writeMessageData(setList);
       if (isLocalWrite) {
-        state = const AsyncValue.loading();
         state = await AsyncValue.guard(() async {
           return setList;
         });
@@ -102,7 +98,6 @@ class MessageListNotifier extends _$MessageListNotifier {
       ];
       final isLocalWrite = await writeMessageData(setList);
       if (isLocalWrite) {
-        state = const AsyncValue.loading();
         state = await AsyncValue.guard(() async {
           return setList;
         });
@@ -112,7 +107,6 @@ class MessageListNotifier extends _$MessageListNotifier {
 
   Future<void> reLoad() async {
     final getData = await readeMessageData();
-    state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       return getData;
     });

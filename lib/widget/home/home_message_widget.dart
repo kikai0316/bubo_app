@@ -1,6 +1,8 @@
 import 'package:bubu_app/component/button.dart';
 import 'package:bubu_app/component/text.dart';
 import 'package:bubu_app/constant/color.dart';
+import 'package:bubu_app/constant/emoji.dart';
+import 'package:bubu_app/constant/img.dart';
 import 'package:bubu_app/model/message_data.dart';
 import 'package:bubu_app/model/message_list_data.dart';
 import 'package:bubu_app/model/user_data.dart';
@@ -23,6 +25,8 @@ class OnMessage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final safeAreaWidth = MediaQuery.of(context).size.width;
     final safeAreaHeight = safeHeight(context);
+    final message = messageData.message[messageData.message.length - 1].message;
+    final isGetData = useState(false);
     useEffect(
       () {
         var cancelled = false;
@@ -33,6 +37,8 @@ class OnMessage extends HookConsumerWidget {
             if (getData != null) {
               final notifier = ref.read(messageListNotifierProvider.notifier);
               notifier.mainImgUpDate(getData, messageData);
+            } else {
+              isGetData.value = true;
             }
           }
         });
@@ -99,7 +105,9 @@ class OnMessage extends HookConsumerWidget {
                                   ),
                                   fit: BoxFit.cover,
                                 )
-                              : null,
+                              : isGetData.value
+                                  ? notImg()
+                                  : null,
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -110,14 +118,17 @@ class OnMessage extends HookConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           nText(
-                            messageData.userData.name,
+                            isGetData.value
+                                ? "Unknown"
+                                : messageData.userData.name,
                             color: Colors.white,
                             fontSize: safeAreaWidth / 30,
                             bold: 700,
                           ),
                           nText(
-                            messageData.message[messageData.message.length - 1]
-                                .message,
+                            emojiData.containsKey(message)
+                                ? "リアクションがありました"
+                                : message,
                             color: Colors.grey,
                             fontSize: safeAreaWidth / 33,
                             bold: 500,

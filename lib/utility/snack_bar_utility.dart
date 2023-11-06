@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:another_flushbar/flushbar.dart';
 import 'package:bubu_app/component/text.dart';
 import 'package:bubu_app/constant/color.dart';
@@ -82,7 +84,7 @@ void messageSnackbar({
       left: safeAreaWidth * 0.03,
       right: safeAreaWidth * 0.03,
       top: safeAreaHeight * 0.01,
-      bottom: safeAreaHeight * 0.02,
+      bottom: safeAreaHeight * 0.01,
     ),
     flushbarPosition: FlushbarPosition.TOP,
     margin: EdgeInsets.only(
@@ -91,7 +93,6 @@ void messageSnackbar({
     ),
     borderRadius: BorderRadius.circular(15),
     messageText: SizedBox(
-      // height: safeAreaHeight * 0.06,
       width: safeAreaWidth * 1,
       child: Padding(
         padding: EdgeInsets.all(
@@ -99,6 +100,14 @@ void messageSnackbar({
         ),
         child: Row(
           children: [
+            Padding(
+              padding: EdgeInsets.only(right: safeAreaWidth * 0.03),
+              child: Icon(
+                Icons.local_fire_department,
+                color: greenColor,
+                size: safeAreaWidth / 13,
+              ),
+            ),
             Expanded(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -107,19 +116,19 @@ void messageSnackbar({
                   nText(
                     "新着メッセージ",
                     color: greenColor,
-                    fontSize: safeAreaWidth / 40,
+                    fontSize: safeAreaWidth / 35,
                     bold: 700,
                   ),
                   nText(
                     name,
                     color: Colors.white,
-                    fontSize: safeAreaWidth / 30,
+                    fontSize: safeAreaWidth / 28,
                     bold: 700,
                   ),
                   nText(
                     messageText,
                     color: Colors.grey,
-                    fontSize: safeAreaWidth / 35,
+                    fontSize: safeAreaWidth / 28,
                     bold: 700,
                   ),
                 ],
@@ -130,8 +139,62 @@ void messageSnackbar({
               child: nText(
                 "返信",
                 color: blueColor2,
-                fontSize: safeAreaWidth / 30,
+                fontSize: safeAreaWidth / 25,
                 bold: 700,
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+    duration: const Duration(seconds: 2),
+  ).show(context);
+}
+
+void encounterSnackbar({required String name, required int count}) {
+  final context = navigatorKey.currentState!.overlay!.context;
+  final safeAreaHeight = safeHeight(context);
+  final safeAreaWidth = MediaQuery.of(context).size.width;
+  HapticFeedback.vibrate();
+  Flushbar(
+    backgroundColor: Colors.black,
+    padding: EdgeInsets.only(
+      left: safeAreaWidth * 0.03,
+      right: safeAreaWidth * 0.03,
+      top: safeAreaHeight * 0.01,
+      bottom: safeAreaHeight * 0.01,
+    ),
+    flushbarPosition: FlushbarPosition.TOP,
+    margin: EdgeInsets.only(
+      right: safeAreaWidth * 0.03,
+      left: safeAreaWidth * 0.03,
+    ),
+    borderRadius: BorderRadius.circular(15),
+    messageText: SizedBox(
+      width: safeAreaWidth * 1,
+      child: Padding(
+        padding: EdgeInsets.all(
+          safeAreaHeight * 0.02,
+        ),
+        child: Row(
+          children: [
+            Padding(
+              padding: EdgeInsets.only(right: safeAreaWidth * 0.03),
+              child: Icon(
+                Icons.celebration,
+                color: blueColor,
+                size: safeAreaWidth / 15,
+              ),
+            ),
+            Expanded(
+              child: Text(
+                "$nameさんと$count回目の出会いです",
+                style: TextStyle(
+                  fontFamily: "Normal",
+                  fontVariations: const [FontVariation("wght", 700)],
+                  color: blueColor,
+                  fontSize: safeAreaWidth / 28,
+                ),
               ),
             ),
           ],

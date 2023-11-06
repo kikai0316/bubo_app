@@ -2,6 +2,8 @@ import 'dart:math';
 import 'dart:ui';
 import 'package:bubu_app/component/text.dart';
 import 'package:bubu_app/constant/color.dart';
+import 'package:bubu_app/constant/emoji.dart';
+import 'package:bubu_app/constant/img.dart';
 import 'package:bubu_app/model/message_data.dart';
 import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/utility.dart';
@@ -87,15 +89,15 @@ Widget recipientChatWidget(
           child: Container(
             width: safeAreaHeight * 0.04,
             height: safeAreaHeight * 0.04,
-            decoration: userData.imgList.isEmpty
-                ? null
-                : BoxDecoration(
-                    image: DecorationImage(
+            decoration: BoxDecoration(
+              image: userData.imgList.isEmpty
+                  ? notImg()
+                  : DecorationImage(
                       image: MemoryImage(userData.imgList.first),
                       fit: BoxFit.cover,
                     ),
-                    shape: BoxShape.circle,
-                  ),
+              shape: BoxShape.circle,
+            ),
           ),
         ),
         Expanded(
@@ -138,6 +140,108 @@ Widget recipientChatWidget(
       ],
     ),
   );
+}
+
+Widget emojiChatWidget(
+  BuildContext context, {
+  required MessageData messeageData,
+  required UserData userData,
+}) {
+  final safeAreaHeight = safeHeight(context);
+  final safeAreaWidth = MediaQuery.of(context).size.width;
+  final String? emoji = emojiData[messeageData.message];
+  final isMyData = messeageData.isMyMessage;
+  return emoji == null
+      ? const SizedBox()
+      : Padding(
+          padding: EdgeInsets.only(
+            top: safeAreaHeight * 0.01,
+            bottom: safeAreaHeight * 0.01,
+            left: safeAreaWidth * 0.03,
+            right: safeAreaWidth * 0.03,
+          ),
+          child: isMyData
+              ? Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(
+                        right: safeAreaWidth * 0.01,
+                      ),
+                      child: nText(
+                        DateFormat('HH:mm').format(messeageData.dateTime),
+                        color: Colors.white,
+                        fontSize: safeAreaWidth / 40,
+                        bold: 700,
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(
+                        left: safeAreaWidth * 0.03,
+                        right: safeAreaWidth * 0.05,
+                      ),
+                      child: Text(
+                        emoji,
+                        style: TextStyle(
+                          fontSize: safeAreaWidth / 7,
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              : Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(right: safeAreaWidth * 0.05),
+                      child: Container(
+                        width: safeAreaHeight * 0.04,
+                        height: safeAreaHeight * 0.04,
+                        decoration: userData.imgList.isEmpty
+                            ? null
+                            : BoxDecoration(
+                                image: DecorationImage(
+                                  image: MemoryImage(userData.imgList.first),
+                                  fit: BoxFit.cover,
+                                ),
+                                shape: BoxShape.circle,
+                              ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.only(
+                              left: safeAreaWidth * 0.03,
+                              right: safeAreaWidth * 0.03,
+                            ),
+                            child: Text(
+                              emoji,
+                              style: TextStyle(
+                                fontSize: safeAreaWidth / 7,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(
+                              left: safeAreaWidth * 0.01,
+                            ),
+                            child: nText(
+                              DateFormat('HH:mm').format(messeageData.dateTime),
+                              color: Colors.white,
+                              fontSize: safeAreaWidth / 40,
+                              bold: 700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+        );
 }
 
 Widget textFieldWidget({
