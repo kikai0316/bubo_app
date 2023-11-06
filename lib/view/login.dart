@@ -35,7 +35,6 @@ class StartPage extends HookConsumerWidget {
     void showSnackbar(String text) {
       isLoading.value = false;
       errorSnackbar(
-        context,
         text: text,
         padding: 0,
       );
@@ -90,9 +89,9 @@ class StartPage extends HookConsumerWidget {
     }
 
     Future<void> singInUp(
-      UserData userData,
       String email,
       String password,
+      String name,
     ) async {
       final FirebaseAuth auth = FirebaseAuth.instance;
       try {
@@ -108,10 +107,10 @@ class StartPage extends HookConsumerWidget {
           final dataSet = UserData(
             imgList: [],
             id: user.uid,
-            name: userData.name,
-            birthday: userData.birthday,
+            name: name,
+            birthday: "",
             family: "fdsaaa",
-            instagram: userData.instagram,
+            instagram: "",
             isGetData: true,
             isView: false,
             acquisitionAt: null,
@@ -131,11 +130,11 @@ class StartPage extends HookConsumerWidget {
       }
     }
 
-    // useEffect(() {
-    //   final notifier = ref.read(deviseListNotifierProvider.notifier);
-    //   notifier.resetData();
-    //   return null;
-    // });
+    useEffect(() {
+      final listNotifier = ref.read(messageListNotifierProvider.notifier);
+      listNotifier.reSet();
+      return null;
+    });
 
     return Stack(
       children: [
@@ -222,8 +221,8 @@ class StartPage extends HookConsumerWidget {
                       onTap: () => bottomSheet(
                         context,
                         page: SingInSheetWidget(
-                          onTap: (value, email, password) =>
-                              singInUp(value, email, password),
+                          onTap: (email, password, name) =>
+                              singInUp(email, password, name),
                         ),
                         isBackgroundColor: true,
                         isPOP: true,

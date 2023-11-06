@@ -169,7 +169,6 @@ class MessageScreenPage extends HookConsumerWidget {
                                       if (!isSend) {
                                         // ignore: use_build_context_synchronously
                                         errorSnackbar(
-                                          context,
                                           text: "メッセージの送信に失敗しました。",
                                           padding: safeAreaHeight * 0.08,
                                         );
@@ -177,7 +176,6 @@ class MessageScreenPage extends HookConsumerWidget {
                                       controller.clear();
                                     } else {
                                       errorSnackbar(
-                                        context,
                                         text: "空白のメッセージは送信できません。",
                                         padding: safeAreaHeight * 0.08,
                                       );
@@ -185,7 +183,6 @@ class MessageScreenPage extends HookConsumerWidget {
                                   } else {
                                     controller.clear();
                                     errorSnackbar(
-                                      context,
                                       text: "相手との距離が、通信範囲外です。",
                                       padding: safeAreaHeight * 0.08,
                                     );

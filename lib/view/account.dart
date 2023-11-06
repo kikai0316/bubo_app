@@ -48,7 +48,6 @@ class AccountPage extends HookConsumerWidget {
     );
     void showSnackbar() {
       errorSnackbar(
-        context,
         text: "サーバーとの通信に失敗しました。",
         padding: safeAreaHeight * 0.01,
       );
@@ -199,9 +198,9 @@ class AccountPage extends HookConsumerWidget {
                               buttonText: "削除する",
                               ontap: () async {
                                 Navigator.pop(context);
-                                final ss = ref
+                                final deviceListNotifier = ref
                                     .read(deviseListNotifierProvider.notifier);
-                                ss.resetData();
+                                deviceListNotifier.resetData();
                                 final loadingNotifier =
                                     ref.read(loadingNotifierProvider.notifier);
                                 loadingNotifier.upData(

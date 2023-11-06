@@ -6,7 +6,9 @@ import 'package:bubu_app/utility/screen_transition_utility.dart';
 import 'package:bubu_app/utility/utility.dart';
 import 'package:bubu_app/view/account.dart';
 import 'package:bubu_app/view/home.dart';
-import 'package:bubu_app/view/home/not_image_page.dart';
+import 'package:bubu_app/view/home/not_data_page/not_birthday_page.dart';
+import 'package:bubu_app/view/home/not_data_page/not_image_page.dart';
+import 'package:bubu_app/view/home/not_data_page/not_instagram_page.dart';
 import 'package:bubu_app/view/login.dart';
 import 'package:bubu_app/view_model/loading_model.dart';
 import 'package:bubu_app/view_model/user_data.dart';
@@ -23,18 +25,24 @@ class UserApp extends HookConsumerWidget {
     final safeAreaWidth = MediaQuery.of(context).size.width;
     final loadingNotifier = ref.watch(loadingNotifierProvider);
     final selectInt = useState<int>(initPage);
+    final isNotPage = useState<bool>(false);
     final notifier = ref.watch(userDataNotifierProvider);
-    final notImgPage = useState<bool>(false);
     final notifierWhen = notifier.when(
       data: (data) {
         if (data != null) {
-          if (data.imgList.isEmpty) {
-            notImgPage.value = true;
+          if (data.instagram.isEmpty) {
+            isNotPage.value = true;
+            return NotInstagramPage(userData: data);
+          } else if (data.birthday.isEmpty) {
+            isNotPage.value = true;
+            return NotBirthdayPage(userData: data);
+          } else if (data.imgList.isEmpty) {
+            isNotPage.value = true;
             return NotImgPage(
               userData: data,
             );
           } else {
-            notImgPage.value = false;
+            isNotPage.value = false;
             return selectInt.value == 0
                 ? HomePage(userData: data)
                 : AccountPage(userData: data);
@@ -52,7 +60,7 @@ class UserApp extends HookConsumerWidget {
     );
     return WillPopScope(
       onWillPop: () async => false,
-      child: notImgPage.value
+      child: isNotPage.value
           ? notifierWhen
           : Stack(
               children: [

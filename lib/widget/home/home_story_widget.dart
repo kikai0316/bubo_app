@@ -39,7 +39,6 @@ class OnStory extends HookConsumerWidget {
     Future<void> dataUpLoad(List<Uint8List> imgList) async {
       void showSnackbar() {
         errorSnackbar(
-          context,
           text: "何らかの問題が発生しました。再試行してください。",
           padding: safeAreaHeight * 0.07,
         );

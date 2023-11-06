@@ -28,7 +28,6 @@ class NotImgPage extends HookConsumerWidget {
     final isLoading = useState<bool>(false);
     void showSnackbar() {
       errorSnackbar(
-        context,
         text: "何らかの問題が発生しました。再試行してください。",
         padding: safeAreaHeight * 0.07,
       );
@@ -125,7 +124,6 @@ class NotImgPage extends HookConsumerWidget {
                                         value,
                                       ],
                                       onError: () => errorSnackbar(
-                                        context,
                                         text: "",
                                         padding: 0,
                                       ),

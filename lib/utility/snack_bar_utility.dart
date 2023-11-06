@@ -8,11 +8,11 @@ import 'package:bubu_app/view/home/message_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-void errorSnackbar(
-  BuildContext context, {
+void errorSnackbar({
   required String text,
   required double? padding,
 }) {
+  final context = navigatorKey.currentState!.overlay!.context;
   final safeAreaWidth = MediaQuery.of(context).size.width;
   // ignore: avoid_dynamic_calls
   ScaffoldMessenger.of(context).hideCurrentSnackBar();

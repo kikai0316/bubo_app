@@ -117,4 +117,10 @@ class MessageListNotifier extends _$MessageListNotifier {
       return getData;
     });
   }
+
+  Future<void> reSet() async {
+    state = await AsyncValue.guard(() async {
+      return [];
+    });
+  }
 }

@@ -12,8 +12,10 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class StoryAllPage extends HookConsumerWidget {
-  const StoryAllPage({super.key, required this.userData});
-  final UserData userData;
+  const StoryAllPage({
+    super.key,
+  });
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final safeAreaHeight = safeHeight(context);
@@ -45,13 +47,13 @@ class StoryAllPage extends HookConsumerWidget {
                     children: [
                       Padding(
                         padding: EdgeInsets.only(
-                          top: safeAreaHeight * 0.05,
+                          top: safeAreaHeight * 0.03,
                           bottom: safeAreaHeight * 0.05,
                         ),
                         child: nText(
-                          "過去24時間以内に\n2人のユーザーと出会いました！",
+                          "過去24時間以内に\n${value.length}人のユーザーと出会いました！",
                           color: blueColor,
-                          fontSize: safeAreaWidth / 22,
+                          fontSize: safeAreaWidth / 27,
                           bold: 700,
                         ),
                       ),
@@ -72,7 +74,7 @@ class StoryAllPage extends HookConsumerWidget {
                                     onTap: () => screenTransitionHero(
                                       context,
                                       SwiperPage(
-                                        myUserData: userData,
+                                        myUserData: setData[i + a],
                                         isMyData: false,
                                         index: i + a,
                                         storyList: setData,
@@ -80,15 +82,8 @@ class StoryAllPage extends HookConsumerWidget {
                                     ),
                                   ),
                                 } else ...{
-                                  Opacity(
-                                    opacity: 0,
-                                    child: OnStory(
-                                      userData: userData,
-                                      isImgOnly: false,
-                                      isMyData: false,
-                                      isNearby: false,
-                                      onTap: () {},
-                                    ),
+                                  SizedBox(
+                                    width: safeAreaHeight * 0.125,
                                   ),
                                 },
                               },

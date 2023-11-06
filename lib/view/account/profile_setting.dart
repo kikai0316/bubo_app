@@ -57,7 +57,6 @@ class ProfileSetting extends HookConsumerWidget {
 
     void showSnackbar() {
       errorSnackbar(
-        context,
         text: "サーバーとの通信に失敗しました。",
         padding: safeAreaHeight * 0.08,
       );

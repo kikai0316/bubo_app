@@ -287,7 +287,7 @@ Future<List<MessageList>> readeMessageData() async {
 }
 
 Future<bool> deleteAllFile(String id) async {
-  final fileName = ["user", "story", "message"];
+  final fileName = ["user", "story", "message", "history", "ticket"];
   try {
     for (int i = 0; i < fileName.length; i++) {
       final file = await _localFile(fileName[i]);

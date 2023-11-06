@@ -1,4 +1,3 @@
-import 'package:another_flushbar/flushbar.dart';
 import 'package:bubu_app/component/component.dart';
 import 'package:bubu_app/component/loading.dart';
 import 'package:bubu_app/component/text.dart';
@@ -7,6 +6,7 @@ import 'package:bubu_app/model/message_list_data.dart';
 import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/screen_transition_utility.dart';
 import 'package:bubu_app/utility/utility.dart';
+import 'package:bubu_app/view/home/story_all_page.dart';
 import 'package:bubu_app/view/home/swiper.dart';
 import 'package:bubu_app/view/user_app.dart';
 import 'package:bubu_app/view_model/device_list.dart';
@@ -15,7 +15,6 @@ import 'package:bubu_app/view_model/story_list.dart';
 import 'package:bubu_app/widget/home/home_message_widget.dart';
 import 'package:bubu_app/widget/home/home_story_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -180,79 +179,10 @@ class HomePage extends HookConsumerWidget {
           padding: EdgeInsets.only(bottom: safeAreaHeight * 0.1),
           child: FloatingActionButton(
             backgroundColor: blueColor,
-            onPressed: () async {
-              HapticFeedback.vibrate();
-              Flushbar(
-                backgroundColor: Colors.black,
-                padding: EdgeInsets.only(
-                  left: safeAreaWidth * 0.03,
-                  right: safeAreaWidth * 0.03,
-                  top: safeAreaHeight * 0.01,
-                  bottom: safeAreaHeight * 0.02,
-                ),
-                flushbarPosition: FlushbarPosition.TOP,
-                margin: EdgeInsets.only(
-                  right: safeAreaWidth * 0.03,
-                  left: safeAreaWidth * 0.03,
-                ),
-                borderRadius: BorderRadius.circular(15),
-                messageText: SizedBox(
-                  // height: safeAreaHeight * 0.06,
-                  width: safeAreaWidth * 1,
-                  child: Padding(
-                    padding: EdgeInsets.all(
-                      safeAreaHeight * 0.01,
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              nText(
-                                "新着メッセージ",
-                                color: greenColor,
-                                fontSize: safeAreaWidth / 40,
-                                bold: 700,
-                              ),
-                              nText(
-                                "あいね",
-                                color: Colors.white,
-                                fontSize: safeAreaWidth / 30,
-                                bold: 700,
-                              ),
-                              nText(
-                                "あいねさんから新着メッセージですだいすけさんから新着メッセージです",
-                                color: Colors.grey,
-                                fontSize: safeAreaWidth / 35,
-                                bold: 700,
-                              ),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(left: safeAreaWidth * 0.05),
-                          child: nText(
-                            "返信",
-                            color: blueColor2,
-                            fontSize: safeAreaWidth / 30,
-                            bold: 700,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                duration: const Duration(seconds: 2),
-              ).show(context);
-            },
-            // => screenTransitionNormal(
-            //   context,
-            //   StoryAllPage(
-            //     userData: userData,
-            //   ),
-            // ),
+            onPressed: () => screenTransitionNormal(
+              context,
+              const StoryAllPage(),
+            ),
             child: Icon(
               Icons.history,
               color: Colors.white,
