@@ -11,6 +11,7 @@ import 'package:bubu_app/utility/snack_bar_utility.dart';
 import 'package:bubu_app/utility/utility.dart';
 import 'package:bubu_app/view_model/device_list.dart';
 import 'package:bubu_app/view_model/message_list.dart';
+import 'package:bubu_app/view_model/story_list.dart';
 import 'package:bubu_app/view_model/user_data.dart';
 import 'package:bubu_app/widget/home/home_message_widget.dart';
 import 'package:bubu_app/widget/home/message_widget.dart';
@@ -85,6 +86,7 @@ class MessageScreenPage extends HookConsumerWidget {
               backgroundColor: blackColor,
               appBar: appber(
                 context,
+                ref: ref,
                 myUserData: myUserNotifireWhen,
                 userData: getData.first.userData,
                 isNearby: setDeviceList.contains(id),
@@ -168,12 +170,15 @@ class MessageScreenPage extends HookConsumerWidget {
                                 onTap: () async {
                                   if (setDeviceList.contains(id)) {
                                     if (controller.text.isNotEmpty) {
+                                      final text = controller.text;
+                                      primaryFocus?.unfocus();
+                                      controller.clear();
                                       isLoading.value = true;
                                       final notifier = ref.read(
                                         deviseListNotifierProvider.notifier,
                                       );
                                       final isSend = await notifier.sendMessage(
-                                        message: controller.text,
+                                        message: text,
                                         userData: messageUserDataNotifireWhen
                                             .userData,
                                         myData: myUserNotifireWhen,
@@ -187,7 +192,6 @@ class MessageScreenPage extends HookConsumerWidget {
                                             padding: safeAreaHeight * 0.08,
                                           );
                                         }
-                                        controller.clear();
                                       }
                                     } else {
                                       errorSnackbar(
@@ -205,11 +209,16 @@ class MessageScreenPage extends HookConsumerWidget {
                                 },
                               ),
                             )
-                          : nText(
-                              "相手が通信範囲外です",
-                              color: Colors.white,
-                              fontSize: safeAreaWidth / 25,
-                              bold: 700,
+                          : Padding(
+                              padding: EdgeInsets.only(
+                                bottom: safeAreaHeight * 0.02,
+                              ),
+                              child: nText(
+                                "相手が通信範囲外です",
+                                color: Colors.white,
+                                fontSize: safeAreaWidth / 25,
+                                bold: 700,
+                              ),
                             ),
                     ),
                   ),
@@ -262,9 +271,61 @@ class MessageScreenPage extends HookConsumerWidget {
     required UserData userData,
     required UserData myUserData,
     required bool isNearby,
+    required WidgetRef ref,
   }) {
     final safeAreaWidth = MediaQuery.of(context).size.width;
     final safeAreaHeight = safeHeight(context);
+    final storyNotifier = ref.watch(storyListNotifierProvider);
+    final storyNotifierWhen = storyNotifier.when(
+      data: (data) {
+        final int index = data.indexWhere(
+          (userData) => userData.id == userData.id,
+        );
+        if (index != -1) {
+          return data[index];
+        } else {
+          return null;
+        }
+      },
+      error: (e, s) => null,
+      loading: () => null,
+    );
+    Widget imgWidget() {
+      if (userData.imgList.isEmpty) {
+        return Container(
+          width: safeAreaHeight * 0.065,
+          height: safeAreaHeight * 0.065,
+          decoration: BoxDecoration(
+            image: userData.imgList.isEmpty ? notImg() : null,
+            shape: BoxShape.circle,
+          ),
+        );
+      } else if (!isNearby || storyNotifierWhen == null) {
+        return Container(
+          width: safeAreaHeight * 0.065,
+          height: safeAreaHeight * 0.065,
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: MemoryImage(
+                userData.imgList.first,
+              ),
+              fit: BoxFit.cover,
+            ),
+            shape: BoxShape.circle,
+          ),
+        );
+      } else {
+        return SizedBox(
+          width: safeAreaHeight * 0.065,
+          height: safeAreaHeight * 0.065,
+          child: MainImgWidget(
+            userData: storyNotifierWhen,
+            myUserData: myUserData,
+          ),
+        );
+      }
+    }
+
     return PreferredSize(
       preferredSize: Size.fromHeight(safeAreaHeight * 0.115),
       child: AppBar(
@@ -313,20 +374,7 @@ class MessageScreenPage extends HookConsumerWidget {
                       left: safeAreaWidth * 0.05,
                       right: safeAreaWidth * 0.03,
                     ),
-                    child: Container(
-                      width: safeAreaHeight * 0.065,
-                      height: safeAreaHeight * 0.065,
-                      decoration: BoxDecoration(
-                        image: userData.imgList.isEmpty ? notImg() : null,
-                        shape: BoxShape.circle,
-                      ),
-                      child: userData.imgList.isNotEmpty
-                          ? MainImgWidget(
-                              userData: userData,
-                              myUserData: myUserData,
-                            )
-                          : null,
-                    ),
+                    child: imgWidget(),
                   ),
                   nText(
                     userData.imgList.isEmpty ? "Unknown" : userData.name,
