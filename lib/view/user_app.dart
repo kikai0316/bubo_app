@@ -10,9 +10,12 @@ import 'package:bubu_app/view/home/not_data_page/not_birthday_page.dart';
 import 'package:bubu_app/view/home/not_data_page/not_image_page.dart';
 import 'package:bubu_app/view/home/not_data_page/not_instagram_page.dart';
 import 'package:bubu_app/view/login.dart';
+import 'package:bubu_app/view_model/intersitital_ad.dart';
 import 'package:bubu_app/view_model/loading_model.dart';
+import 'package:bubu_app/view_model/message_list.dart';
 import 'package:bubu_app/view_model/user_data.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -26,7 +29,21 @@ class UserApp extends HookConsumerWidget {
     final loadingNotifier = ref.watch(loadingNotifierProvider);
     final selectInt = useState<int>(initPage);
     final isNotPage = useState<bool>(false);
+    final messageNotifier = ref.watch(messageListNotifierProvider);
+    final messageNotifierCount = messageNotifier.when(
+      data: (data) {
+        final count = data
+            .expand((messageList) => messageList.message)
+            .where((messageData) => !messageData.isRead)
+            .length;
+        FlutterAppBadger.updateBadgeCount(count);
+        return count;
+      },
+      error: (e, s) => 0,
+      loading: () => 0,
+    );
     final notifier = ref.watch(userDataNotifierProvider);
+
     final notifierWhen = notifier.when(
       data: (data) {
         if (data != null) {
@@ -58,6 +75,7 @@ class UserApp extends HookConsumerWidget {
       ),
       loading: () => loadinPage(isLoading: true, text: null, context: context),
     );
+    ref.watch(interstitialAdNotifierProvider);
     return WillPopScope(
       onWillPop: () async => false,
       child: isNotPage.value
@@ -96,12 +114,19 @@ class UserApp extends HookConsumerWidget {
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Icon(
-                                      pageList[i].icon,
-                                      size: i == 1
-                                          ? safeAreaWidth / 12
-                                          : safeAreaWidth / 14,
-                                      color: Colors.white,
+                                    Badge.count(
+                                      backgroundColor: blueColor2,
+                                      smallSize: safeAreaWidth * 0.1,
+                                      count: messageNotifierCount,
+                                      isLabelVisible:
+                                          i == 0 && messageNotifierCount != 0,
+                                      child: Icon(
+                                        pageList[i].icon,
+                                        size: i == 1
+                                            ? safeAreaWidth / 12
+                                            : safeAreaWidth / 14,
+                                        color: Colors.white,
+                                      ),
                                     ),
                                     nText(
                                       pageList[i].name,

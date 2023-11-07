@@ -74,7 +74,17 @@ class MessageListNotifier extends _$MessageListNotifier {
     if (index != -1) {
       final setList = [...state.value!];
       setList[index] = MessageList(
-        userData: setList[index].userData,
+        userData: UserData(
+          name: userData.name,
+          id: userData.id,
+          imgList: setList[index].userData.imgList,
+          birthday: setList[index].userData.birthday,
+          family: setList[index].userData.family,
+          instagram: setList[index].userData.instagram,
+          isGetData: setList[index].userData.isGetData,
+          isView: setList[index].userData.isView,
+          acquisitionAt: null,
+        ),
         message: [
           ...setList[index].message,
           messageData,

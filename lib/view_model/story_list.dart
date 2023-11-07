@@ -15,33 +15,27 @@ class StoryListNotifier extends _$StoryListNotifier {
 
   Future<void> addData(String data) async {
     try {
-      final List<String> getString = data.split('@');
-      if (getString.length == 2) {
-        if (!state.value!.any(
-          (userData) => userData.id == getString[0],
-        )) {
-          final setUserData = UserData(
-            imgList: [],
-            id: getString[0],
-            name: getString[1],
-            birthday: "",
-            family: "",
-            instagram: "",
-            isGetData: false,
-            isView: false,
-            acquisitionAt: DateTime.now(),
-          );
-          final setList = hasExceeded24Hours([...state.value!, setUserData]);
-          final historyNotifier =
-              ref.read(historyListNotifierProvider.notifier);
-          historyNotifier.add(getString[0]);
-          final isLocalWrite = await writeStoryData(setList);
-          if (isLocalWrite) {
-            state = const AsyncValue.loading();
-            state = await AsyncValue.guard(() async {
-              return setList;
-            });
-          }
+      if (!state.value!.any((userData) => userData.id == data)) {
+        final setUserData = UserData(
+          imgList: [],
+          id: data,
+          name: "",
+          birthday: "",
+          family: "",
+          instagram: "",
+          isGetData: false,
+          isView: false,
+          acquisitionAt: DateTime.now(),
+        );
+        final setList = hasExceeded24Hours([...state.value!, setUserData]);
+        final historyNotifier = ref.read(historyListNotifierProvider.notifier);
+        historyNotifier.add(data);
+        final isLocalWrite = await writeStoryData(setList);
+        if (isLocalWrite) {
+          state = const AsyncValue.loading();
+          state = await AsyncValue.guard(() async {
+            return setList;
+          });
         }
       }
     } catch (e) {

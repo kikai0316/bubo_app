@@ -1,27 +1,27 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'device_list.dart';
+part of 'intersitital_ad.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$deviseListNotifierHash() =>
-    r'9032a863ff2e1fbd5658eca0aa1fed327b1815e9';
+String _$interstitialAdNotifierHash() =>
+    r'2c1685569306ebc4555c06abd9092825feac7f47';
 
-/// See also [DeviseListNotifier].
-@ProviderFor(DeviseListNotifier)
-final deviseListNotifierProvider =
-    NotifierProvider<DeviseListNotifier, List<Device>?>.internal(
-  DeviseListNotifier.new,
-  name: r'deviseListNotifierProvider',
+/// See also [InterstitialAdNotifier].
+@ProviderFor(InterstitialAdNotifier)
+final interstitialAdNotifierProvider =
+    AsyncNotifierProvider<InterstitialAdNotifier, InterstitialAd?>.internal(
+  InterstitialAdNotifier.new,
+  name: r'interstitialAdNotifierProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$deviseListNotifierHash,
+      : _$interstitialAdNotifierHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$DeviseListNotifier = Notifier<List<Device>?>;
+typedef _$InterstitialAdNotifier = AsyncNotifier<InterstitialAd?>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

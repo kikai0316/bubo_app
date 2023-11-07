@@ -88,3 +88,37 @@ Widget borderButton({
     ),
   );
 }
+
+Widget miniButton({
+  required BuildContext context,
+  required String text,
+  required Color color,
+  required bool isBoarder,
+  required void Function()? onTap,
+}) {
+  final safeAreaHeight = safeHeight(context);
+  final safeAreaWidth = MediaQuery.of(context).size.width;
+  return Material(
+    color: color,
+    borderRadius: BorderRadius.circular(10),
+    child: InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(10),
+      child: Container(
+        alignment: Alignment.center,
+        height: safeAreaHeight * 0.05,
+        width: safeAreaWidth * 0.4,
+        decoration: BoxDecoration(
+          border: isBoarder ? Border.all(color: Colors.white) : null,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: nText(
+          text,
+          color: Colors.white,
+          fontSize: safeAreaWidth / 30,
+          bold: 700,
+        ),
+      ),
+    ),
+  );
+}

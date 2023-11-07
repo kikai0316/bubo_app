@@ -1,10 +1,10 @@
 import 'package:bubu_app/component/text.dart';
 import 'package:bubu_app/constant/color.dart';
-import 'package:bubu_app/constant/dummy_data.dart';
 import 'package:bubu_app/model/ticket_list.dart';
 import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/snack_bar_utility.dart';
 import 'package:bubu_app/utility/utility.dart';
+import 'package:bubu_app/view_model/intersitital_ad.dart';
 import 'package:bubu_app/view_model/ticket_list.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -105,8 +105,6 @@ class EncountersWidget extends HookConsumerWidget {
   }
 }
 
-late InterstitialAd interstitialAd;
-
 class InstagramGetDialog extends HookConsumerWidget {
   const InstagramGetDialog({
     super.key,
@@ -119,11 +117,10 @@ class InstagramGetDialog extends HookConsumerWidget {
     final safeAreaWidth = MediaQuery.of(context).size.width;
     final safeAreaHeight = safeHeight(context);
     final isCopy = useState<bool>(false);
+    final adNotifire = ref.watch(interstitialAdNotifierProvider);
     final notifier = ref.watch(ticketListNotifierProvider);
     final isScreen = useState<bool?>(null);
-    final isSetAd = useState<bool>(false);
     final timeText = useState<String?>(null);
-    final isInitIntersititalAdCalled = useState<bool>(false);
     final notifierWhen = notifier.when(
       data: (data) {
         if (isScreen.value == null) {
@@ -137,10 +134,7 @@ class InstagramGetDialog extends HookConsumerWidget {
       error: (e, s) => const TicketList(free: [], ad: []),
       loading: () => const TicketList(free: [], ad: []),
     );
-    final titleText = [
-      "広告を見て取得",
-      "チケットで取得",
-    ];
+
     Future<void> copy() async {
       if (!isCopy.value) {
         isCopy.value = true;
@@ -181,38 +175,65 @@ class InstagramGetDialog extends HookConsumerWidget {
       isScreen.value = true;
     }
 
-    void initIntersititalAd() {
-      InterstitialAd.load(
-        adUnitId: textADID,
-        request: const AdRequest(),
-        adLoadCallback: InterstitialAdLoadCallback(
-          onAdLoaded: (ad) {
-            interstitialAd = ad;
-            isSetAd.value = true;
-            interstitialAd.fullScreenContentCallback =
-                FullScreenContentCallback(
-              onAdDismissedFullScreenContent: (ad) {
-                ad.dispose();
-                getInstagramToNext(false);
+    final adNotifireWhen = adNotifire.when(
+      data: (data) => data == null
+          ? adLoading(context)
+          : Padding(
+              padding: EdgeInsets.only(top: safeAreaHeight * 0.02),
+              child: button(
+                context,
+                title: "広告を見て取得",
+                onTap: () {
+                  final readNotifierProvider =
+                      ref.read(interstitialAdNotifierProvider.notifier);
+                  data.fullScreenContentCallback = FullScreenContentCallback(
+                    onAdDismissedFullScreenContent: (ad) {
+                      readNotifierProvider.dispose();
+                      getInstagramToNext(false);
+                    },
+                    onAdFailedToShowFullScreenContent: (ad, error) {
+                      readNotifierProvider.dispose();
+                    },
+                  );
+                  interstitialAd.show();
+                },
+                backGroundColor: Colors.transparent,
+                textColor: blueColor2,
+                border: Border.all(color: blueColor2),
+              ),
+            ),
+      error: (e, s) => Padding(
+        padding: EdgeInsets.only(top: safeAreaHeight * 0.02),
+        child: Column(
+          children: [
+            Padding(
+              padding: EdgeInsets.only(bottom: safeAreaHeight * 0.005),
+              child: nText(
+                "広告の取得にエラーが発生しました",
+                color: Colors.red,
+                fontSize: safeAreaWidth / 35,
+                bold: 700,
+              ),
+            ),
+            button(
+              context,
+              title: "広告データ再取得",
+              onTap: () {
+                final readNotifire =
+                    ref.read(interstitialAdNotifierProvider.notifier);
+                readNotifire.dispose();
               },
-              onAdFailedToShowFullScreenContent: (ad, error) {
-                ad.dispose();
-              },
-            );
-          },
-          onAdFailedToLoad: (errror) {
-            interstitialAd.dispose();
-          },
+              backGroundColor: Colors.transparent,
+              textColor: Colors.red,
+              border: Border.all(color: Colors.red),
+            ),
+          ],
         ),
-      );
-    }
-
+      ),
+      loading: () => adLoading(context),
+    );
     useEffect(
       () {
-        if (!isInitIntersititalAdCalled.value) {
-          initIntersititalAd();
-          isInitIntersititalAdCalled.value = true;
-        }
         var cancelled = false;
         final bool isTime = timeText.value == null &&
             notifierWhen.free.isNotEmpty &&
@@ -298,54 +319,25 @@ class InstagramGetDialog extends HookConsumerWidget {
                       bold: 700,
                     ),
                   },
-                  for (int i = 0; i < 2; i++) ...{
-                    Padding(
-                      padding: EdgeInsets.only(top: safeAreaHeight * 0.02),
-                      child: SizedBox(
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            Opacity(
-                              opacity: i == 1 && notifierWhen.free.length > 1
-                                  ? 0.3
-                                  : i == 0 && !isSetAd.value
-                                      ? 0.2
-                                      : 1,
-                              child: button(
-                                context,
-                                title: titleText[i],
-                                onTap: () {
-                                  if (i == 0) {
-                                    try {
-                                      if (isSetAd.value) {
-                                        interstitialAd.show();
-                                      }
-                                    } catch (e) {
-                                      return;
-                                    }
-                                  }
-                                  if (i == 1 && notifierWhen.free.length < 2) {
-                                    getInstagramToNext(true);
-                                  }
-                                },
-                                backGroundColor:
-                                    i == 0 ? Colors.transparent : blueColor2,
-                                textColor: i == 0 ? blueColor2 : Colors.white,
-                                border: i == 0
-                                    ? Border.all(color: blueColor2)
-                                    : null,
-                              ),
-                            ),
-                            if (i == 0 && !isSetAd.value)
-                              CupertinoActivityIndicator(
-                                color: Colors.black,
-                                radius: safeAreaHeight * 0.02,
-                              ),
-                          ],
-                        ),
+                  adNotifireWhen,
+                  Padding(
+                    padding: EdgeInsets.only(top: safeAreaHeight * 0.02),
+                    child: Opacity(
+                      opacity: notifierWhen.free.length > 1 ? 0.3 : 1,
+                      child: button(
+                        context,
+                        title: "チケットで取得",
+                        onTap: () {
+                          if (notifierWhen.free.length < 2) {
+                            getInstagramToNext(true);
+                          }
+                        },
+                        backGroundColor: blueColor2,
+                        textColor: Colors.white,
+                        border: null,
                       ),
                     ),
-                  },
+                  ),
                 } else ...{
                   Expanded(
                     child: Container(
@@ -508,5 +500,34 @@ class InstagramGetDialog extends HookConsumerWidget {
     final int minutes = diff.inMinutes % 60;
     final int seconds = diff.inSeconds % 60;
     return "$hours時間$minutes分$seconds秒";
+  }
+
+  Widget adLoading(BuildContext context) {
+    final safeAreaHeight = safeHeight(context);
+    return Padding(
+      padding: EdgeInsets.only(top: safeAreaHeight * 0.02),
+      child: SizedBox(
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Opacity(
+              opacity: 0.3,
+              child: button(
+                context,
+                title: "広告を見て取得",
+                onTap: () {},
+                backGroundColor: Colors.transparent,
+                textColor: blueColor2,
+                border: Border.all(color: blueColor2),
+              ),
+            ),
+            CupertinoActivityIndicator(
+              color: Colors.black,
+              radius: safeAreaHeight * 0.015,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

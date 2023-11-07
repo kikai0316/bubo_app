@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:bubu_app/component/button.dart';
 import 'package:bubu_app/component/loading.dart';
 import 'package:bubu_app/component/text.dart';
 import 'package:bubu_app/constant/color.dart';
@@ -93,30 +94,15 @@ class AccountPage extends HookConsumerWidget {
                           bold: 700,
                         ),
                       ),
-                      Material(
+                      miniButton(
+                        context: context,
+                        text: "プロフィールを編集",
+                        isBoarder: false,
                         color: Colors.grey.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(10),
-                        child: InkWell(
-                          onTap: () => screenTransitionNormal(
-                            context,
-                            ProfileSetting(
-                              userData: userData,
-                            ),
-                          ),
-                          borderRadius: BorderRadius.circular(10),
-                          child: Container(
-                            alignment: Alignment.center,
-                            height: safeAreaHeight * 0.05,
-                            width: safeAreaWidth * 0.4,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: nText(
-                              "プロフィールを編集",
-                              color: Colors.white,
-                              fontSize: safeAreaWidth / 30,
-                              bold: 700,
-                            ),
+                        onTap: () => screenTransitionNormal(
+                          context,
+                          ProfileSetting(
+                            userData: userData,
                           ),
                         ),
                       ),

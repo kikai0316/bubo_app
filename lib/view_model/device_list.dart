@@ -36,7 +36,7 @@ class DeviseListNotifier extends _$DeviseListNotifier {
   Future<void> initNearbyService(UserData userData) async {
     await nearbyService.init(
       serviceType: 'bobo',
-      deviceName: "${userData.id}@${userData.name}",
+      deviceName: userData.id,
       strategy: Strategy.P2P_CLUSTER,
       callback: (bool isRunning) async {
         if (isRunning) {
@@ -122,6 +122,13 @@ class DeviseListNotifier extends _$DeviseListNotifier {
     state = null;
   }
 
+  Future<void> sendMessageCancel() async {
+    final setData = [...state!];
+    state = [];
+    await Future<void>.delayed(const Duration(milliseconds: 600));
+    state = setData;
+  }
+
   Future<bool> sendMessage({
     required String message,
     required UserData userData,
@@ -137,7 +144,7 @@ class DeviseListNotifier extends _$DeviseListNotifier {
     bool isLoop = true;
     while (isLoop) {
       final Device foundDevice = (state ?? []).firstWhere(
-        (device) => device.deviceId.split('@')[0] == userData.id,
+        (device) => device.deviceId == userData.id,
         orElse: () => Device("", "", 0),
       );
       if (foundDevice.deviceId != "") {
@@ -150,12 +157,11 @@ class DeviseListNotifier extends _$DeviseListNotifier {
             // ignore: empty_catches
           } catch (e) {}
         }
-        if (foundDevice.state == SessionState.connecting) {}
         if (foundDevice.state == SessionState.connected) {
           isLoop = false;
           try {
             nearbyService.sendMessage(
-              "${userData.id}@${userData.name}",
+              userData.id,
               jsonEncode(setUserData),
             );
             notifier.addMessage(

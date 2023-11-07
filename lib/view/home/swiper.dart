@@ -1,6 +1,7 @@
 import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/firebase_utility.dart';
 import 'package:bubu_app/view/home/on_swiper.dart';
+import 'package:bubu_app/view_model/loading_model.dart';
 import 'package:bubu_app/view_model/story_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_carousel_slider/carousel_slider.dart';
@@ -28,6 +29,7 @@ class SwiperPage extends HookConsumerWidget {
     final isMove = useState<bool>(false);
     final scrollBack = useState<double>(0);
     final dataList = useState<List<UserData>>([...storyList]);
+    final loadingNotifier = ref.watch(loadingNotifierProvider);
     bool isNotScreen(int index) {
       if (index == 0 || index == dataList.value.length + 1) {
         return true;
@@ -162,6 +164,9 @@ class SwiperPage extends HookConsumerWidget {
               color: Colors.black.withOpacity(0),
             ),
           ),
+          if (loadingNotifier != null) ...{
+            loadingNotifier,
+          },
         ],
       ),
     );

@@ -6,6 +6,7 @@ import 'package:bubu_app/utility/utility.dart';
 import 'package:bubu_app/view/home/message_sheet.dart';
 import 'package:bubu_app/view_model/device_list.dart';
 import 'package:bubu_app/view_model/history_list.dart';
+import 'package:bubu_app/view_model/loading_model.dart';
 import 'package:bubu_app/view_model/story_list.dart';
 import 'package:bubu_app/view_model/user_data.dart';
 import 'package:bubu_app/widget/home/swiper_widget.dart';
@@ -37,7 +38,6 @@ class OnSwiper extends HookConsumerWidget {
     final imgIndex = useState<int>(data.isView ? data.imgList.length - 1 : 0);
     final message = useState<String?>(null);
     final isShowBottomSheet = useState<bool>(false);
-    final isLoading = useState<bool>(false);
     final deviceList = ref.watch(deviseListNotifierProvider);
     final setDeviceList = (deviceList ?? [])
         .map((element) => element.deviceId.split('@')[0])
@@ -64,7 +64,18 @@ class OnSwiper extends HookConsumerWidget {
     }
 
     Future<void> sendMessage(String text) async {
-      isLoading.value = true;
+      final loadingNotifier = ref.read(loadingNotifierProvider.notifier);
+      loadingNotifier.upData(
+        loadinPageWithCncel(
+          context: context,
+          isLoading: true,
+          text: "接続中...",
+          onTap: () {
+            final notifier = ref.read(deviseListNotifierProvider.notifier);
+            notifier.sendMessageCancel();
+          },
+        ),
+      );
       final notifier = ref.read(deviseListNotifierProvider.notifier);
       final isSend = await notifier.sendMessage(
         message: text,
@@ -72,12 +83,12 @@ class OnSwiper extends HookConsumerWidget {
         myData: myData,
       );
       if (isSend) {
-        isLoading.value = false;
+        loadingNotifier.upData(null);
         messageSend(
           "メッセージを送信しました",
         );
       } else {
-        isLoading.value = false;
+        loadingNotifier.upData(null);
         messageSend(
           "送信に失敗しました",
         );
@@ -464,11 +475,6 @@ class OnSwiper extends HookConsumerWidget {
                       () => message.value = null,
                     ),
                   },
-                  loadinPage(
-                    context: context,
-                    isLoading: isLoading.value,
-                    text: "接続中...",
-                  ),
                 ],
               ),
             ),

@@ -25,7 +25,7 @@ class OnMessage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final safeAreaWidth = MediaQuery.of(context).size.width;
     final safeAreaHeight = safeHeight(context);
-    final message = messageData.message[messageData.message.length - 1].message;
+    final message = messageData.message[messageData.message.length - 1];
     final isGetData = useState(false);
     useEffect(
       () {
@@ -126,9 +126,11 @@ class OnMessage extends HookConsumerWidget {
                             bold: 700,
                           ),
                           nText(
-                            emojiData.containsKey(message)
-                                ? "リアクションがありました"
-                                : message,
+                            emojiData.containsKey(message.message)
+                                ? message.isMyMessage
+                                    ? "リアクションを送信しました"
+                                    : "リアクションが送信されました"
+                                : message.message,
                             color: Colors.grey,
                             fontSize: safeAreaWidth / 33,
                             bold: 500,

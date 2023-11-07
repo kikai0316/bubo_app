@@ -178,15 +178,17 @@ class MessageScreenPage extends HookConsumerWidget {
                                             .userData,
                                         myData: myUserNotifireWhen,
                                       );
-                                      isLoading.value = false;
-                                      if (!isSend) {
-                                        // ignore: use_build_context_synchronously
-                                        errorSnackbar(
-                                          text: "メッセージの送信に失敗しました。",
-                                          padding: safeAreaHeight * 0.08,
-                                        );
+                                      if (context.mounted) {
+                                        isLoading.value = false;
+                                        if (!isSend) {
+                                          // ignore: use_build_context_synchronously
+                                          errorSnackbar(
+                                            text: "メッセージの送信に失敗しました。",
+                                            padding: safeAreaHeight * 0.08,
+                                          );
+                                        }
+                                        controller.clear();
                                       }
-                                      controller.clear();
                                     } else {
                                       errorSnackbar(
                                         text: "空白のメッセージは送信できません。",
@@ -210,11 +212,6 @@ class MessageScreenPage extends HookConsumerWidget {
                               bold: 700,
                             ),
                     ),
-                  ),
-                  loadinPage(
-                    context: context,
-                    isLoading: isLoading.value,
-                    text: "接続中...",
                   ),
                 ],
               ),
@@ -242,8 +239,21 @@ class MessageScreenPage extends HookConsumerWidget {
       ),
     );
 
-    return SizedBox(
-      child: messageListWhen,
+    return Stack(
+      children: [
+        SizedBox(
+          child: messageListWhen,
+        ),
+        loadinPageWithCncel(
+          context: context,
+          isLoading: isLoading.value,
+          text: "接続中...",
+          onTap: () {
+            final notifier = ref.read(deviseListNotifierProvider.notifier);
+            notifier.sendMessageCancel();
+          },
+        ),
+      ],
     );
   }
 

@@ -27,7 +27,9 @@ class StoryAllPage extends HookConsumerWidget {
         .toList();
     final storyListWhen = storyList.when(
       data: (value) {
-        final setData = sortUserData(value, setDeviceList);
+        final setData = sortUserData(value, setDeviceList)
+            .where((userData) => userData.imgList.isNotEmpty)
+            .toList();
         return Align(
           alignment: Alignment.topCenter,
           child: setData.isEmpty
@@ -51,7 +53,7 @@ class StoryAllPage extends HookConsumerWidget {
                           bottom: safeAreaHeight * 0.05,
                         ),
                         child: nText(
-                          "過去24時間以内に\n${value.length}人のユーザーと出会いました！",
+                          "過去24時間以内に\n${setData.length}人のユーザーと出会いました！",
                           color: blueColor,
                           fontSize: safeAreaWidth / 27,
                           bold: 700,
