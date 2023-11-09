@@ -97,8 +97,6 @@ class AccountPage extends HookConsumerWidget {
                       miniButton(
                         context: context,
                         text: "プロフィールを編集",
-                        isBoarder: false,
-                        color: Colors.grey.withOpacity(0.2),
                         onTap: () => screenTransitionNormal(
                           context,
                           ProfileSetting(

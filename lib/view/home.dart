@@ -14,6 +14,7 @@ import 'package:bubu_app/view_model/message_list.dart';
 import 'package:bubu_app/view_model/story_list.dart';
 import 'package:bubu_app/widget/home/home_message_widget.dart';
 import 'package:bubu_app/widget/home/home_story_widget.dart';
+import 'package:bubu_app/widget/home/home_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -28,6 +29,7 @@ class HomePage extends HookConsumerWidget {
     final storyList = ref.watch(storyListNotifierProvider);
     final messageList = ref.watch(messageListNotifierProvider);
     final deviceList = ref.watch(deviseListNotifierProvider);
+    final isServiceState = useState<double>(deviceList == null ? 1.5 : 1);
     final setDeviceList = (deviceList ?? [])
         .map((element) => element.deviceId.split('@')[0])
         .toList();
@@ -56,32 +58,36 @@ class HomePage extends HookConsumerWidget {
             ),
             SizedBox(
               width: safeAreaWidth * 1,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    SizedBox(
-                      width: safeAreaWidth * 0.02,
-                    ),
-                    for (int i = 0; i < setData.length + 1; i++) ...{
-                      OnStory(
-                        isImgOnly: false,
-                        userData: i == 0 ? userData : setData[i - 1],
-                        isMyData: i == 0,
-                        isNearby: true,
-                        onTap: () => screenTransitionHero(
-                          context,
-                          SwiperPage(
-                            myUserData: userData,
-                            isMyData: i == 0,
-                            index: i == 0 ? 0 : i - 1,
-                            storyList: i == 0 ? [userData] : setData,
-                          ),
+              child: Stack(
+                children: [
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        SizedBox(
+                          width: safeAreaWidth * 0.02,
                         ),
-                      ),
-                    },
-                  ],
-                ),
+                        for (int i = 0; i < setData.length + 1; i++) ...{
+                          OnStory(
+                            isImgOnly: false,
+                            userData: i == 0 ? userData : setData[i - 1],
+                            isMyData: i == 0,
+                            isNearby: true,
+                            onTap: () => screenTransitionHero(
+                              context,
+                              SwiperPage(
+                                myUserData: userData,
+                                isMyData: i == 0,
+                                index: i == 0 ? 0 : i - 1,
+                                storyList: i == 0 ? [userData] : setData,
+                              ),
+                            ),
+                          ),
+                        },
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -131,66 +137,111 @@ class HomePage extends HookConsumerWidget {
       ),
     );
 
-    useEffect(
-      () {
-        if (deviceList == null) {
-          final notifier = ref.read(deviseListNotifierProvider.notifier);
-          notifier.initNearbyService(userData);
-        }
-        return null;
-      },
-      [deviceList],
-    );
-
-    return Material(
-      child: Scaffold(
-        extendBody: true,
-        resizeToAvoidBottomInset: false,
-        backgroundColor: blackColor,
-        appBar: appberWithLogo(context),
-        body: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return Stack(
+      children: [
+        Scaffold(
+          extendBody: true,
+          resizeToAvoidBottomInset: false,
+          backgroundColor: blackColor,
+          appBar: appberWithLogo(context),
+          body: Stack(
             children: [
-              storyListWhen,
-              line(
-                context,
-                top: safeAreaHeight * 0.015,
-                bottom: 0,
-              ),
-              Padding(
-                padding: EdgeInsets.only(
-                  left: safeAreaWidth * 0.03,
-                  top: safeAreaHeight * 0.015,
-                  bottom: safeAreaHeight * 0.01,
+              SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    storyListWhen,
+                    line(
+                      context,
+                      top: safeAreaHeight * 0.015,
+                      bottom: 0,
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(
+                        left: safeAreaWidth * 0.03,
+                        top: safeAreaHeight * 0.015,
+                        bottom: safeAreaHeight * 0.01,
+                      ),
+                      child: nText(
+                        "メッセージ",
+                        color: Colors.white,
+                        fontSize: safeAreaWidth / 22,
+                        bold: 700,
+                      ),
+                    ),
+                    messageListWhen,
+                  ],
                 ),
-                child: nText(
-                  "メッセージ",
-                  color: Colors.white,
-                  fontSize: safeAreaWidth / 22,
-                  bold: 700,
+              ),
+              AnimatedAlign(
+                curve: Curves.elasticOut,
+                duration: const Duration(milliseconds: 1000),
+                alignment: Alignment(1, isServiceState.value),
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    bottom: safeAreaHeight * 0.21,
+                    right: safeAreaHeight * 0.015,
+                  ),
+                  child: GestureDetector(
+                    onTap: () {
+                      final notifier =
+                          ref.read(deviseListNotifierProvider.notifier);
+                      notifier.resetData();
+                      isServiceState.value = 1.5;
+                    },
+                    child: Visibility(
+                      visible: deviceList != null,
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                        child: Container(
+                          alignment: Alignment.center,
+                          height: safeAreaHeight * 0.075,
+                          width: safeAreaHeight * 0.075,
+                          decoration: const BoxDecoration(
+                            color: greenColor,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.sensors,
+                            color: Colors.white,
+                            size: safeAreaWidth / 13,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ),
-              messageListWhen,
             ],
           ),
-        ),
-        floatingActionButton: Padding(
-          padding: EdgeInsets.only(bottom: safeAreaHeight * 0.1),
-          child: FloatingActionButton(
-            backgroundColor: blueColor,
-            onPressed: () => screenTransitionNormal(
-              context,
-              const StoryAllPage(),
-            ),
-            child: Icon(
-              Icons.history,
-              color: Colors.white,
-              size: safeAreaWidth / 13,
+          floatingActionButton: Padding(
+            padding: EdgeInsets.only(bottom: safeAreaHeight * 0.1),
+            child: FloatingActionButton(
+              backgroundColor: blueColor,
+              onPressed: () => screenTransitionNormal(
+                context,
+                const StoryAllPage(),
+              ),
+              child: Icon(
+                Icons.history,
+                color: Colors.white,
+                size: safeAreaWidth / 13,
+              ),
             ),
           ),
         ),
-      ),
+        if (deviceList == null)
+          nearbyStartWidget(
+            context,
+            onTap: () async {
+              final notifier = ref.read(deviseListNotifierProvider.notifier);
+              notifier.initNearbyService(userData);
+              isServiceState.value = 1;
+            },
+          ),
+      ],
     );
   }
 
@@ -216,15 +267,6 @@ class HomePage extends HookConsumerWidget {
                 ),
               ),
             ),
-            // Row(
-            //   mainAxisAlignment: MainAxisAlignment.end,
-            //   children: [
-            //     Icon(
-            //       Icons.history,
-            //       size: safeAreaWidth / 11,
-            //     ),
-            //   ],
-            // )
           ],
         ),
       ),

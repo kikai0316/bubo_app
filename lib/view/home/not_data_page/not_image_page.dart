@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'dart:ui';
 import 'package:bubu_app/component/button.dart';
 import 'package:bubu_app/component/loading.dart';
 import 'package:bubu_app/component/text.dart';
@@ -12,6 +13,7 @@ import 'package:bubu_app/view_model/user_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class NotImgPage extends HookConsumerWidget {
   const NotImgPage({
@@ -26,6 +28,7 @@ class NotImgPage extends HookConsumerWidget {
     final imgList = useState<List<Uint8List>>([]);
     final upLoadMesse = useState<String>("");
     final isLoading = useState<bool>(false);
+    final isPermission = useState<bool>(false);
     void showSnackbar() {
       errorSnackbar(
         text: "何らかの問題が発生しました。再試行してください。",
@@ -69,6 +72,17 @@ class NotImgPage extends HookConsumerWidget {
       }
     }
 
+    useEffect(() {
+      Future(() async {
+        await Permission.photosAddOnly.request();
+        final isBool = await hasPhotoPermission();
+        if (context.mounted) {
+          isPermission.value = isBool;
+        }
+      });
+      return null;
+    });
+
     return Scaffold(
       backgroundColor: blackColor,
       body: Stack(
@@ -79,7 +93,7 @@ class NotImgPage extends HookConsumerWidget {
                 children: [
                   Padding(
                     padding: EdgeInsets.only(
-                      top: safeAreaHeight * 0.03,
+                      top: safeAreaHeight * 0.06,
                       bottom: safeAreaHeight * 0.08,
                     ),
                     child: nText(
@@ -174,6 +188,10 @@ class NotImgPage extends HookConsumerWidget {
             context: context,
             isLoading: isLoading.value,
             text: upLoadMesse.value,
+          ),
+          Visibility(
+            visible: isPermission.value,
+            child: photoPermissionWidget(context),
           ),
         ],
       ),
@@ -276,4 +294,118 @@ Widget imgWidget(
       ),
     ),
   );
+}
+
+Widget photoPermissionWidget(
+  BuildContext context,
+) {
+  final safeAreaHeight = safeHeight(context);
+  final safeAreaWidth = MediaQuery.of(context).size.width;
+  return Container(
+    alignment: Alignment.center,
+    height: double.infinity,
+    color: Colors.black.withOpacity(0.8),
+    child: Container(
+      alignment: Alignment.center,
+      height: safeAreaHeight * 0.35,
+      width: safeAreaWidth * 0.85,
+      decoration: BoxDecoration(
+        color: whiteColor,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(
+        children: [
+          Expanded(
+            child: Container(
+              alignment: Alignment.center,
+              child: FittedBox(
+                fit: BoxFit.fitWidth,
+                child: nText(
+                  "カメラロールへの\nアクセス許可が必要です",
+                  color: Colors.black,
+                  fontSize: safeAreaWidth / 20,
+                  bold: 700,
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.only(
+              left: safeAreaWidth * 0.05,
+              right: safeAreaWidth * 0.05,
+              bottom: safeAreaHeight * 0.02,
+            ),
+            child: Text(
+              // permissionMessage,
+              "カメラロールへのアクセス権を、下記の「設定画面」ボタンをタップ→「写真」を選択→「すべての写真」を選択",
+              textAlign: TextAlign.center,
+
+              style: TextStyle(
+                decoration: TextDecoration.none,
+                fontFamily: "Normal",
+                fontVariations: const [FontVariation("wght", 700)],
+                color: Colors.grey,
+                fontSize: safeAreaWidth / 35,
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.only(
+              left: safeAreaWidth * 0.05,
+              right: safeAreaWidth * 0.05,
+              bottom: safeAreaHeight * 0.01,
+            ),
+            child: Text(
+              // permissionMessage,
+              "変更後はアプリを再起動してください。",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                decoration: TextDecoration.none,
+                fontFamily: "Normal",
+                fontVariations: const [FontVariation("wght", 700)],
+                color: Colors.red,
+                fontSize: safeAreaWidth / 35,
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.all(safeAreaWidth * 0.03),
+            child: GestureDetector(
+              onTap: () {
+                openAppSettings();
+              },
+              child: Container(
+                alignment: Alignment.center,
+                height: safeAreaHeight * 0.065,
+                width: safeAreaWidth * 0.95,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    width: 2,
+                    color: blueColor2,
+                  ),
+                  borderRadius: BorderRadius.circular(
+                    10,
+                  ),
+                ),
+                child: nText(
+                  "設定画面へ",
+                  color: blueColor2,
+                  fontSize: safeAreaWidth / 27,
+                  bold: 700,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+Future<bool> hasPhotoPermission() async {
+  final status = await Permission.photosAddOnly.status;
+  if (status.isGranted) {
+    return false;
+  }
+  return true;
 }

@@ -1,28 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-<dict>
-    <key>UIBackgroundModes</key>
-    <array>
-        <string>remote-notification</string>
-    </array>
-    <key>GADApplicationIdentifier</key>
-    <string>ca-app-pub-5151087641300264/9676922342</string>
-    <key>SKAdNetworkItems</key>
-    <array>
-      <dict>
-        <key>SKAdNetworkIdentifier</key>
-        <string>cstr6suwn9.skadnetwork</string>
-      </dict>
-    </array>
-    <key>GADApplicationIdentifier</key>
-    <string>ca-app-pub-3940256099942544~1458002511</string>
-    <key>NSCameraUsageDescription</key>
-    <string>画像を送る際に使用します</string>
-    <key>NSPhotoLibraryUsageDescription</key>
-    <string>ユーザーのプロフィール写真などを追加する時に必要です。</string>
-	<key>NSMicrophoneUsageDescription</key>
-    <string>音声メッセージを送る際に,使用します</string>
+<dict> 
+    <key>NSUserNotificationUsageDescription</key>
+    <string>アプリからの通知を受け取るためには、通知パーミッションが必要です。</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
@@ -45,18 +26,39 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>GADApplicationIdentifier</key>
+	<string>ca-app-pub-3940256099942544~1458002511</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>Bubu Appは、Bluetoothを使用して周辺デバイスと接続し、メッセージをやり取りします。これにより、普段出会わない人と出会うという体験を提供します</string>
-	<key>NSLocalNetworkUsageDescription</key>
-    <string>BubuAppは、ローカルネットワークを使用して,普段出会わない人とのデータ通信を行います</string>
 	<key>NSBonjourServices</key>
 	<array>
-        <string>_bobo._tcp</string>
-    </array>
+		<string>_bobo._tcp</string>
+	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>画像を送る際に使用します</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>BubuAppは、ローカルネットワークを使用して,普段出会わない人とのデータ通信を行います</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>音声メッセージを送る際に,使用します</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>ユーザーのプロフィール写真などを追加する時に必要です。</string>
+	<key>SKAdNetworkItems</key>
+	<array>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>cstr6suwn9.skadnetwork</string>
+		</dict>
+	</array>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>processing</string>
+		<string>remote-notification</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

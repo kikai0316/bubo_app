@@ -7,12 +7,13 @@ import 'package:bubu_app/constant/url.dart';
 import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/firebase_utility.dart';
 import 'package:bubu_app/utility/path_provider_utility.dart';
+import 'package:bubu_app/utility/screen_transition_utility.dart';
 import 'package:bubu_app/utility/secure_storage_utility.dart';
 import 'package:bubu_app/utility/snack_bar_utility.dart';
 import 'package:bubu_app/utility/utility.dart';
 import 'package:bubu_app/view/login/login_sheet.dart';
 import 'package:bubu_app/view/login/singin_sheet.dart';
-import 'package:bubu_app/view/user_app.dart';
+import 'package:bubu_app/view/request_page.dart';
 import 'package:bubu_app/view_model/message_list.dart';
 import 'package:bubu_app/view_model/story_list.dart';
 import 'package:bubu_app/view_model/user_data.dart';
@@ -52,13 +53,9 @@ class StartPage extends HookConsumerWidget {
       isLoading.value = false;
       if (isSuccess) {
         // ignore: use_build_context_synchronously
-        Navigator.push<Widget>(
+        screenTransitionNormal(
           context,
-          MaterialPageRoute(
-            builder: (context) => const UserApp(
-              initPage: 0,
-            ),
-          ),
+          const RequestNotificationsPage(),
         );
       } else {
         showSnackbar("エラーが発生しました。");

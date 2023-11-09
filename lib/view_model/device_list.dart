@@ -6,34 +6,37 @@ import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/snack_bar_utility.dart';
 import 'package:bubu_app/view_model/message_list.dart';
 import 'package:bubu_app/view_model/story_list.dart';
-import 'package:bubu_app/view_model/user_data.dart';
 import 'package:flutter_nearby_connections/flutter_nearby_connections.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'device_list.g.dart';
 
-final nearbyService = NearbyService();
+late NearbyService nearbyService;
+StreamSubscription<dynamic>? stateChangedSubscription;
+StreamSubscription<dynamic>? dataReceivedSubscription;
 
 @Riverpod(keepAlive: true)
 class DeviseListNotifier extends _$DeviseListNotifier {
   @override
   List<Device>? build() {
-    final notifierUser = ref.watch(userDataNotifierProvider);
-    final notifierUserWhen = notifierUser.when(
-      data: (value) {
-        if (value == null) {
-          return null;
-        } else {
-          initNearbyService(value);
-          return <Device>[];
-        }
-      },
-      error: (e, s) => null,
-      loading: () => null,
-    );
-    return notifierUserWhen;
+    // final notifierUser = ref.watch(userDataNotifierProvider);
+    // final notifierUserWhen = notifierUser.when(
+    //   data: (value) {
+    //     if (value == null) {
+    //       return null;
+    //     } else {
+    //       initNearbyService(value);
+    //       return <Device>[];
+    //     }
+    //   },
+    //   error: (e, s) => null,
+    //   loading: () => null,
+    // );
+    return null;
   }
 
   Future<void> initNearbyService(UserData userData) async {
+    nearbyService = NearbyService();
+    state = [];
     await nearbyService.init(
       serviceType: 'bobo',
       deviceName: userData.id,
@@ -43,15 +46,18 @@ class DeviseListNotifier extends _$DeviseListNotifier {
           try {
             await nearbyService.stopAdvertisingPeer();
             await nearbyService.stopBrowsingForPeers();
+            await stateChangedSubscription?.cancel();
+            await dataReceivedSubscription?.cancel();
             await Future<void>.delayed(const Duration(microseconds: 200));
             await nearbyService.startAdvertisingPeer();
             await nearbyService.startBrowsingForPeers();
             await Future<void>.delayed(const Duration(microseconds: 200));
-            callbackNearbyService(userData);
+            callbackNearbyService();
             setupReceivedDataSubscription();
           } catch (e) {
             await nearbyService.stopAdvertisingPeer();
             await nearbyService.stopBrowsingForPeers();
+            state = null;
             return;
           }
         }
@@ -59,8 +65,8 @@ class DeviseListNotifier extends _$DeviseListNotifier {
     );
   }
 
-  Future<void> callbackNearbyService(UserData userData) async {
-    nearbyService.stateChangedSubscription(
+  Future<void> callbackNearbyService() async {
+    stateChangedSubscription = nearbyService.stateChangedSubscription(
       callback: (devicesList) async {
         final setDevicesList = [...devicesList];
         if (devicesList.length > 20) {
@@ -76,7 +82,7 @@ class DeviseListNotifier extends _$DeviseListNotifier {
   }
 
   Future<void> setupReceivedDataSubscription() async {
-    nearbyService.dataReceivedSubscription(
+    dataReceivedSubscription = nearbyService.dataReceivedSubscription(
       callback: (dynamic data) async {
         final receivedData =
             // ignore: avoid_dynamic_calls
@@ -117,6 +123,8 @@ class DeviseListNotifier extends _$DeviseListNotifier {
   }
 
   Future<void> resetData() async {
+    await stateChangedSubscription?.cancel();
+    await dataReceivedSubscription?.cancel();
     await nearbyService.stopAdvertisingPeer();
     await nearbyService.stopBrowsingForPeers();
     state = null;

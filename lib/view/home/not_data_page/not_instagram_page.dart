@@ -78,7 +78,7 @@ class NotInstagramPage extends HookConsumerWidget {
                 children: [
                   Padding(
                     padding: EdgeInsets.only(
-                      top: safeAreaHeight * 0.03,
+                      top: safeAreaHeight * 0.06,
                       bottom: safeAreaHeight * 0.06,
                     ),
                     child: nText(
@@ -90,8 +90,8 @@ class NotInstagramPage extends HookConsumerWidget {
                   ),
                   Padding(
                     padding: EdgeInsets.only(
-                      right: safeAreaWidth * 0.1,
-                      left: safeAreaWidth * 0.1,
+                      right: safeAreaWidth * 0.08,
+                      left: safeAreaWidth * 0.08,
                     ),
                     child: TextFormField(
                       onChanged: (value) {
@@ -170,15 +170,18 @@ class NotInstagramPage extends HookConsumerWidget {
             child: SafeArea(
               child: Opacity(
                 opacity: text.value.isEmpty ? 0.3 : 1,
-                child: bottomButton(
-                  context: context,
-                  isWhiteMainColor: true,
-                  text: "完了",
-                  onTap: () async {
-                    if (isCheck()) {
-                      dataUpLoad();
-                    }
-                  },
+                child: Padding(
+                  padding: EdgeInsets.only(bottom: safeAreaHeight * 0.02),
+                  child: bottomButton(
+                    context: context,
+                    isWhiteMainColor: true,
+                    text: "完了",
+                    onTap: () async {
+                      if (isCheck()) {
+                        dataUpLoad();
+                      }
+                    },
+                  ),
                 ),
               ),
             ),

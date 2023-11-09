@@ -81,7 +81,7 @@ class NotBirthdayPage extends HookConsumerWidget {
                 children: [
                   Padding(
                     padding: EdgeInsets.only(
-                      top: safeAreaHeight * 0.03,
+                      top: safeAreaHeight * 0.06,
                       bottom: safeAreaHeight * 0.06,
                     ),
                     child: nText(
