@@ -102,7 +102,7 @@ class HomePage extends HookConsumerWidget {
     );
     final messageListWhen = messageList.when(
       data: (value) {
-        final setData = sortMessageListsByDate(value);
+        final setData = sortMessageListsByDateAndId(value, setDeviceList);
         if (setData.isEmpty) {
           return Center(
             child: Padding(
@@ -116,15 +116,18 @@ class HomePage extends HookConsumerWidget {
             ),
           );
         } else {
-          return Column(
-            children: [
-              for (int i = 0; i < setData.length; i++) ...{
-                OnMessage(
-                  messageData: setData[i],
-                  myData: userData,
-                ),
-              },
-            ],
+          return Center(
+            child: Column(
+              children: [
+                for (int i = 0; i < setData.length; i++) ...{
+                  OnMessage(
+                    messageData: setData[i],
+                    myData: userData,
+                    isNearby: setDeviceList.contains(setData[i].userData.id),
+                  ),
+                },
+              ],
+            ),
           );
         }
       },
@@ -137,6 +140,9 @@ class HomePage extends HookConsumerWidget {
       ),
     );
 
+    useEffect(() {
+      return null;
+    });
     return Stack(
       children: [
         Scaffold(
@@ -179,16 +185,23 @@ class HomePage extends HookConsumerWidget {
                 alignment: Alignment(1, isServiceState.value),
                 child: Padding(
                   padding: EdgeInsets.only(
-                    bottom: safeAreaHeight * 0.21,
-                    right: safeAreaHeight * 0.015,
+                    bottom: safeAreaWidth * 0.4,
+                    right: safeAreaWidth * 0.04,
                   ),
                   child: GestureDetector(
-                    onTap: () {
-                      final notifier =
-                          ref.read(deviseListNotifierProvider.notifier);
-                      notifier.resetData();
-                      isServiceState.value = 1.5;
-                    },
+                    onTap: () => showAlertDialog(
+                      context,
+                      title: "周囲のデバイスとの\n接続を停止しますか？",
+                      subTitle: null,
+                      buttonText: "停止",
+                      ontap: () {
+                        Navigator.pop(context);
+                        final notifier =
+                            ref.read(deviseListNotifierProvider.notifier);
+                        notifier.resetData();
+                        isServiceState.value = 1.5;
+                      },
+                    ),
                     child: Visibility(
                       visible: deviceList != null,
                       child: Card(
@@ -197,8 +210,8 @@ class HomePage extends HookConsumerWidget {
                         ),
                         child: Container(
                           alignment: Alignment.center,
-                          height: safeAreaHeight * 0.075,
-                          width: safeAreaHeight * 0.075,
+                          height: safeAreaWidth * 0.13,
+                          width: safeAreaWidth * 0.13,
                           decoration: const BoxDecoration(
                             color: greenColor,
                             shape: BoxShape.circle,
@@ -274,14 +287,26 @@ class HomePage extends HookConsumerWidget {
   }
 }
 
-List<MessageList> sortMessageListsByDate(List<MessageList> messageLists) {
+List<MessageList> sortMessageListsByDateAndId(
+  List<MessageList> messageLists,
+  List<String> idList,
+) {
   final List<MessageList> sortedLists = List.from(messageLists);
   sortedLists.sort((a, b) {
     final DateTime dateA = a.message.last.dateTime;
     final DateTime dateB = b.message.last.dateTime;
     return dateB.compareTo(dateA);
   });
-  return sortedLists;
+  final List<MessageList> prioritizedLists = [];
+  final List<MessageList> otherLists = [];
+  for (final messageList in sortedLists) {
+    if (idList.contains(messageList.userData.id)) {
+      prioritizedLists.add(messageList);
+    } else {
+      otherLists.add(messageList);
+    }
+  }
+  return prioritizedLists + otherLists;
 }
 
 List<UserData> sortStoryList(List<UserData> data, List<String> idList) {

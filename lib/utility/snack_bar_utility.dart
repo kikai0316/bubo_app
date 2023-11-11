@@ -83,11 +83,12 @@ void messageSnackbar({
     padding: EdgeInsets.only(
       left: safeAreaWidth * 0.03,
       right: safeAreaWidth * 0.03,
-      top: safeAreaHeight * 0.01,
-      bottom: safeAreaHeight * 0.01,
+      top: safeAreaHeight * 0.005,
+      bottom: safeAreaHeight * 0.005,
     ),
     flushbarPosition: FlushbarPosition.TOP,
     margin: EdgeInsets.only(
+      top: safeAreaHeight * 0.01,
       right: safeAreaWidth * 0.03,
       left: safeAreaWidth * 0.03,
     ),
@@ -116,19 +117,19 @@ void messageSnackbar({
                   nText(
                     "新着メッセージ",
                     color: greenColor,
-                    fontSize: safeAreaWidth / 35,
+                    fontSize: safeAreaWidth / 40,
                     bold: 700,
                   ),
                   nText(
                     name,
                     color: Colors.white,
-                    fontSize: safeAreaWidth / 28,
+                    fontSize: safeAreaWidth / 30,
                     bold: 700,
                   ),
                   nText(
                     messageText,
                     color: Colors.grey,
-                    fontSize: safeAreaWidth / 28,
+                    fontSize: safeAreaWidth / 30,
                     bold: 700,
                   ),
                 ],
@@ -138,7 +139,7 @@ void messageSnackbar({
               padding: EdgeInsets.only(left: safeAreaWidth * 0.05),
               child: nText(
                 "返信",
-                color: blueColor2,
+                color: greenColor,
                 fontSize: safeAreaWidth / 25,
                 bold: 700,
               ),

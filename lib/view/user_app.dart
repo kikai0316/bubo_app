@@ -76,6 +76,7 @@ class UserApp extends HookConsumerWidget {
       loading: () => loadinPage(isLoading: true, text: null, context: context),
     );
     ref.watch(interstitialAdNotifierProvider);
+
     return WillPopScope(
       onWillPop: () async => false,
       child: isNotPage.value

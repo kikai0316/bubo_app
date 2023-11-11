@@ -21,3 +21,22 @@ Widget nText(
     ),
   );
 }
+
+Widget nText2(
+  String text, {
+  required Color color,
+  required double fontSize,
+  required double bold,
+}) {
+  return Text(
+    text,
+    textAlign: TextAlign.left,
+    style: TextStyle(
+      decoration: TextDecoration.none,
+      fontFamily: "Normal",
+      fontVariations: [FontVariation("wght", bold)],
+      color: color,
+      fontSize: fontSize,
+    ),
+  );
+}

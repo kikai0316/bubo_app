@@ -11,15 +11,22 @@ import 'package:bubu_app/utility/screen_transition_utility.dart';
 import 'package:bubu_app/utility/utility.dart';
 import 'package:bubu_app/view/home/message_screen.dart';
 import 'package:bubu_app/view_model/message_list.dart';
+import 'package:bubu_app/view_model/story_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class OnMessage extends HookConsumerWidget {
-  const OnMessage({super.key, required this.messageData, required this.myData});
+  const OnMessage({
+    super.key,
+    required this.messageData,
+    required this.myData,
+    required this.isNearby,
+  });
   final MessageList messageData;
   final UserData myData;
+  final bool isNearby;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -27,36 +34,42 @@ class OnMessage extends HookConsumerWidget {
     final safeAreaHeight = safeHeight(context);
     final message = messageData.message[messageData.message.length - 1];
     final isGetData = useState(false);
-    useEffect(
-      () {
-        var cancelled = false;
-        Future(() async {
-          if (messageData.userData.imgList.isEmpty) {
-            final getData = await imgMainGet(messageData.userData);
-            if (cancelled) return;
-            if (getData != null) {
-              final notifier = ref.read(messageListNotifierProvider.notifier);
-              notifier.mainImgUpDate(getData, messageData);
-            } else {
-              isGetData.value = true;
-            }
-          }
-        });
+    final storyListNotifier = ref.watch(storyListNotifierProvider);
+    Future<void> imgGet() async {
+      final getData = await imgMainGet(messageData.userData);
+      if (context.mounted) {
+        if (getData != null) {
+          final notifier = ref.read(messageListNotifierProvider.notifier);
+          notifier.mainImgUpDate(getData, messageData);
+        } else {
+          isGetData.value = true;
+        }
+      }
+    }
 
-        return () {
-          cancelled = true;
-        };
+    final userData = storyListNotifier.when(
+      data: (data) {
+        final int index = data
+            .indexWhere((userData) => userData.id == messageData.userData.id);
+        if (index != -1) {
+          return data[index];
+        } else {
+          if (messageData.userData.imgList.isEmpty) {
+            imgGet();
+          }
+          return null;
+        }
       },
-      [],
+      error: (e, s) => null,
+      loading: () => null,
     );
-    return Material(
-      color: Colors.transparent,
-      borderRadius: BorderRadius.circular(15),
-      child: InkWell(
-        onTap: () => screenTransitionNormal(
-          context,
-          MessageScreenPage(id: messageData.userData.id),
-        ),
+    return GestureDetector(
+      onTap: () => screenTransitionNormal(
+        context,
+        MessageScreenPage(id: messageData.userData.id),
+      ),
+      child: SizedBox(
+        width: safeAreaWidth * 0.98,
         child: Slidable(
           key: ValueKey(messageData.userData.id),
           endActionPane: ActionPane(
@@ -76,9 +89,8 @@ class OnMessage extends HookConsumerWidget {
               ),
             ],
           ),
-          child: Container(
+          child: SizedBox(
             width: double.infinity,
-            color: Colors.black.withOpacity(0),
             child: Padding(
               padding: EdgeInsets.only(
                 top: safeAreaHeight * 0.015,
@@ -98,16 +110,24 @@ class OnMessage extends HookConsumerWidget {
                         width: safeAreaHeight * 0.07,
                         decoration: BoxDecoration(
                           color: blackColor,
-                          image: messageData.userData.imgList.isNotEmpty
+                          image: userData != null && userData.imgList.isNotEmpty
                               ? DecorationImage(
                                   image: MemoryImage(
-                                    messageData.userData.imgList.first,
+                                    userData.imgList.first,
                                   ),
                                   fit: BoxFit.cover,
                                 )
-                              : isGetData.value
-                                  ? notImg()
-                                  : null,
+                              : userData == null &&
+                                      messageData.userData.imgList.isNotEmpty
+                                  ? DecorationImage(
+                                      image: MemoryImage(
+                                        messageData.userData.imgList.first,
+                                      ),
+                                      fit: BoxFit.cover,
+                                    )
+                                  : isGetData.value
+                                      ? notImg()
+                                      : null,
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -117,13 +137,37 @@ class OnMessage extends HookConsumerWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          nText(
-                            isGetData.value
-                                ? "Unknown"
-                                : messageData.userData.name,
-                            color: Colors.white,
-                            fontSize: safeAreaWidth / 30,
-                            bold: 700,
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Container(
+                                constraints: BoxConstraints(
+                                  maxWidth: safeAreaWidth * 0.35,
+                                ),
+                                child: nText(
+                                  isGetData.value
+                                      ? "Unknownaaaaaaaaaaaaaaああああああああああああああ"
+                                      : userData != null
+                                          ? userData.name
+                                          : messageData.userData.name,
+                                  color: Colors.white,
+                                  fontSize: safeAreaWidth / 30,
+                                  bold: 700,
+                                ),
+                              ),
+                              nText(
+                                "｜",
+                                color: Colors.grey,
+                                fontSize: safeAreaWidth / 30,
+                                bold: 700,
+                              ),
+                              nText(
+                                isNearby ? "付近います" : "通信範囲外です",
+                                color: isNearby ? greenColor : Colors.grey,
+                                fontSize: safeAreaWidth / 40,
+                                bold: 700,
+                              ),
+                            ],
                           ),
                           nText(
                             emojiData.containsKey(message.message)

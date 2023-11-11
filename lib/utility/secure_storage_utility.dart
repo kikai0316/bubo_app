@@ -23,24 +23,16 @@ Future<bool> writeSecureStorage({
 }) async {
   try {
     const storage = FlutterSecureStorage();
-    final Map<String, String> userData = {'email': email, "password": password};
-    await storage.write(key: "account", value: jsonEncode(userData));
+    final Map<String, String> userData = {
+      'email': email,
+      "password": password,
+    };
+    await storage.write(
+      key: "account",
+      value: jsonEncode(userData),
+    );
     return true;
   } catch (e) {
     return false;
   }
 }
-
-// Future<void> deleteSecureStorage({
-//   required String id,
-//   required void Function()? onError,
-// }) async {
-//   try {
-//     const storage = FlutterSecureStorage();
-//     await storage.delete(key: id);
-//   } catch (e) {
-//     if (onError != null) {
-//       onError();
-//     }
-//   }
-// }

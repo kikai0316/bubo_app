@@ -115,8 +115,8 @@ Widget nearbyStartWidget(
       style: TextStyle(
         fontFamily: "Normal",
         fontVariations: const [FontVariation("wght", 700)],
-        color: text == "ON" ? greenColor : Colors.white,
-        fontSize: safeAreaWidth / 24,
+        color: text == "ON" ? greenColor : Colors.grey,
+        fontSize: safeAreaWidth / 25,
       ),
     );
   }
@@ -141,7 +141,7 @@ Widget nearbyStartWidget(
           height: safeAreaHeight * 0.43,
           width: safeAreaWidth * 0.9,
           decoration: BoxDecoration(
-            color: blackColor,
+            // color: blackColor,
             borderRadius: BorderRadius.circular(15),
           ),
           child: Padding(
@@ -162,11 +162,11 @@ Widget nearbyStartWidget(
                 Padding(
                   padding: EdgeInsets.only(
                     bottom: safeAreaHeight * 0.05,
-                    top: safeAreaHeight * 0.03,
+                    top: safeAreaHeight * 0.01,
                   ),
                   child: Container(
                     alignment: Alignment.center,
-                    height: safeAreaHeight * 0.12,
+                    height: safeAreaHeight * 0.1,
                     width: double.infinity,
                     child: Stack(
                       alignment: Alignment.center,
@@ -198,8 +198,8 @@ Widget nearbyStartWidget(
                           alignment: Alignment.centerRight,
                           child: Container(
                             alignment: Alignment.center,
-                            width: safeAreaHeight * 0.11,
-                            height: safeAreaHeight * 0.11,
+                            width: safeAreaHeight * 0.09,
+                            height: safeAreaHeight * 0.09,
                             decoration: const BoxDecoration(
                               shape: BoxShape.circle,
                               color: Colors.white,

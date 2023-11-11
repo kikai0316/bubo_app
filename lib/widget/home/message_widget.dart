@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'dart:ui';
 import 'package:bubu_app/component/text.dart';
 import 'package:bubu_app/constant/color.dart';
@@ -33,7 +32,7 @@ Widget myChatWidget(
       children: [
         Padding(
           padding: EdgeInsets.only(right: safeAreaWidth * 0.01),
-          child: nText(
+          child: nText2(
             DateFormat('HH:mm').format(messeageData.dateTime),
             color: Colors.white,
             fontSize: safeAreaWidth / 40,
@@ -52,8 +51,8 @@ Widget myChatWidget(
             ),
           ),
           child: Padding(
-            padding: EdgeInsets.all(safeAreaWidth * 0.03),
-            child: nText(
+            padding: EdgeInsets.all(safeAreaWidth * 0.025),
+            child: nText2(
               messeageData.message,
               color: Colors.white,
               fontSize: safeAreaWidth / 30,
@@ -117,7 +116,7 @@ Widget recipientChatWidget(
                 ),
                 child: Padding(
                   padding: EdgeInsets.all(safeAreaWidth * 0.03),
-                  child: nText(
+                  child: nText2(
                     messeageData.message,
                     color: Colors.white,
                     fontSize: safeAreaWidth / 30,
@@ -127,7 +126,7 @@ Widget recipientChatWidget(
               ),
               Padding(
                 padding: EdgeInsets.only(left: safeAreaWidth * 0.01),
-                child: nText(
+                child: nText2(
                   DateFormat('HH:mm').format(messeageData.dateTime),
                   color: Colors.white,
                   fontSize: safeAreaWidth / 40,
@@ -169,7 +168,7 @@ Widget emojiChatWidget(
                       padding: EdgeInsets.only(
                         right: safeAreaWidth * 0.01,
                       ),
-                      child: nText(
+                      child: nText2(
                         DateFormat('HH:mm').format(messeageData.dateTime),
                         color: Colors.white,
                         fontSize: safeAreaWidth / 40,
@@ -229,7 +228,7 @@ Widget emojiChatWidget(
                             padding: EdgeInsets.only(
                               left: safeAreaWidth * 0.01,
                             ),
-                            child: nText(
+                            child: nText2(
                               DateFormat('HH:mm').format(messeageData.dateTime),
                               color: Colors.white,
                               fontSize: safeAreaWidth / 40,
@@ -244,100 +243,128 @@ Widget emojiChatWidget(
         );
 }
 
-Widget textFieldWidget({
-  required BuildContext context,
-  required TextEditingController? controller,
-  required void Function()? onTap,
-}) {
-  final safeAreaHeight = safeHeight(context);
-  final safeAreaWidth = MediaQuery.of(context).size.width;
-  return Container(
-    width: double.infinity,
-    decoration: BoxDecoration(
-      gradient: LinearGradient(
-        begin: FractionalOffset.topCenter,
-        end: FractionalOffset.bottomCenter,
-        colors: [
-          blackColor.withOpacity(0),
-          blackColor.withOpacity(1),
-          blackColor.withOpacity(1),
-        ],
-      ),
-    ),
-    child: Padding(
-      padding: EdgeInsets.only(
-        top: safeAreaHeight * 0.01,
-        bottom: safeAreaHeight * 0.01,
-        left: safeAreaWidth * 0.03,
-        right: safeAreaWidth * 0.03,
-      ),
-      child: Container(
-        constraints: BoxConstraints(
-          maxHeight: safeAreaHeight * 0.15,
+final GlobalKey widgetKey = GlobalKey();
+
+class MessageTextFieldWidget extends HookConsumerWidget {
+  const MessageTextFieldWidget({
+    super.key,
+    required this.controller,
+    required this.onTap,
+  });
+  final TextEditingController controller;
+  final void Function()? onTap;
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final safeAreaHeight = safeHeight(context);
+    final safeAreaWidth = MediaQuery.of(context).size.width;
+    final isButtonposition = useState(false);
+
+    void getSize() {
+      if (context.mounted) {
+        if ((safeAreaHeight * 0.07) < widgetKey.currentContext!.size!.height) {
+          isButtonposition.value = true;
+        } else {
+          isButtonposition.value = false;
+        }
+      }
+    }
+
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: FractionalOffset.topCenter,
+          end: FractionalOffset.bottomCenter,
+          colors: [
+            blackColor.withOpacity(0),
+            blackColor.withOpacity(1),
+            blackColor.withOpacity(1),
+          ],
         ),
-        width: safeAreaWidth * 0.95,
-        decoration: BoxDecoration(
-          color: const Color.fromARGB(255, 59, 59, 59).withOpacity(0.9),
-          borderRadius: BorderRadius.circular(25),
+      ),
+      child: Padding(
+        padding: EdgeInsets.only(
+          top: safeAreaHeight * 0.01,
+          bottom: safeAreaHeight * 0.01,
+          left: safeAreaWidth * 0.03,
+          right: safeAreaWidth * 0.03,
         ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.only(
-                  left: safeAreaWidth * 0.05,
-                  right: safeAreaWidth * 0.03,
-                ),
-                child: TextFormField(
-                  controller: controller,
-                  maxLines: null,
-                  textAlign: TextAlign.left,
-                  style: TextStyle(
-                    fontFamily: "Normal",
-                    fontVariations: const [FontVariation("wght", 700)],
-                    color: Colors.white,
-                    fontSize: safeAreaWidth / 25,
+        child: Container(
+          key: widgetKey,
+          constraints: BoxConstraints(
+            maxHeight: safeAreaHeight * 0.15,
+          ),
+          width: safeAreaWidth * 0.95,
+          decoration: BoxDecoration(
+            color: const Color.fromARGB(255, 59, 59, 59).withOpacity(0.9),
+            borderRadius: BorderRadius.circular(25),
+          ),
+          child: Row(
+            crossAxisAlignment: isButtonposition.value
+                ? CrossAxisAlignment.end
+                : CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    left: safeAreaWidth * 0.05,
+                    right: safeAreaWidth * 0.03,
                   ),
-                  decoration: InputDecoration(
-                    enabledBorder: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    hintText: "メッセージを入力...",
-                    hintStyle: TextStyle(
+                  child: TextFormField(
+                    controller: controller,
+                    maxLines: null,
+                    textAlign: TextAlign.left,
+                    onChanged: (value) async {
+                      await Future<void>.delayed(
+                        const Duration(milliseconds: 100),
+                      );
+                      getSize();
+                    },
+                    style: TextStyle(
                       fontFamily: "Normal",
-                      color: Colors.grey,
-                      fontVariations: const [FontVariation("wght", 600)],
-                      fontSize: safeAreaWidth / 25,
+                      fontVariations: const [FontVariation("wght", 700)],
+                      color: Colors.white,
+                      fontSize: safeAreaWidth / 26,
+                    ),
+                    decoration: InputDecoration(
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      hintText: "メッセージを入力...",
+                      hintStyle: TextStyle(
+                        fontFamily: "Normal",
+                        color: Colors.grey,
+                        fontVariations: const [FontVariation("wght", 600)],
+                        fontSize: safeAreaWidth / 26,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-            Padding(
-              padding: EdgeInsets.only(
-                top: safeAreaHeight * 0.005,
-                bottom: safeAreaHeight * 0.005,
-                right: safeAreaHeight * 0.005,
-              ),
-              child: Material(
-                color: blueColor2,
-                borderRadius: BorderRadius.circular(20),
-                child: InkWell(
-                  onTap: onTap,
-                  borderRadius: BorderRadius.circular(20),
-                  child: Container(
-                    alignment: Alignment.center,
-                    width: safeAreaWidth * 0.15,
-                    height: safeAreaHeight * 0.05,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Padding(
-                      padding: EdgeInsets.only(
-                        left: safeAreaWidth * 0.01,
+              Padding(
+                padding: EdgeInsets.only(
+                  right: safeAreaWidth * 0.015,
+                  bottom: isButtonposition.value ? safeAreaHeight * 0.01 : 0,
+                ),
+                child: Material(
+                  color: blueColor2,
+                  borderRadius: BorderRadius.circular(50),
+                  child: InkWell(
+                    onTap: () {
+                      isButtonposition.value = false;
+                      onTap!();
+                    },
+                    borderRadius: BorderRadius.circular(50),
+                    child: Container(
+                      alignment: Alignment.center,
+                      width: safeAreaWidth * 0.15,
+                      height: safeAreaWidth * 0.1,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(50),
                       ),
-                      child: Transform.rotate(
-                        angle: -15 * 2.0 * pi / 180,
+                      child: Padding(
+                        padding: EdgeInsets.only(
+                          left: safeAreaWidth * 0.01,
+                        ),
                         child: Icon(
                           Icons.send,
                           color: Colors.white,
@@ -348,12 +375,12 @@ Widget textFieldWidget({
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 String formatDateLabel(DateTime date) {

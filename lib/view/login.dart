@@ -14,6 +14,7 @@ import 'package:bubu_app/utility/utility.dart';
 import 'package:bubu_app/view/login/login_sheet.dart';
 import 'package:bubu_app/view/login/singin_sheet.dart';
 import 'package:bubu_app/view/request_page.dart';
+import 'package:bubu_app/view/user_app.dart';
 import 'package:bubu_app/view_model/message_list.dart';
 import 'package:bubu_app/view_model/story_list.dart';
 import 'package:bubu_app/view_model/user_data.dart';
@@ -22,6 +23,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class StartPage extends HookConsumerWidget {
   const StartPage({
@@ -50,12 +52,15 @@ class StartPage extends HookConsumerWidget {
       await userDataNotifier.reLoad();
       await storyListNotifier.reLoad();
       await messageListNotifier.reLoad();
+      final isPermission = await checkNotificationPermissionStatus();
       isLoading.value = false;
       if (isSuccess) {
         // ignore: use_build_context_synchronously
         screenTransitionNormal(
           context,
-          const RequestNotificationsPage(),
+          isPermission
+              ? const RequestNotificationsPage()
+              : const UserApp(initPage: 0),
         );
       } else {
         showSnackbar("エラーが発生しました。");
@@ -267,5 +272,18 @@ class StartPage extends HookConsumerWidget {
         ],
       ),
     );
+  }
+}
+
+Future<bool> checkNotificationPermissionStatus() async {
+  final status = await Permission.notification.status;
+  if (status.isGranted) {
+    return false;
+  } else if (status.isDenied) {
+    return true;
+  } else if (status.isPermanentlyDenied) {
+    return false;
+  } else {
+    return true;
   }
 }

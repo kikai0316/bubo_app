@@ -51,7 +51,9 @@ class MessageScreenPage extends HookConsumerWidget {
     final setDeviceList = (deviceList ?? [])
         .map((element) => element.deviceId.split('@')[0])
         .toList();
+
     final messageList = ref.watch(messageListNotifierProvider);
+
     final messageListWhen = messageList.when(
       data: (value) {
         final List<MessageList> getData = value
@@ -98,60 +100,25 @@ class MessageScreenPage extends HookConsumerWidget {
                       alignment: Alignment.topCenter,
                       child: GestureDetector(
                         onTap: () => FocusScope.of(context).unfocus(),
-                        child: ListView.builder(
-                          itemCount: getData.first.message.length,
-                          shrinkWrap: true,
+                        child: SingleChildScrollView(
                           reverse: true,
-                          padding: EdgeInsets.only(
-                            top: safeAreaHeight * 0.01,
-                            bottom: safeAreaHeight *
-                                (focusNode.hasFocus ? 0.18 : 0.1),
+                          child: Column(
+                            // for(final item in)
+                            children: [
+                              SizedBox(
+                                height: safeAreaHeight * 0.01,
+                              ),
+                              for (int i = 0;
+                                  i < getData.first.message.length;
+                                  i++) ...{
+                                talkWidget(context, getData, i),
+                              },
+                              SizedBox(
+                                height: safeAreaHeight *
+                                    (focusNode.hasFocus ? 0.18 : 0.1),
+                              ),
+                            ],
                           ),
-                          itemBuilder: (BuildContext context, int index) {
-                            final newIndex =
-                                getData.first.message.length - index - 1;
-                            final date =
-                                getData.first.message[newIndex].dateTime;
-                            final lastDate = newIndex - 1 > -1
-                                ? getData.first.message[newIndex - 1].dateTime
-                                : null;
-                            final bool isNewDay = lastDate?.day == date.day &&
-                                lastDate?.month == date.month &&
-                                lastDate?.year == date.year;
-                            return Column(
-                              children: [
-                                if (!isNewDay) ...{
-                                  dateLabelWidget(context, date),
-                                },
-                                if (emojiData.containsKey(
-                                  getData.first.message[newIndex].message,
-                                )) ...{
-                                  emojiChatWidget(
-                                    context,
-                                    messeageData:
-                                        getData.first.message[newIndex],
-                                    userData: getData.first.userData,
-                                  ),
-                                } else ...{
-                                  if (getData
-                                      .first.message[newIndex].isMyMessage) ...{
-                                    myChatWidget(
-                                      context,
-                                      messeageData:
-                                          getData.first.message[newIndex],
-                                    ),
-                                  } else ...{
-                                    recipientChatWidget(
-                                      context,
-                                      messeageData:
-                                          getData.first.message[newIndex],
-                                      userData: getData.first.userData,
-                                    ),
-                                  },
-                                },
-                              ],
-                            );
-                          },
                         ),
                       ),
                     ),
@@ -164,8 +131,7 @@ class MessageScreenPage extends HookConsumerWidget {
                               padding: EdgeInsets.only(
                                 top: safeAreaHeight * 0.001,
                               ),
-                              child: textFieldWidget(
-                                context: context,
+                              child: MessageTextFieldWidget(
                                 controller: controller,
                                 onTap: () async {
                                   if (setDeviceList.contains(id)) {
@@ -414,6 +380,49 @@ class MessageScreenPage extends HookConsumerWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget talkWidget(
+    BuildContext context,
+    List<MessageList> getData,
+    int index,
+  ) {
+    final newIndex = getData.first.message.length - index - 1;
+    final date = getData.first.message[newIndex].dateTime;
+    final lastDate =
+        newIndex - 1 > -1 ? getData.first.message[newIndex - 1].dateTime : null;
+    final bool isNewDay = lastDate?.day == date.day &&
+        lastDate?.month == date.month &&
+        lastDate?.year == date.year;
+    return Column(
+      children: [
+        if (!isNewDay || index == 0) ...{
+          dateLabelWidget(context, date),
+        },
+        if (emojiData.containsKey(
+          getData.first.message[newIndex].message,
+        )) ...{
+          emojiChatWidget(
+            context,
+            messeageData: getData.first.message[newIndex],
+            userData: getData.first.userData,
+          ),
+        } else ...{
+          if (getData.first.message[newIndex].isMyMessage) ...{
+            myChatWidget(
+              context,
+              messeageData: getData.first.message[newIndex],
+            ),
+          } else ...{
+            recipientChatWidget(
+              context,
+              messeageData: getData.first.message[newIndex],
+              userData: getData.first.userData,
+            ),
+          },
+        },
+      ],
     );
   }
 }
