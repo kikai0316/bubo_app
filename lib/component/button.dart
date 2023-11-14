@@ -158,3 +158,37 @@ Widget shadowButton(
     ),
   );
 }
+
+Widget dialogButton(
+  BuildContext context, {
+  required String title,
+  required Color backGroundColor,
+  required Color textColor,
+  required BoxBorder? border,
+  required void Function() onTap,
+}) {
+  final safeAreaWidth = MediaQuery.of(context).size.width;
+  final safeAreaHeight = safeHeight(context);
+  return Material(
+    color: backGroundColor,
+    borderRadius: BorderRadius.circular(50),
+    child: InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(50),
+      child: Container(
+        alignment: Alignment.center,
+        height: safeAreaHeight * 0.055,
+        decoration: BoxDecoration(
+          border: border,
+          borderRadius: BorderRadius.circular(50),
+        ),
+        child: nText(
+          title,
+          color: textColor,
+          fontSize: safeAreaWidth / 30,
+          bold: 700,
+        ),
+      ),
+    ),
+  );
+}

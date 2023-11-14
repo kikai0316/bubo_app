@@ -43,7 +43,6 @@ class UserApp extends HookConsumerWidget {
       loading: () => 0,
     );
     final notifier = ref.watch(userDataNotifierProvider);
-
     final notifierWhen = notifier.when(
       data: (data) {
         if (data != null) {

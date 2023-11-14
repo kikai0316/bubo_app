@@ -1,3 +1,4 @@
+import 'package:bubu_app/component/button.dart';
 import 'package:bubu_app/component/text.dart';
 import 'package:bubu_app/constant/color.dart';
 import 'package:bubu_app/model/ticket_list.dart';
@@ -180,7 +181,7 @@ class InstagramGetDialog extends HookConsumerWidget {
           ? adLoading(context)
           : Padding(
               padding: EdgeInsets.only(top: safeAreaHeight * 0.02),
-              child: button(
+              child: dialogButton(
                 context,
                 title: "広告を見て取得",
                 onTap: () {
@@ -215,7 +216,7 @@ class InstagramGetDialog extends HookConsumerWidget {
                 bold: 700,
               ),
             ),
-            button(
+            dialogButton(
               context,
               title: "広告データ再取得",
               onTap: () {
@@ -324,7 +325,7 @@ class InstagramGetDialog extends HookConsumerWidget {
                     padding: EdgeInsets.only(top: safeAreaHeight * 0.02),
                     child: Opacity(
                       opacity: notifierWhen.free.length > 1 ? 0.3 : 1,
-                      child: button(
+                      child: dialogButton(
                         context,
                         title: "チケットで取得",
                         onTap: () {
@@ -416,7 +417,7 @@ class InstagramGetDialog extends HookConsumerWidget {
                       ),
                     ),
                   ),
-                  button(
+                  dialogButton(
                     context,
                     title: "とじる",
                     onTap: () => Navigator.pop(context),
@@ -440,40 +441,6 @@ class InstagramGetDialog extends HookConsumerWidget {
               ),
             },
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget button(
-    BuildContext context, {
-    required String title,
-    required Color backGroundColor,
-    required Color textColor,
-    required BoxBorder? border,
-    required void Function() onTap,
-  }) {
-    final safeAreaWidth = MediaQuery.of(context).size.width;
-    final safeAreaHeight = safeHeight(context);
-    return Material(
-      color: backGroundColor,
-      borderRadius: BorderRadius.circular(50),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(50),
-        child: Container(
-          alignment: Alignment.center,
-          height: safeAreaHeight * 0.055,
-          decoration: BoxDecoration(
-            border: border,
-            borderRadius: BorderRadius.circular(50),
-          ),
-          child: nText(
-            title,
-            color: textColor,
-            fontSize: safeAreaWidth / 30,
-            bold: 700,
-          ),
         ),
       ),
     );
@@ -512,7 +479,7 @@ class InstagramGetDialog extends HookConsumerWidget {
           children: [
             Opacity(
               opacity: 0.3,
-              child: button(
+              child: dialogButton(
                 context,
                 title: "広告を見て取得",
                 onTap: () {},

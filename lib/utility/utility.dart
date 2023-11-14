@@ -7,6 +7,7 @@ import 'package:bubu_app/component/text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:flutter_insta/flutter_insta.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -150,4 +151,14 @@ void showAlertDialog(
       ],
     ),
   );
+}
+
+Future<FlutterInsta?> getInstagramAccount(String userName) async {
+  try {
+    final FlutterInsta flutterInsta = FlutterInsta();
+    await flutterInsta.getProfileData(userName);
+    return flutterInsta;
+  } catch (e) {
+    return null;
+  }
 }

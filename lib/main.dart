@@ -37,6 +37,7 @@ class MyApp extends HookConsumerWidget {
     Future<UserData?> getSecureStorageData() async {
       await cacheSecureStorage();
       final UserData? userData = await readUserData();
+
       return userData;
     }
 
