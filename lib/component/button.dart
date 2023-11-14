@@ -185,7 +185,7 @@ Widget dialogButton(
         child: nText(
           title,
           color: textColor,
-          fontSize: safeAreaWidth / 30,
+          fontSize: safeAreaWidth / 29,
           bold: 700,
         ),
       ),
