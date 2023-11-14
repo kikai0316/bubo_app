@@ -13,13 +13,13 @@ Future<bool> upLoadImg({
       if (i == 0) {
         await storagedb
             .ref(
-              '${userData.id}/main/${"${userData.name}@${userData.birthday.split(' / ').join()}@${userData.family}@$i"} ',
+              '${userData.id}/main/${"${userData.name}@${userData.birthday}@${userData.family}@${userData.instagram}@$i"} ',
             )
             .putData(imgList[i]);
       } else {
         await storagedb
             .ref(
-              '${userData.id}/others/${"${userData.name}@${userData.birthday.split(' / ').join()}@${userData.family}@$i"} ',
+              '${userData.id}/others/$i',
             )
             .putData(imgList[i]);
       }
@@ -59,6 +59,7 @@ Future<UserData?> myDataGet(String id) async {
         name: userDataList[0],
         birthday: userDataList[1],
         family: userDataList[2],
+        instagram: userDataList[3],
         isGetData: true,
         isView: false,
         acquisitionAt: null,
@@ -75,22 +76,24 @@ Future<UserData?> imgMainGet(UserData userData) async {
   try {
     final resultMain =
         await FirebaseStorage.instance.ref("${userData.id}/main").listAll();
-    final mainImgGet = await resultMain.items.first.getData();
-    if (mainImgGet != null) {
-      final List<String> parts = resultMain.items.first.name.split('@');
-      return UserData(
-        imgList: [mainImgGet],
-        id: userData.id,
-        name: parts[0],
-        birthday: parts[1],
-        family: parts[2],
-        isGetData: false,
-        isView: userData.isView,
-        acquisitionAt: userData.acquisitionAt,
-      );
-    } else {
-      return null;
+    if (resultMain.items.isNotEmpty) {
+      final mainImgGet = await resultMain.items.first.getData();
+      if (mainImgGet != null) {
+        final List<String> parts = resultMain.items.first.name.split('@');
+        return UserData(
+          imgList: [mainImgGet],
+          id: userData.id,
+          name: parts[0],
+          birthday: parts[1],
+          family: parts[2],
+          instagram: parts[3],
+          isGetData: false,
+          isView: userData.isView,
+          acquisitionAt: userData.acquisitionAt,
+        );
+      }
     }
+    return null;
   } on FirebaseException {
     return null;
   }
@@ -108,20 +111,17 @@ Future<UserData?> imgOtherGet(UserData userData) async {
       }
     }
 
-    if (imgList.isNotEmpty) {
-      return UserData(
-        imgList: [...userData.imgList, ...imgList],
-        id: userData.id,
-        name: userData.name,
-        birthday: userData.birthday,
-        family: userData.family,
-        isGetData: true,
-        isView: userData.isView,
-        acquisitionAt: userData.acquisitionAt,
-      );
-    } else {
-      return null;
-    }
+    return UserData(
+      imgList: [...userData.imgList, ...imgList],
+      id: userData.id,
+      name: userData.name,
+      birthday: userData.birthday,
+      family: userData.family,
+      instagram: userData.instagram,
+      isGetData: true,
+      isView: userData.isView,
+      acquisitionAt: userData.acquisitionAt,
+    );
   } on FirebaseException {
     return null;
   }
@@ -136,17 +136,16 @@ Future<bool> userDataUpData(UserData userData) async {
     }
     await storagedb
         .ref(
-          '${userData.id}/main/${"${userData.name}@${userData.birthday.split(' / ').join()}@${userData.family}@0"} ',
+          '${userData.id}/main/${"${userData.name}@${userData.birthday}@${userData.family}@${userData.instagram}@0"} ',
         )
         .putData(userData.imgList.first);
-
     return true;
   } on FirebaseException {
     return false;
   }
 }
 
-Future<bool> accountDelete(
+Future<bool> dbImgAllDelete(
   UserData userData,
 ) async {
   try {
@@ -158,6 +157,39 @@ Future<bool> accountDelete(
     final resultOthers = await storagedb.ref("${userData.id}/others").listAll();
     for (final ref in resultOthers.items) {
       await ref.delete();
+    }
+    return true;
+  } on FirebaseException {
+    return false;
+  }
+}
+
+Future<bool> comparisonUpLoad({
+  required UserData userData,
+  required List<Uint8List> newImgList,
+  required void Function(int) onStream,
+}) async {
+  try {
+    final storagedb = FirebaseStorage.instance;
+    if (userData.imgList.first != newImgList.first) {
+      await storagedb
+          .ref(
+            '${userData.id}/main/${"${userData.name}@${userData.birthday}@${userData.family}@0"} ',
+          )
+          .putData(newImgList.first);
+    }
+    onStream(1);
+    final resultOthers = await storagedb.ref("${userData.id}/others").listAll();
+    for (final ref in resultOthers.items) {
+      await ref.delete();
+    }
+    for (int i = 1; i < newImgList.length; i++) {
+      await storagedb
+          .ref(
+            '${userData.id}/others/${"${userData.name}@${userData.birthday}@${userData.family}@$i"} ',
+          )
+          .putData(newImgList[i]);
+      onStream(i);
     }
     return true;
   } on FirebaseException {

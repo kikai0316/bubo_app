@@ -1,5 +1,6 @@
 import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/path_provider_utility.dart';
+import 'package:bubu_app/view_model/history_list.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'story_list.g.dart';
 
@@ -8,27 +9,27 @@ class StoryListNotifier extends _$StoryListNotifier {
   @override
   Future<List<UserData>> build() async {
     final List<UserData> getData = await readStoryData();
-    return hasExceeded24Hours(getData);
+    final setData = await initHasExceeded24Hours(getData);
+    return setData;
   }
 
-  Future<void> addData(Map<String, dynamic> data) async {
+  Future<void> addData(String data) async {
     try {
-      final userID = data['id'] as String;
-      final userNAME = data['name'] as String;
-      if (!state.value!.any(
-        (userData) => userData.id == userID,
-      )) {
+      if (!state.value!.any((userData) => userData.id == data)) {
         final setUserData = UserData(
           imgList: [],
-          id: userID,
-          name: userNAME,
+          id: data,
+          name: "",
           birthday: "",
           family: "",
+          instagram: "",
           isGetData: false,
           isView: false,
           acquisitionAt: DateTime.now(),
         );
-        final setList = [...state.value!, setUserData];
+        final setList = hasExceeded24Hours([...state.value!, setUserData]);
+        final historyNotifier = ref.read(historyListNotifierProvider.notifier);
+        historyNotifier.add(data);
         final isLocalWrite = await writeStoryData(setList);
         if (isLocalWrite) {
           state = const AsyncValue.loading();
@@ -48,7 +49,7 @@ class StoryListNotifier extends _$StoryListNotifier {
     if (index != -1) {
       final setList = [...state.value!];
       setList[index] = newUserData;
-      final isLocalWrite = await writeStoryData(setList);
+      final isLocalWrite = await writeStoryData(hasExceeded24Hours(setList));
       if (isLocalWrite) {
         state = const AsyncValue.loading();
         state = await AsyncValue.guard(() async {
@@ -71,15 +72,17 @@ class StoryListNotifier extends _$StoryListNotifier {
     }
   }
 
-  Future<void> resetDate() async {
+  Future<void> reLoad() async {
+    final List<UserData> getData = await readStoryData();
+    final setData = await initHasExceeded24Hours(getData);
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      return [];
+      return setData;
     });
   }
 }
 
-Future<List<UserData>> hasExceeded24Hours(List<UserData> data) async {
+Future<List<UserData>> initHasExceeded24Hours(List<UserData> data) async {
   final DateTime now = DateTime.now();
   final DateTime twentyFourHoursAgo = now.subtract(const Duration(hours: 24));
   bool isEdit = false;
@@ -97,6 +100,22 @@ Future<List<UserData>> hasExceeded24Hours(List<UserData> data) async {
   }
   if (isEdit) {
     await writeStoryData(newData);
+  }
+  return newData;
+}
+
+List<UserData> hasExceeded24Hours(List<UserData> data) {
+  final DateTime now = DateTime.now();
+  final DateTime twentyFourHoursAgo = now.subtract(const Duration(hours: 24));
+  final List<UserData> newData = [...data];
+  for (int i = 0; i < newData.length; i++) {
+    if (newData[i].acquisitionAt == null) {
+      newData.removeAt(i);
+    } else {
+      if (newData[i].acquisitionAt!.isBefore(twentyFourHoursAgo)) {
+        newData.removeAt(i);
+      }
+    }
   }
   return newData;
 }

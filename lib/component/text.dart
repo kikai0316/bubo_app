@@ -17,13 +17,12 @@ Widget nText(
       fontFamily: "Normal",
       fontVariations: [FontVariation("wght", bold)],
       color: color,
-      fontWeight: FontWeight.w100,
       fontSize: fontSize,
     ),
   );
 }
 
-Widget nTextWithShadow(
+Widget nText2(
   String text, {
   required Color color,
   required double fontSize,
@@ -31,18 +30,12 @@ Widget nTextWithShadow(
 }) {
   return Text(
     text,
-    overflow: TextOverflow.ellipsis,
+    textAlign: TextAlign.left,
     style: TextStyle(
-      shadows: const [
-        Shadow(
-          blurRadius: 0.8,
-        ),
-      ],
       decoration: TextDecoration.none,
       fontFamily: "Normal",
       fontVariations: [FontVariation("wght", bold)],
       color: color,
-      fontWeight: FontWeight.w100,
       fontSize: fontSize,
     ),
   );

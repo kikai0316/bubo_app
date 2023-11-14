@@ -20,6 +20,7 @@ mixin _$UserData {
   String get id => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
   String get birthday => throw _privateConstructorUsedError;
+  String get instagram => throw _privateConstructorUsedError;
   String get family => throw _privateConstructorUsedError;
   bool get isGetData => throw _privateConstructorUsedError;
   bool get isView => throw _privateConstructorUsedError;
@@ -40,6 +41,7 @@ abstract class $UserDataCopyWith<$Res> {
       String id,
       String name,
       String birthday,
+      String instagram,
       String family,
       bool isGetData,
       bool isView,
@@ -63,6 +65,7 @@ class _$UserDataCopyWithImpl<$Res, $Val extends UserData>
     Object? id = null,
     Object? name = null,
     Object? birthday = null,
+    Object? instagram = null,
     Object? family = null,
     Object? isGetData = null,
     Object? isView = null,
@@ -84,6 +87,10 @@ class _$UserDataCopyWithImpl<$Res, $Val extends UserData>
       birthday: null == birthday
           ? _value.birthday
           : birthday // ignore: cast_nullable_to_non_nullable
+              as String,
+      instagram: null == instagram
+          ? _value.instagram
+          : instagram // ignore: cast_nullable_to_non_nullable
               as String,
       family: null == family
           ? _value.family
@@ -118,6 +125,7 @@ abstract class _$$UserDataImplCopyWith<$Res>
       String id,
       String name,
       String birthday,
+      String instagram,
       String family,
       bool isGetData,
       bool isView,
@@ -139,6 +147,7 @@ class __$$UserDataImplCopyWithImpl<$Res>
     Object? id = null,
     Object? name = null,
     Object? birthday = null,
+    Object? instagram = null,
     Object? family = null,
     Object? isGetData = null,
     Object? isView = null,
@@ -160,6 +169,10 @@ class __$$UserDataImplCopyWithImpl<$Res>
       birthday: null == birthday
           ? _value.birthday
           : birthday // ignore: cast_nullable_to_non_nullable
+              as String,
+      instagram: null == instagram
+          ? _value.instagram
+          : instagram // ignore: cast_nullable_to_non_nullable
               as String,
       family: null == family
           ? _value.family
@@ -189,6 +202,7 @@ class _$UserDataImpl implements _UserData {
       required this.id,
       required this.name,
       required this.birthday,
+      required this.instagram,
       required this.family,
       required this.isGetData,
       required this.isView,
@@ -210,6 +224,8 @@ class _$UserDataImpl implements _UserData {
   @override
   final String birthday;
   @override
+  final String instagram;
+  @override
   final String family;
   @override
   final bool isGetData;
@@ -220,7 +236,7 @@ class _$UserDataImpl implements _UserData {
 
   @override
   String toString() {
-    return 'UserData(imgList: $imgList, id: $id, name: $name, birthday: $birthday, family: $family, isGetData: $isGetData, isView: $isView, acquisitionAt: $acquisitionAt)';
+    return 'UserData(imgList: $imgList, id: $id, name: $name, birthday: $birthday, instagram: $instagram, family: $family, isGetData: $isGetData, isView: $isView, acquisitionAt: $acquisitionAt)';
   }
 
   @override
@@ -233,6 +249,8 @@ class _$UserDataImpl implements _UserData {
             (identical(other.name, name) || other.name == name) &&
             (identical(other.birthday, birthday) ||
                 other.birthday == birthday) &&
+            (identical(other.instagram, instagram) ||
+                other.instagram == instagram) &&
             (identical(other.family, family) || other.family == family) &&
             (identical(other.isGetData, isGetData) ||
                 other.isGetData == isGetData) &&
@@ -248,6 +266,7 @@ class _$UserDataImpl implements _UserData {
       id,
       name,
       birthday,
+      instagram,
       family,
       isGetData,
       isView,
@@ -266,6 +285,7 @@ abstract class _UserData implements UserData {
       required final String id,
       required final String name,
       required final String birthday,
+      required final String instagram,
       required final String family,
       required final bool isGetData,
       required final bool isView,
@@ -279,6 +299,8 @@ abstract class _UserData implements UserData {
   String get name;
   @override
   String get birthday;
+  @override
+  String get instagram;
   @override
   String get family;
   @override

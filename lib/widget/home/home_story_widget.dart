@@ -1,9 +1,17 @@
+import 'dart:typed_data';
+
+import 'package:bubu_app/component/loading.dart';
 import 'package:bubu_app/component/text.dart';
 import 'package:bubu_app/constant/color.dart';
 import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/firebase_utility.dart';
+import 'package:bubu_app/utility/path_provider_utility.dart';
+import 'package:bubu_app/utility/snack_bar_utility.dart';
 import 'package:bubu_app/utility/utility.dart';
+import 'package:bubu_app/view/home/img_upload_sheet.dart';
+import 'package:bubu_app/view_model/loading_model.dart';
 import 'package:bubu_app/view_model/story_list.dart';
+import 'package:bubu_app/view_model/user_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -14,20 +22,77 @@ class OnStory extends HookConsumerWidget {
     required this.isMyData,
     required this.userData,
     required this.onTap,
-    required this.index,
     required this.isNearby,
+    required this.isImgOnly,
   });
   final UserData userData;
   final void Function() onTap;
-  final int index;
   final bool isMyData;
   final bool isNearby;
+  final bool isImgOnly;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isTapEvent = useState<bool>(false);
     final safeAreaWidth = MediaQuery.of(context).size.width;
     final safeAreaHeight = safeHeight(context);
+    Future<void> dataUpLoad(List<Uint8List> imgList) async {
+      void showSnackbar() {
+        errorSnackbar(
+          text: "何らかの問題が発生しました。再試行してください。",
+          padding: safeAreaHeight * 0.07,
+        );
+      }
+
+      final loadingNotifier = ref.read(loadingNotifierProvider.notifier);
+      final imgItem = imgList.length;
+      loadingNotifier.upData(
+        loadinPage(
+          context: context,
+          isLoading: true,
+          text: "アップロード中（ 0/$imgItem ）...",
+        ),
+      );
+      final isUpLoad = await comparisonUpLoad(
+        userData: userData,
+        newImgList: imgList,
+        onStream: (index) {
+          loadingNotifier.upData(
+            loadinPage(
+              context: context,
+              isLoading: true,
+              text: "アップロード中（ $index/$imgItem ）...",
+            ),
+          );
+        },
+      );
+      if (isUpLoad) {
+        final setData = UserData(
+          imgList: imgList,
+          id: userData.id,
+          name: userData.name,
+          birthday: userData.birthday,
+          family: userData.family,
+          instagram: userData.instagram,
+          isGetData: true,
+          isView: false,
+          acquisitionAt: null,
+        );
+        final iswWite = await writeUserData(setData);
+        if (iswWite) {
+          loadingNotifier.upData(null);
+          final notifier = ref.read(userDataNotifierProvider.notifier);
+          notifier.reLoad();
+        } else {
+          loadingNotifier.upData(null);
+          showSnackbar();
+        }
+      } else {
+        loadingNotifier.upData(null);
+        showSnackbar();
+      }
+    }
+
     useEffect(
       () {
         var cancelled = false;
@@ -50,7 +115,7 @@ class OnStory extends HookConsumerWidget {
       [],
     );
     return Padding(
-      padding: EdgeInsets.only(right: safeAreaHeight * 0.02),
+      padding: EdgeInsets.only(right: isImgOnly ? 0 : safeAreaHeight * 0.02),
       child: GestureDetector(
         onTap: () {
           isTapEvent.value = false;
@@ -101,7 +166,7 @@ class OnStory extends HookConsumerWidget {
                         alignment: Alignment.center,
                         children: [
                           Padding(
-                            padding: EdgeInsets.all(safeAreaHeight * 0.0035),
+                            padding: EdgeInsets.all(safeAreaHeight * 0.003),
                             child: Container(
                               alignment: Alignment.center,
                               height: double.infinity,
@@ -111,7 +176,7 @@ class OnStory extends HookConsumerWidget {
                                 shape: BoxShape.circle,
                               ),
                               child: Padding(
-                                padding: EdgeInsets.all(safeAreaHeight * 0.004),
+                                padding: EdgeInsets.all(safeAreaHeight * 0.003),
                                 child: Container(
                                   height: double.infinity,
                                   width: double.infinity,
@@ -135,7 +200,15 @@ class OnStory extends HookConsumerWidget {
                             Align(
                               alignment: Alignment.bottomRight,
                               child: GestureDetector(
-                                onTap: () {},
+                                onTap: () => bottomSheet(
+                                  context,
+                                  page: ImgUpLoadPage(
+                                    userData: userData,
+                                    onTap: (value) => dataUpLoad(value),
+                                  ),
+                                  isBackgroundColor: true,
+                                  isPOP: true,
+                                ),
                                 child: Container(
                                   alignment: Alignment.center,
                                   height: safeAreaHeight * 0.038,
@@ -154,7 +227,7 @@ class OnStory extends HookConsumerWidget {
                                   child: Icon(
                                     Icons.add,
                                     color: blueColor,
-                                    size: safeAreaWidth / 18,
+                                    size: safeAreaWidth / 16,
                                   ),
                                 ),
                               ),
@@ -187,15 +260,17 @@ class OnStory extends HookConsumerWidget {
                     ),
                   ),
                 ),
-                Padding(
-                  padding: EdgeInsets.only(top: safeAreaHeight * 0.005),
-                  child: nText(
-                    userData.name,
-                    color: Colors.white.withOpacity(0.9),
-                    fontSize: safeAreaWidth / 35,
-                    bold: 500,
+                if (!isImgOnly) ...{
+                  Padding(
+                    padding: EdgeInsets.only(top: safeAreaHeight * 0.005),
+                    child: nText(
+                      userData.name,
+                      color: Colors.white.withOpacity(0.9),
+                      fontSize: safeAreaWidth / 40,
+                      bold: 500,
+                    ),
                   ),
-                ),
+                },
               ],
             ),
           ),

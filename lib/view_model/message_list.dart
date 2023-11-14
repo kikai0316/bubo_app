@@ -1,3 +1,4 @@
+import 'package:bubu_app/model/message_data.dart';
 import 'package:bubu_app/model/message_list_data.dart';
 import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/path_provider_utility.dart';
@@ -25,7 +26,6 @@ class MessageListNotifier extends _$MessageListNotifier {
       setList[index] = setData;
       final isLocalWrite = await writeMessageData(setList);
       if (isLocalWrite) {
-        state = const AsyncValue.loading();
         state = await AsyncValue.guard(() async {
           return setList;
         });
@@ -42,7 +42,6 @@ class MessageListNotifier extends _$MessageListNotifier {
       setList[index] = newMessagerData;
       final isLocalWrite = await writeMessageData(setList);
       if (isLocalWrite) {
-        state = const AsyncValue.loading();
         state = await AsyncValue.guard(() async {
           return setList;
         });
@@ -50,8 +49,80 @@ class MessageListNotifier extends _$MessageListNotifier {
     }
   }
 
-  Future<void> resetDate() async {
-    state = const AsyncValue.loading();
+  Future<void> dataDelete(String id) async {
+    final int index = state.value!.indexWhere(
+      (messagerData) => messagerData.userData.id == id,
+    );
+    if (index != -1) {
+      final setList = [...state.value!];
+      setList.removeAt(index);
+      final isLocalWrite = await writeMessageData(setList);
+      if (isLocalWrite) {
+        state = await AsyncValue.guard(() async {
+          return setList;
+        });
+      }
+    }
+  }
+
+  Future<void> addMessage({
+    required MessageData messageData,
+    required UserData userData,
+  }) async {
+    final int index = state.value!
+        .indexWhere((messagerData) => messagerData.userData.id == userData.id);
+    if (index != -1) {
+      final setList = [...state.value!];
+      setList[index] = MessageList(
+        userData: UserData(
+          name: userData.name,
+          id: userData.id,
+          imgList: setList[index].userData.imgList,
+          birthday: setList[index].userData.birthday,
+          family: setList[index].userData.family,
+          instagram: setList[index].userData.instagram,
+          isGetData: setList[index].userData.isGetData,
+          isView: setList[index].userData.isView,
+          acquisitionAt: null,
+        ),
+        message: [
+          ...setList[index].message,
+          messageData,
+        ],
+      );
+      final isLocalWrite = await writeMessageData(setList);
+      if (isLocalWrite) {
+        state = await AsyncValue.guard(() async {
+          return setList;
+        });
+      }
+    } else {
+      final setList = [
+        MessageList(
+          userData: userData,
+          message: [
+            messageData,
+          ],
+        ),
+        ...state.value!,
+      ];
+      final isLocalWrite = await writeMessageData(setList);
+      if (isLocalWrite) {
+        state = await AsyncValue.guard(() async {
+          return setList;
+        });
+      }
+    }
+  }
+
+  Future<void> reLoad() async {
+    final getData = await readeMessageData();
+    state = await AsyncValue.guard(() async {
+      return getData;
+    });
+  }
+
+  Future<void> reSet() async {
     state = await AsyncValue.guard(() async {
       return [];
     });

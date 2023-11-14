@@ -1,7 +1,8 @@
-import 'dart:math';
 import 'dart:ui';
 import 'package:bubu_app/component/text.dart';
 import 'package:bubu_app/constant/color.dart';
+import 'package:bubu_app/constant/emoji.dart';
+import 'package:bubu_app/constant/img.dart';
 import 'package:bubu_app/model/message_data.dart';
 import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/utility.dart';
@@ -31,7 +32,7 @@ Widget myChatWidget(
       children: [
         Padding(
           padding: EdgeInsets.only(right: safeAreaWidth * 0.01),
-          child: nText(
+          child: nText2(
             DateFormat('HH:mm').format(messeageData.dateTime),
             color: Colors.white,
             fontSize: safeAreaWidth / 40,
@@ -50,8 +51,8 @@ Widget myChatWidget(
             ),
           ),
           child: Padding(
-            padding: EdgeInsets.all(safeAreaWidth * 0.03),
-            child: nText(
+            padding: EdgeInsets.all(safeAreaWidth * 0.025),
+            child: nText2(
               messeageData.message,
               color: Colors.white,
               fontSize: safeAreaWidth / 30,
@@ -87,15 +88,15 @@ Widget recipientChatWidget(
           child: Container(
             width: safeAreaHeight * 0.04,
             height: safeAreaHeight * 0.04,
-            decoration: userData.imgList.isEmpty
-                ? null
-                : BoxDecoration(
-                    image: DecorationImage(
+            decoration: BoxDecoration(
+              image: userData.imgList.isEmpty
+                  ? notImg()
+                  : DecorationImage(
                       image: MemoryImage(userData.imgList.first),
                       fit: BoxFit.cover,
                     ),
-                    shape: BoxShape.circle,
-                  ),
+              shape: BoxShape.circle,
+            ),
           ),
         ),
         Expanded(
@@ -115,7 +116,7 @@ Widget recipientChatWidget(
                 ),
                 child: Padding(
                   padding: EdgeInsets.all(safeAreaWidth * 0.03),
-                  child: nText(
+                  child: nText2(
                     messeageData.message,
                     color: Colors.white,
                     fontSize: safeAreaWidth / 30,
@@ -125,7 +126,7 @@ Widget recipientChatWidget(
               ),
               Padding(
                 padding: EdgeInsets.only(left: safeAreaWidth * 0.01),
-                child: nText(
+                child: nText2(
                   DateFormat('HH:mm').format(messeageData.dateTime),
                   color: Colors.white,
                   fontSize: safeAreaWidth / 40,
@@ -140,100 +141,230 @@ Widget recipientChatWidget(
   );
 }
 
-Widget textFieldWidget({
-  required BuildContext context,
-  required TextEditingController? controller,
-  required void Function()? onTap,
+Widget emojiChatWidget(
+  BuildContext context, {
+  required MessageData messeageData,
+  required UserData userData,
 }) {
   final safeAreaHeight = safeHeight(context);
   final safeAreaWidth = MediaQuery.of(context).size.width;
-  return Container(
-    width: double.infinity,
-    decoration: BoxDecoration(
-      gradient: LinearGradient(
-        begin: FractionalOffset.topCenter,
-        end: FractionalOffset.bottomCenter,
-        colors: [
-          blackColor.withOpacity(0),
-          blackColor.withOpacity(1),
-          blackColor.withOpacity(1),
-        ],
-      ),
-    ),
-    child: Padding(
-      padding: EdgeInsets.only(
-        top: safeAreaHeight * 0.01,
-        bottom: safeAreaHeight * 0.01,
-        left: safeAreaWidth * 0.03,
-        right: safeAreaWidth * 0.03,
-      ),
-      child: Container(
-        constraints: BoxConstraints(
-          maxHeight: safeAreaHeight * 0.15,
-        ),
-        width: safeAreaWidth * 0.95,
-        decoration: BoxDecoration(
-          color: const Color.fromARGB(255, 59, 59, 59).withOpacity(0.9),
-          borderRadius: BorderRadius.circular(25),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.only(
-                  left: safeAreaWidth * 0.05,
-                  right: safeAreaWidth * 0.03,
-                ),
-                child: TextFormField(
-                  controller: controller,
-                  maxLines: null,
-                  textAlign: TextAlign.left,
-                  style: TextStyle(
-                    fontFamily: "Normal",
-                    fontVariations: const [FontVariation("wght", 700)],
-                    color: Colors.white,
-                    fontSize: safeAreaWidth / 25,
-                  ),
-                  decoration: InputDecoration(
-                    enabledBorder: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    hintText: "メッセージを入力...",
-                    hintStyle: TextStyle(
-                      fontFamily: "Normal",
-                      color: Colors.grey,
-                      fontVariations: const [FontVariation("wght", 600)],
-                      fontSize: safeAreaWidth / 25,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.only(
-                top: safeAreaHeight * 0.005,
-                bottom: safeAreaHeight * 0.005,
-                right: safeAreaHeight * 0.005,
-              ),
-              child: Material(
-                color: blueColor2,
-                borderRadius: BorderRadius.circular(20),
-                child: InkWell(
-                  onTap: onTap,
-                  borderRadius: BorderRadius.circular(20),
-                  child: Container(
-                    alignment: Alignment.center,
-                    width: safeAreaWidth * 0.15,
-                    height: safeAreaHeight * 0.05,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Padding(
+  final String? emoji = emojiData[messeageData.message];
+  final isMyData = messeageData.isMyMessage;
+  return emoji == null
+      ? const SizedBox()
+      : Padding(
+          padding: EdgeInsets.only(
+            top: safeAreaHeight * 0.01,
+            bottom: safeAreaHeight * 0.01,
+            left: safeAreaWidth * 0.03,
+            right: safeAreaWidth * 0.03,
+          ),
+          child: isMyData
+              ? Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Padding(
                       padding: EdgeInsets.only(
-                        left: safeAreaWidth * 0.01,
+                        right: safeAreaWidth * 0.01,
                       ),
-                      child: Transform.rotate(
-                        angle: -15 * 2.0 * pi / 180,
+                      child: nText2(
+                        DateFormat('HH:mm').format(messeageData.dateTime),
+                        color: Colors.white,
+                        fontSize: safeAreaWidth / 40,
+                        bold: 700,
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(
+                        left: safeAreaWidth * 0.03,
+                        right: safeAreaWidth * 0.05,
+                      ),
+                      child: Text(
+                        emoji,
+                        style: TextStyle(
+                          fontSize: safeAreaWidth / 7,
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              : Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(right: safeAreaWidth * 0.05),
+                      child: Container(
+                        width: safeAreaHeight * 0.04,
+                        height: safeAreaHeight * 0.04,
+                        decoration: userData.imgList.isEmpty
+                            ? null
+                            : BoxDecoration(
+                                image: DecorationImage(
+                                  image: MemoryImage(userData.imgList.first),
+                                  fit: BoxFit.cover,
+                                ),
+                                shape: BoxShape.circle,
+                              ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.only(
+                              left: safeAreaWidth * 0.03,
+                              right: safeAreaWidth * 0.03,
+                            ),
+                            child: Text(
+                              emoji,
+                              style: TextStyle(
+                                fontSize: safeAreaWidth / 7,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(
+                              left: safeAreaWidth * 0.01,
+                            ),
+                            child: nText2(
+                              DateFormat('HH:mm').format(messeageData.dateTime),
+                              color: Colors.white,
+                              fontSize: safeAreaWidth / 40,
+                              bold: 700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+        );
+}
+
+final GlobalKey widgetKey = GlobalKey();
+
+class MessageTextFieldWidget extends HookConsumerWidget {
+  const MessageTextFieldWidget({
+    super.key,
+    required this.controller,
+    required this.onTap,
+  });
+  final TextEditingController controller;
+  final void Function()? onTap;
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final safeAreaHeight = safeHeight(context);
+    final safeAreaWidth = MediaQuery.of(context).size.width;
+    final isButtonposition = useState(false);
+
+    void getSize() {
+      if (context.mounted) {
+        if ((safeAreaHeight * 0.07) < widgetKey.currentContext!.size!.height) {
+          isButtonposition.value = true;
+        } else {
+          isButtonposition.value = false;
+        }
+      }
+    }
+
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: FractionalOffset.topCenter,
+          end: FractionalOffset.bottomCenter,
+          colors: [
+            blackColor.withOpacity(0),
+            blackColor.withOpacity(1),
+            blackColor.withOpacity(1),
+          ],
+        ),
+      ),
+      child: Padding(
+        padding: EdgeInsets.only(
+          top: safeAreaHeight * 0.01,
+          bottom: safeAreaHeight * 0.01,
+          left: safeAreaWidth * 0.03,
+          right: safeAreaWidth * 0.03,
+        ),
+        child: Container(
+          key: widgetKey,
+          constraints: BoxConstraints(
+            maxHeight: safeAreaHeight * 0.15,
+          ),
+          width: safeAreaWidth * 0.95,
+          decoration: BoxDecoration(
+            color: const Color.fromARGB(255, 59, 59, 59).withOpacity(0.9),
+            borderRadius: BorderRadius.circular(25),
+          ),
+          child: Row(
+            crossAxisAlignment: isButtonposition.value
+                ? CrossAxisAlignment.end
+                : CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    left: safeAreaWidth * 0.05,
+                    right: safeAreaWidth * 0.03,
+                  ),
+                  child: TextFormField(
+                    controller: controller,
+                    maxLines: null,
+                    textAlign: TextAlign.left,
+                    onChanged: (value) async {
+                      await Future<void>.delayed(
+                        const Duration(milliseconds: 100),
+                      );
+                      getSize();
+                    },
+                    style: TextStyle(
+                      fontFamily: "Normal",
+                      fontVariations: const [FontVariation("wght", 700)],
+                      color: Colors.white,
+                      fontSize: safeAreaWidth / 26,
+                    ),
+                    decoration: InputDecoration(
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      hintText: "メッセージを入力...",
+                      hintStyle: TextStyle(
+                        fontFamily: "Normal",
+                        color: Colors.grey,
+                        fontVariations: const [FontVariation("wght", 600)],
+                        fontSize: safeAreaWidth / 26,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(
+                  right: safeAreaWidth * 0.015,
+                  bottom: isButtonposition.value ? safeAreaHeight * 0.01 : 0,
+                ),
+                child: Material(
+                  color: blueColor2,
+                  borderRadius: BorderRadius.circular(50),
+                  child: InkWell(
+                    onTap: () {
+                      isButtonposition.value = false;
+                      onTap!();
+                    },
+                    borderRadius: BorderRadius.circular(50),
+                    child: Container(
+                      alignment: Alignment.center,
+                      width: safeAreaWidth * 0.15,
+                      height: safeAreaWidth * 0.1,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.only(
+                          left: safeAreaWidth * 0.01,
+                        ),
                         child: Icon(
                           Icons.send,
                           color: Colors.white,
@@ -244,12 +375,12 @@ Widget textFieldWidget({
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 String formatDateLabel(DateTime date) {
@@ -295,8 +426,10 @@ class MainImgWidget extends HookConsumerWidget {
   const MainImgWidget({
     super.key,
     required this.userData,
+    required this.myUserData,
   });
   final UserData userData;
+  final UserData myUserData;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -309,8 +442,12 @@ class MainImgWidget extends HookConsumerWidget {
           context,
           PageRouteBuilder(
             transitionDuration: const Duration(milliseconds: 500),
-            pageBuilder: (_, __, ___) =>
-                SwiperPage(isMyData: false, index: 0, storyList: [userData]),
+            pageBuilder: (_, __, ___) => SwiperPage(
+              isMyData: false,
+              index: 0,
+              storyList: [userData],
+              myUserData: myUserData,
+            ),
           ),
         );
       },

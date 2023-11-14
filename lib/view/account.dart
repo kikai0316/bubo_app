@@ -1,16 +1,24 @@
 import 'dart:async';
-
+import 'package:bubu_app/component/button.dart';
+import 'package:bubu_app/component/loading.dart';
+import 'package:bubu_app/component/text.dart';
 import 'package:bubu_app/constant/color.dart';
 import 'package:bubu_app/constant/url.dart';
 import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/firebase_utility.dart';
 import 'package:bubu_app/utility/path_provider_utility.dart';
 import 'package:bubu_app/utility/screen_transition_utility.dart';
+import 'package:bubu_app/utility/secure_storage_utility.dart';
 import 'package:bubu_app/utility/snack_bar_utility.dart';
 import 'package:bubu_app/utility/utility.dart';
-import 'package:bubu_app/view/start_page.dart';
+import 'package:bubu_app/view/account/profile_setting.dart';
+import 'package:bubu_app/view/login.dart';
+import 'package:bubu_app/view_model/device_list.dart';
+import 'package:bubu_app/view_model/history_list.dart';
 import 'package:bubu_app/view_model/loading_model.dart';
+import 'package:bubu_app/view_model/story_list.dart';
 import 'package:bubu_app/widget/account/account_widgt.dart';
+import 'package:bubu_app/widget/home/home_story_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -22,9 +30,25 @@ class AccountPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final safeAreaHeight = safeHeight(context);
     final safeAreaWidth = MediaQuery.of(context).size.width;
+    final toDayNotifier = ref.watch(storyListNotifierProvider);
+    final historyNotifier = ref.watch(historyListNotifierProvider);
+    final int? toDayNotifierWhen = toDayNotifier.when(
+      data: (data) => countDataForToday(data),
+      error: (e, s) => null,
+      loading: () => null,
+    );
+    final int? historyNotifierWhen = historyNotifier.when(
+      data: (data) {
+        return data
+            .where((element) => data.where((e) => e == element).length == 1)
+            .toList()
+            .length;
+      },
+      error: (e, s) => null,
+      loading: () => null,
+    );
     void showSnackbar() {
       errorSnackbar(
-        context,
         text: "サーバーとの通信に失敗しました。",
         padding: safeAreaHeight * 0.01,
       );
@@ -36,31 +60,6 @@ class AccountPage extends HookConsumerWidget {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              Padding(
-                padding: EdgeInsets.only(
-                  top: safeAreaHeight * 0.03,
-                  bottom: safeAreaHeight * 0.03,
-                ),
-                child: accountMain(context: context, data: userData),
-              ),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Padding(
-                  padding: EdgeInsets.only(
-                    left: safeAreaWidth * 0.1,
-                    bottom: safeAreaHeight * 0.01,
-                  ),
-                  child: Text(
-                    "アカウント",
-                    style: TextStyle(
-                      overflow: TextOverflow.ellipsis,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: safeAreaWidth / 25,
-                    ),
-                  ),
-                ),
-              ),
               Container(
                 width: safeAreaWidth * 0.9,
                 decoration: BoxDecoration(
@@ -68,39 +67,66 @@ class AccountPage extends HookConsumerWidget {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Padding(
-                  padding: EdgeInsets.only(
-                    top: safeAreaHeight * 0.001,
-                    bottom: safeAreaHeight * 0.001,
+                  padding: EdgeInsets.all(
+                    safeAreaHeight * 0.02,
                   ),
                   child: Column(
                     children: [
-                      for (int i = 0; i < 1; i++) ...{
-                        settingWidget(
-                          isRedTitle: false,
-                          trailing: Icon(
-                            Icons.arrow_forward_ios,
-                            color: Colors.white.withOpacity(0.8),
-                            size: safeAreaWidth / 21,
-                          ),
-                          isOnlyTopRadius: i == 0,
-                          isOnlyBottomRadius: i == 0,
-                          onTap: () {
-                            if (i == 0) {
-                              showAlertDialog(
-                                context,
-                                title: "バージョン",
-                                subTitle: "12311",
-                                buttonText: null,
-                                ontap: null,
-                              );
-                            }
-                          },
-                          context: context,
-                          iconText: settingTitle[i],
+                      SizedBox(
+                        height: safeAreaHeight * 0.105,
+                        child: OnStory(
+                          isImgOnly: true,
+                          isMyData: true,
+                          userData: userData,
+                          onTap: () {},
+                          isNearby: false,
                         ),
-                      },
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(
+                          top: safeAreaHeight * 0.01,
+                          bottom: safeAreaHeight * 0.015,
+                        ),
+                        child: nText(
+                          userData.name,
+                          color: Colors.white,
+                          fontSize: safeAreaWidth / 20,
+                          bold: 700,
+                        ),
+                      ),
+                      miniButton(
+                        context: context,
+                        text: "プロフィールを編集",
+                        onTap: () => screenTransitionNormal(
+                          context,
+                          ProfileSetting(
+                            userData: userData,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(
+                  top: safeAreaHeight * 0.02,
+                  bottom: safeAreaHeight * 0.01,
+                ),
+                child: accountMainWidget(
+                  context,
+                  isEncounter: false,
+                  data: historyNotifierWhen ?? 0,
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(
+                  top: safeAreaHeight * 0.01,
+                ),
+                child: accountMainWidget(
+                  context,
+                  isEncounter: true,
+                  data: toDayNotifierWhen ?? 0,
                 ),
               ),
               Align(
@@ -108,11 +134,11 @@ class AccountPage extends HookConsumerWidget {
                 child: Padding(
                   padding: EdgeInsets.only(
                     left: safeAreaWidth * 0.1,
-                    top: safeAreaHeight * 0.02,
+                    top: safeAreaHeight * 0.04,
                     bottom: safeAreaHeight * 0.01,
                   ),
                   child: Text(
-                    "その他",
+                    "設定・その他",
                     style: TextStyle(
                       overflow: TextOverflow.ellipsis,
                       color: Colors.white,
@@ -130,9 +156,18 @@ class AccountPage extends HookConsumerWidget {
                 ),
                 child: Column(
                   children: [
-                    for (int i = 1; i < 4; i++) ...{
+                    for (int i = 0; i < 4; i++) ...{
                       settingWidget(
                         onTap: () {
+                          if (i == 0) {
+                            showAlertDialog(
+                              context,
+                              title: "バージョン",
+                              subTitle: "12311",
+                              buttonText: null,
+                              ontap: null,
+                            );
+                          }
                           if (i == 1) {
                             openURL(url: termsURL, onError: null);
                           }
@@ -147,34 +182,56 @@ class AccountPage extends HookConsumerWidget {
                               buttonText: "削除する",
                               ontap: () async {
                                 Navigator.pop(context);
+                                final deviceListNotifier = ref
+                                    .read(deviseListNotifierProvider.notifier);
+                                deviceListNotifier.resetData();
                                 final loadingNotifier =
                                     ref.read(loadingNotifierProvider.notifier);
-                                loadingNotifier.upDateTrue();
-                                final dbDelete = await accountDelete(userData);
+                                loadingNotifier.upData(
+                                  loadinPage(
+                                    context: context,
+                                    isLoading: true,
+                                    text: "アカウント削除中...",
+                                  ),
+                                );
+                                final dbDelete = await dbImgAllDelete(userData);
                                 final localDelete =
                                     await deleteAllFile(userData.id);
                                 if (dbDelete && localDelete) {
                                   final user =
                                       FirebaseAuth.instance.currentUser;
-                                  if (user != null) {
-                                    await user
-                                        .delete()
-                                        .onError((error, stackTrace) {
-                                      loadingNotifier.upDateFalse();
+                                  final getAccountData =
+                                      await readSecureStorage();
+                                  if (user != null && getAccountData != null) {
+                                    try {
+                                      final AuthCredential credential =
+                                          EmailAuthProvider.credential(
+                                        email: getAccountData["email"]!,
+                                        password: getAccountData["password"]!,
+                                      );
+                                      await user.reauthenticateWithCredential(
+                                        credential,
+                                      );
+                                      await user.delete();
+                                      await Future<void>.delayed(
+                                        const Duration(seconds: 1),
+                                      );
+                                      loadingNotifier.upData(null);
+                                      // ignore: use_build_context_synchronously
+                                      screenTransitionToTop(
+                                        context,
+                                        const StartPage(),
+                                      );
+                                    } on FirebaseException {
+                                      loadingNotifier.upData(null);
                                       showSnackbar();
-                                    });
-                                    loadingNotifier.upDateFalse();
-                                    // ignore: use_build_context_synchronously
-                                    screenTransitionToTop(
-                                      context,
-                                      const StartPage(),
-                                    );
+                                    }
                                   } else {
-                                    loadingNotifier.upDateFalse();
+                                    loadingNotifier.upData(null);
                                     showSnackbar();
                                   }
                                 } else {
-                                  loadingNotifier.upDateFalse();
+                                  loadingNotifier.upData(null);
                                   showSnackbar();
                                 }
                               },
@@ -184,7 +241,7 @@ class AccountPage extends HookConsumerWidget {
                         context: context,
                         isRedTitle: i == 3,
                         iconText: settingTitle[i],
-                        isOnlyTopRadius: i == 1,
+                        isOnlyTopRadius: i == 0,
                         isOnlyBottomRadius: i == 3,
                         trailing: Icon(
                           Icons.arrow_forward_ios,
@@ -197,7 +254,7 @@ class AccountPage extends HookConsumerWidget {
                 ),
               ),
               SizedBox(
-                height: safeAreaHeight * 0.15,
+                height: safeAreaHeight * 0.01,
               ),
             ],
           ),
@@ -205,4 +262,19 @@ class AccountPage extends HookConsumerWidget {
       ),
     );
   }
+}
+
+int countDataForToday(List<UserData> data) {
+  final DateTime now = DateTime.now();
+  final DateTime startOfDay = DateTime(now.year, now.month, now.day);
+  final DateTime endOfDay = DateTime(now.year, now.month, now.day, 23, 59, 59);
+  int count = 0;
+  for (int i = 0; i < data.length; i++) {
+    if (data[i].acquisitionAt != null &&
+        data[i].acquisitionAt!.isAfter(startOfDay) &&
+        data[i].acquisitionAt!.isBefore(endOfDay)) {
+      count++;
+    }
+  }
+  return count;
 }

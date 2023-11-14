@@ -2,10 +2,12 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui';
+
 import 'package:bubu_app/component/text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:flutter_insta/flutter_insta.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -52,7 +54,7 @@ Future getMobileImage({
       final String base64Image = base64Encode(imageBytes);
       final Uint8List unit8 = base64Decode(base64Image);
       final compressedResult =
-          await FlutterImageCompress.compressWithList(unit8, quality: 0);
+          await FlutterImageCompress.compressWithList(unit8, quality: 10);
       onSuccess(Uint8List.fromList(compressedResult));
     }
   } catch (e) {
@@ -63,7 +65,7 @@ Future getMobileImage({
 Future openURL({required String url, required void Function()? onError}) async {
   final Uri setURL = Uri.parse(url);
   if (await canLaunchUrl(setURL)) {
-    await launchUrl(setURL);
+    await launchUrl(setURL, mode: LaunchMode.inAppWebView);
   } else {
     if (onError != null) {
       onError();
@@ -149,4 +151,14 @@ void showAlertDialog(
       ],
     ),
   );
+}
+
+Future<FlutterInsta?> getInstagramAccount(String userName) async {
+  try {
+    final FlutterInsta flutterInsta = FlutterInsta();
+    await flutterInsta.getProfileData(userName);
+    return flutterInsta;
+  } catch (e) {
+    return null;
+  }
 }

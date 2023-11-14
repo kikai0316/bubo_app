@@ -7,12 +7,12 @@ part of 'device_list.dart';
 // **************************************************************************
 
 String _$deviseListNotifierHash() =>
-    r'e8e95d52211640fc829cddad8181ee1e95a15628';
+    r'9032a863ff2e1fbd5658eca0aa1fed327b1815e9';
 
 /// See also [DeviseListNotifier].
 @ProviderFor(DeviseListNotifier)
 final deviseListNotifierProvider =
-    AutoDisposeNotifierProvider<DeviseListNotifier, List<String>>.internal(
+    NotifierProvider<DeviseListNotifier, List<Device>?>.internal(
   DeviseListNotifier.new,
   name: r'deviseListNotifierProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -22,6 +22,6 @@ final deviseListNotifierProvider =
   allTransitiveDependencies: null,
 );
 
-typedef _$DeviseListNotifier = AutoDisposeNotifier<List<String>>;
+typedef _$DeviseListNotifier = Notifier<List<Device>?>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

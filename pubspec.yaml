@@ -8,24 +8,32 @@ environment:
   sdk: '>=2.19.6 <3.0.0'
 
 dependencies:
+  another_flushbar: ^1.12.30
+  badges: ^3.1.2
   cupertino_icons: ^1.0.2
+  encrypt: ^5.0.3
   firebase_auth: ^4.10.1
   firebase_core: ^2.17.0
   firebase_storage: ^11.2.8
   flutter:
     sdk: flutter
+  flutter_app_badger: ^1.5.0
   flutter_carousel_slider: ^1.1.0
   flutter_datetime_picker_plus: ^2.1.0
   flutter_hooks: ^0.18.6
   flutter_image_compress: ^2.0.4
+  flutter_insta: ^1.0.1
+  flutter_local_notifications: ^16.1.0
   flutter_nearby_connections: ^1.1.1
   flutter_secure_storage: ^8.1.0
+  flutter_slidable: ^3.0.0
   freezed_annotation: ^2.4.1
+  google_mobile_ads: ^3.1.0
   hooks_riverpod: ^2.3.8
   image_picker: ^0.8.9
   intl: ^0.18.1
-  loading_animation_widget: ^1.2.0+4
   path_provider: ^2.1.1
+  permission_handler: ^11.0.1
   riverpod_annotation: ^2.1.2
   shared_preferences: ^2.2.1
   url_launcher: ^6.1.11
