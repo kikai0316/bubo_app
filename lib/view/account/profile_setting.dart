@@ -183,6 +183,9 @@ class ProfileSetting extends HookConsumerWidget {
                                             isBackgroundColor: true,
                                             page: UserEditSheet(
                                               isUserName: i == 0,
+                                              initData: i == 0
+                                                  ? editName.value
+                                                  : editInstagram.value,
                                               controller: textController!,
                                               onTap: () async {
                                                 if (i == 0) {

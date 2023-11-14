@@ -228,6 +228,7 @@ Widget instagramAccount(
                     height: safeAreaWidth * 0.2,
                     width: safeAreaWidth * 0.2,
                     decoration: BoxDecoration(
+                      color: Colors.grey.withOpacity(0.5),
                       image: DecorationImage(
                         image: NetworkImage(img),
                         fit: BoxFit.cover,
