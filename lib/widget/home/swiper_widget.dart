@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:bubu_app/component/button.dart';
 import 'package:bubu_app/component/text.dart';
 import 'package:bubu_app/constant/color.dart';
@@ -346,75 +348,81 @@ class InstagramGetDialog extends HookConsumerWidget {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          FittedBox(
-                            fit: BoxFit.fitWidth,
-                            child: nText(
-                              userData.instagram,
-                              color: Colors.black,
-                              fontSize: safeAreaWidth / 16,
-                              bold: 700,
-                            ),
-                          ),
-                          Container(
-                            height: safeAreaHeight * 0.06,
-                            alignment: Alignment.bottomCenter,
-                            child: isCopy.value
-                                ? nText(
-                                    "コピー完了!!",
-                                    color: Colors.green,
-                                    fontSize: safeAreaWidth / 25,
-                                    bold: 700,
-                                  )
-                                : Material(
-                                    color: Colors.black,
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: InkWell(
-                                      onTap: isCopy.value
-                                          ? null
-                                          : () async {
-                                              final data = ClipboardData(
-                                                text: userData.instagram,
-                                              );
-                                              await Clipboard.setData(data);
-                                              copy();
-                                            },
-                                      borderRadius: BorderRadius.circular(10),
-                                      child: Container(
-                                        alignment: Alignment.center,
-                                        height: safeAreaHeight * 0.035,
-                                        width: safeAreaWidth * 0.3,
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                        ),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Padding(
-                                              padding: EdgeInsets.only(
-                                                right: safeAreaWidth * 0.02,
-                                              ),
-                                              child: Icon(
-                                                Icons.content_copy,
-                                                color: Colors.white,
-                                                size: safeAreaWidth / 25,
-                                              ),
-                                            ),
-                                            nText(
-                                              "コピーする",
-                                              color: Colors.white,
-                                              fontSize: safeAreaWidth / 35,
-                                              bold: 700,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                constraints: BoxConstraints(
+                                  maxWidth: safeAreaWidth * 0.6,
+                                ),
+                                child: FittedBox(
+                                  fit: BoxFit.fitWidth,
+                                  child: Text(
+                                    userData.instagram,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      decoration: TextDecoration.none,
+                                      fontFamily: "Normal",
+                                      fontVariations: const [
+                                        FontVariation("wght", 700),
+                                      ],
+                                      color: Colors.black,
+                                      fontSize: safeAreaWidth / 16,
                                     ),
                                   ),
+                                ),
+                              ),
+                              Padding(
+                                padding:
+                                    EdgeInsets.only(left: safeAreaWidth * 0.03),
+                                child: GestureDetector(
+                                  onTap: isCopy.value
+                                      ? null
+                                      : () async {
+                                          final data = ClipboardData(
+                                            text: userData.instagram,
+                                          );
+                                          await Clipboard.setData(data);
+                                          copy();
+                                        },
+                                  child: Container(
+                                    alignment: Alignment.center,
+                                    height: safeAreaHeight * 0.035,
+                                    width: safeAreaHeight * 0.035,
+                                    decoration: BoxDecoration(
+                                      color: isCopy.value
+                                          ? greenColor
+                                          : Colors.black,
+                                      borderRadius: BorderRadius.circular(50),
+                                    ),
+                                    child: Icon(
+                                      isCopy.value
+                                          ? Icons.done
+                                          : Icons.content_copy,
+                                      color: Colors.white,
+                                      size: safeAreaWidth / 25,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: safeAreaHeight * 0.01),
+                    child: dialogButton(
+                      context,
+                      title: "Instagramアプリを開く",
+                      onTap: () => openURL(
+                        url: "https://instagram.com/${userData.instagram}",
+                        onError: null,
+                      ),
+                      backGroundColor: blueColor2,
+                      textColor: Colors.white,
+                      border: null,
                     ),
                   ),
                   dialogButton(

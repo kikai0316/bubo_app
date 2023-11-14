@@ -382,41 +382,46 @@ class OnSwiper extends HookConsumerWidget {
                                               borderRadius:
                                                   BorderRadius.circular(10),
                                               child: InkWell(
-                                                onTap:
-                                                    //  i == 1 && !isNearby
-                                                    //     ? null
-                                                    // : isMyData
-                                                    //     ? null
-                                                    // :
-                                                    () {
-                                                  if (i == 0) {
-                                                    showDialog<void>(
-                                                      context: context,
-                                                      builder: (
-                                                        BuildContext context,
-                                                      ) =>
-                                                          Dialog(
-                                                        elevation: 0,
-                                                        backgroundColor:
-                                                            Colors.transparent,
-                                                        child:
-                                                            InstagramGetDialog(
-                                                          userData: data,
-                                                        ),
-                                                      ),
-                                                    );
-                                                  }
-                                                  if (i == 1) {
-                                                    bottomSheet(
-                                                      context,
-                                                      page: MessageBottomSheet(
-                                                        onTap: sendMessage,
-                                                      ),
-                                                      isPOP: true,
-                                                      isBackgroundColor: false,
-                                                    );
-                                                  }
-                                                },
+                                                onTap: i == 1 && !isNearby
+                                                    ? null
+                                                    : isMyData
+                                                        ? null
+                                                        : () {
+                                                            if (i == 0) {
+                                                              showDialog<void>(
+                                                                context:
+                                                                    context,
+                                                                builder: (
+                                                                  BuildContext
+                                                                      context,
+                                                                ) =>
+                                                                    Dialog(
+                                                                  elevation: 0,
+                                                                  backgroundColor:
+                                                                      Colors
+                                                                          .transparent,
+                                                                  child:
+                                                                      InstagramGetDialog(
+                                                                    userData:
+                                                                        data,
+                                                                  ),
+                                                                ),
+                                                              );
+                                                            }
+                                                            if (i == 1) {
+                                                              bottomSheet(
+                                                                context,
+                                                                page:
+                                                                    MessageBottomSheet(
+                                                                  onTap:
+                                                                      sendMessage,
+                                                                ),
+                                                                isPOP: true,
+                                                                isBackgroundColor:
+                                                                    false,
+                                                              );
+                                                            }
+                                                          },
                                                 borderRadius:
                                                     BorderRadius.circular(10),
                                                 child: Container(

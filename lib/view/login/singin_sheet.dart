@@ -60,18 +60,6 @@ class SingInSheetWidget extends HookConsumerWidget {
         errorMessage.value[2] = "ユーザー名に「@」を含めないでください。";
         isError = false;
       }
-      // if (controllerList[3].text.isEmpty) {
-      //   errorMessage.value[3] = "InstagramのユーザーIDを入力してください。";
-      //   isError = false;
-      // }
-      // if (!RegExp(r'^[a-z0-9_.]+$').hasMatch(controllerList[3].text)) {
-      //   errorMessage.value[3] = "正確なInstagramのユーザーIDを入力してください。";
-      //   isError = false;
-      // }
-      // if (birthday.value == null || birthday.value!.isEmpty) {
-      //   errorMessage.value[4] = "誕生日を入力してください";
-      //   isError = false;
-      // }
       errorMessage.value = [...errorMessage.value];
       return isError;
     }
@@ -137,66 +125,6 @@ class SingInSheetWidget extends HookConsumerWidget {
                             errorText(errorMessage.value[i]!),
                           },
                         },
-                        // Padding(
-                        //   padding: EdgeInsets.only(top: safeAreaHeight * 0.02),
-                        //   child: instagramTextField(
-                        //     context,
-                        //     isError: errorMessage.value[3] != null,
-                        //     controller: controllerList[3],
-                        //     onChanged: (value) {
-                        //       errorMessage.value[3] = null;
-                        //       errorMessage.value = [...errorMessage.value];
-                        //     },
-                        //   ),
-                        // ),
-                        // if (errorMessage.value[3] != null) ...{
-                        //   errorText(errorMessage.value[3]!),
-                        // },
-                        // Padding(
-                        //   padding: EdgeInsets.only(top: safeAreaHeight * 0.005),
-                        //   child: GestureDetector(
-                        //     onTap: () => openURL(
-                        //       url:
-                        //           "https://instagram.com/${controllerList[3].text}",
-                        //       onError: () => errorMessage.value[3] =
-                        //           "エラーが発生しました。再試行してください。",
-                        //     ),
-                        //     child: Opacity(
-                        //       opacity: controllerList[3].text.isEmpty ? 0.3 : 1,
-                        //       child: Row(
-                        //         mainAxisAlignment: MainAxisAlignment.end,
-                        //         children: [
-                        //           nText(
-                        //             "アカウント確認する",
-                        //             color: blueColor,
-                        //             fontSize: safeAreaWidth / 35,
-                        //             bold: 700,
-                        //           ),
-                        //           const Icon(
-                        //             Icons.navigate_next,
-                        //             color: blueColor,
-                        //           ),
-                        //         ],
-                        //       ),
-                        //     ),
-                        //   ),
-                        // ),
-                        // Padding(
-                        //   padding: EdgeInsets.only(top: safeAreaHeight * 0.02),
-                        //   child: birthdayWidget(
-                        //     context,
-                        //     isError: errorMessage.value[4] != null,
-                        //     text: birthday.value,
-                        //     onDataSet: (value) {
-                        //       errorMessage.value[4] = null;
-                        //       errorMessage.value = [...errorMessage.value];
-                        //       birthday.value = value;
-                        //     },
-                        //   ),
-                        // ),
-                        // if (errorMessage.value[4] != null) ...{
-                        //   errorText(errorMessage.value[4]!),
-                        // },
                         SizedBox(
                           height: safeAreaHeight * 0.1,
                         ),
@@ -218,17 +146,6 @@ class SingInSheetWidget extends HookConsumerWidget {
                           await Future<void>.delayed(
                             const Duration(milliseconds: 500),
                           );
-                          // final dataSet = UserData(
-                          //   imgList: [],
-                          //   id: "",
-                          //   name: controllerList[2].text,
-                          //   birthday: "",
-                          //   family: "",
-                          //   instagram: "",
-                          //   isGetData: true,
-                          //   isView: false,
-                          //   acquisitionAt: null,
-                          // );
                           onTap(
                             controllerList[0].text,
                             controllerList[1].text,
