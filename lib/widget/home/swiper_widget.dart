@@ -157,8 +157,7 @@ class InstagramGetDialog extends HookConsumerWidget {
                 ...notifierWhen.free,
                 TicketData(
                   id: userData.id,
-                  acquisitionAt: DateTime.now()
-                      .subtract(const Duration(hours: 11, minutes: 59)),
+                  acquisitionAt: DateTime.now(),
                 ),
               ]
             : notifierWhen.free,
