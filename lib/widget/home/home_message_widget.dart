@@ -85,7 +85,6 @@ class OnMessage extends HookConsumerWidget {
                 backgroundColor: Colors.red,
                 foregroundColor: Colors.white,
                 icon: Icons.delete,
-                // label: "delete",
               ),
             ],
           ),
@@ -138,7 +137,6 @@ class OnMessage extends HookConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
-                            crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Container(
                                 constraints: BoxConstraints(
@@ -146,26 +144,24 @@ class OnMessage extends HookConsumerWidget {
                                 ),
                                 child: nText(
                                   isGetData.value
-                                      ? "Unknownaaaaaaaaaaaaaaああああああああああああああ"
+                                      ? "Unknown"
                                       : userData != null
                                           ? userData.name
                                           : messageData.userData.name,
                                   color: Colors.white,
-                                  fontSize: safeAreaWidth / 30,
+                                  fontSize: safeAreaWidth / 27,
                                   bold: 700,
                                 ),
                               ),
-                              nText(
-                                "｜",
-                                color: Colors.grey,
-                                fontSize: safeAreaWidth / 30,
-                                bold: 700,
-                              ),
-                              nText(
-                                isNearby ? "付近います" : "通信範囲外です",
-                                color: isNearby ? greenColor : Colors.grey,
-                                fontSize: safeAreaWidth / 40,
-                                bold: 700,
+                              Padding(
+                                padding:
+                                    EdgeInsets.only(left: safeAreaWidth * 0.02),
+                                child: nText(
+                                  isNearby ? "付近います" : "通信範囲外です",
+                                  color: isNearby ? greenColor : Colors.grey,
+                                  fontSize: safeAreaWidth / 40,
+                                  bold: 700,
+                                ),
                               ),
                             ],
                           ),
@@ -176,7 +172,7 @@ class OnMessage extends HookConsumerWidget {
                                     : "リアクションが送信されました"
                                 : message.message,
                             color: Colors.grey,
-                            fontSize: safeAreaWidth / 33,
+                            fontSize: safeAreaWidth / 27,
                             bold: 500,
                           ),
                         ],
@@ -186,7 +182,6 @@ class OnMessage extends HookConsumerWidget {
                       height: safeAreaHeight * 0.08,
                       width: safeAreaWidth * 0.15,
                       child: Column(
-                        // mainAxisAlignment: MainAxisAlignment.cen,
                         children: [
                           nText(
                             formatDate(
