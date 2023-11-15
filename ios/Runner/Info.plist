@@ -30,6 +30,8 @@
 	<string>ca-app-pub-3940256099942544~1458002511</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>Bubu Appは、Bluetoothを使用して周辺デバイスと接続し、メッセージをやり取りします。これにより、普段出会わない人と出会うという体験を提供します</string>
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>Bubu Appは、Bluetoothを使用して周辺デバイスと接続し、メッセージをやり取りします。これにより、普段出会わない人と出会うという体験を提供します</string>
 	<key>NSBonjourServices</key>
