@@ -44,7 +44,7 @@ class HomePage extends HookConsumerWidget {
                   bottom: safeAreaHeight * 0.01,
                 ),
                 child: Padding(
-                  padding: EdgeInsets.all(safeAreaHeight * 0.02),
+                  padding: EdgeInsets.all(safeAreaHeight * 0.01),
                   child: nText(
                     setData.isEmpty
                         ? "付近にユーザーは存在しません"
@@ -262,7 +262,7 @@ class HomePage extends HookConsumerWidget {
     final safeAreaHeight = safeHeight(context);
     final safeAreaWidth = MediaQuery.of(context).size.width;
     return PreferredSize(
-      preferredSize: Size.fromHeight(safeAreaHeight * 0.05),
+      preferredSize: Size.fromHeight(safeAreaHeight * 0.04),
       child: AppBar(
         backgroundColor: Colors.transparent,
         automaticallyImplyLeading: false,
@@ -272,7 +272,7 @@ class HomePage extends HookConsumerWidget {
           children: [
             Container(
               height: safeAreaHeight * 0.1,
-              width: safeAreaWidth * 0.22,
+              width: safeAreaWidth * 0.3,
               decoration: const BoxDecoration(
                 image: DecorationImage(
                   image: AssetImage("assets/img/logo.png"),

@@ -1,6 +1,7 @@
 import 'package:bubu_app/component/button.dart';
 import 'package:bubu_app/component/component.dart';
 import 'package:bubu_app/component/loading.dart';
+import 'package:bubu_app/component/text.dart';
 import 'package:bubu_app/constant/color.dart';
 import 'package:bubu_app/constant/img.dart';
 import 'package:bubu_app/constant/url.dart';
@@ -142,99 +143,97 @@ class StartPage extends HookConsumerWidget {
       children: [
         Scaffold(
           backgroundColor: blackColor,
-          appBar: AppBar(
-            elevation: 0,
-            backgroundColor: Colors.transparent,
-            automaticallyImplyLeading: false,
-          ),
           body: SafeArea(
-            child: Center(
-              child: Padding(
-                padding: EdgeInsets.only(
-                  left: safeAreaWidth * 0.06,
-                  right: safeAreaWidth * 0.06,
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Padding(
-                        padding: EdgeInsets.only(
-                          top: safeAreaHeight * 0.06,
-                          bottom: safeAreaHeight * 0.2,
-                        ),
-                        child: Container(
-                          alignment: Alignment.center,
-                          child: Container(
-                            height: safeAreaHeight * 0.15,
-                            width: safeAreaHeight * 0.15,
-                            decoration: BoxDecoration(
-                              image: appLogoImg(),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
+            child: Padding(
+              padding: EdgeInsets.only(
+                left: safeAreaWidth * 0.06,
+                right: safeAreaWidth * 0.06,
+              ),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: Column(
                       children: [
-                        Padding(
-                          padding: EdgeInsets.only(
-                            bottom: safeAreaHeight * 0.05,
+                        Container(
+                          height: safeAreaHeight * 0.1,
+                          width: safeAreaWidth * 0.3,
+                          decoration: BoxDecoration(
+                            image: appLogoImg(),
                           ),
-                          child: privacyText(
-                            context: context,
-                            onTap1: () => openURL(
-                              url: termsURL,
-                              onError: () => showSnackbar("エラーが発生しました"),
-                            ),
-                            onTap2: () => openURL(
-                              url: privacyURL,
-                              onError: () => showSnackbar("エラーが発生しました"),
+                        ),
+                        Expanded(
+                          child: Container(
+                            alignment: Alignment.center,
+                            child: nText(
+                              "新しい世界へ\nの扉を開けましょう",
+                              color: Colors.white,
+                              fontSize: safeAreaWidth / 14,
+                              bold: 700,
                             ),
                           ),
                         ),
                       ],
                     ),
-                    bottomButton(
-                      context: context,
-                      isWhiteMainColor: true,
-                      text: "ログイン",
-                      onTap: () => bottomSheet(
-                        context,
-                        page: LoginSheetWidget(
-                          onTap: (email, password) => logIn(email, password),
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(
+                          bottom: safeAreaHeight * 0.05,
                         ),
-                        isBackgroundColor: true,
-                        isPOP: true,
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(
-                        top: safeAreaHeight * 0.01,
-                      ),
-                      child: loginLine(
-                        context,
-                      ),
-                    ),
-                    borderButton(
-                      context: context,
-                      text: "新規登録",
-                      onTap: () => bottomSheet(
-                        context,
-                        page: SingInSheetWidget(
-                          onTap: (email, password, name) =>
-                              singInUp(email, password, name),
+                        child: privacyText(
+                          context: context,
+                          onTap1: () => openURL(
+                            url: termsURL,
+                            onError: () => showSnackbar("エラーが発生しました"),
+                          ),
+                          onTap2: () => openURL(
+                            url: privacyURL,
+                            onError: () => showSnackbar("エラーが発生しました"),
+                          ),
                         ),
-                        isBackgroundColor: true,
-                        isPOP: true,
                       ),
+                    ],
+                  ),
+                  bottomButton(
+                    context: context,
+                    isWhiteMainColor: true,
+                    text: "ログイン",
+                    onTap: () => bottomSheet(
+                      context,
+                      page: LoginSheetWidget(
+                        onTap: (email, password) => logIn(email, password),
+                      ),
+                      isBackgroundColor: true,
+                      isPOP: true,
                     ),
-                    SizedBox(
-                      height: safeAreaHeight * 0.02,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(
+                      top: safeAreaHeight * 0.01,
                     ),
-                  ],
-                ),
+                    child: loginLine(
+                      context,
+                    ),
+                  ),
+                  borderButton(
+                    context: context,
+                    text: "新規登録",
+                    onTap: () => bottomSheet(
+                      context,
+                      page: SingInSheetWidget(
+                        onTap: (email, password, name) =>
+                            singInUp(email, password, name),
+                      ),
+                      isBackgroundColor: true,
+                      isPOP: true,
+                    ),
+                  ),
+                  SizedBox(
+                    height: safeAreaHeight * 0.02,
+                  ),
+                ],
               ),
             ),
           ),

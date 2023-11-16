@@ -59,13 +59,16 @@ class WithIconInLoadingPage extends HookConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            height: safeAreaHeight * 0.15,
-            width: safeAreaHeight * 0.15,
+            height: safeAreaHeight * 0.1,
+            width: safeAreaHeight * 0.3,
             decoration: BoxDecoration(image: appLogoImg()),
           ),
-          CupertinoActivityIndicator(
-            color: Colors.white,
-            radius: safeAreaHeight * 0.018,
+          Padding(
+            padding: EdgeInsets.only(top: safeAreaHeight * 0.02),
+            child: CupertinoActivityIndicator(
+              color: Colors.white,
+              radius: safeAreaHeight * 0.018,
+            ),
           ),
         ],
       ),
