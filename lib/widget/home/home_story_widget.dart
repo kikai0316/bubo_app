@@ -264,7 +264,7 @@ class OnStory extends HookConsumerWidget {
                   Padding(
                     padding: EdgeInsets.only(top: safeAreaHeight * 0.005),
                     child: nText(
-                      "ああああああああああ",
+                      userData.name,
                       color: Colors.white.withOpacity(0.9),
                       fontSize: safeAreaWidth / 37,
                       bold: 500,

@@ -189,11 +189,11 @@ class ProfileSetting extends HookConsumerWidget {
                                               controller: textController!,
                                               onTap: () async {
                                                 if (i == 0) {
+                                                  Navigator.pop(context);
                                                   editName.value =
                                                       textController!.text;
                                                 } else {
                                                   isLoading.value = true;
-
                                                   Navigator.pop(context);
                                                   final accountGet =
                                                       await getInstagramAccount(
