@@ -63,7 +63,7 @@ class OnMessage extends HookConsumerWidget {
       error: (e, s) => null,
       loading: () => null,
     );
-    return GestureDetector(
+    return InkWell(
       onTap: () => screenTransitionNormal(
         context,
         MessageScreenPage(id: messageData.userData.id),
@@ -149,13 +149,13 @@ class OnMessage extends HookConsumerWidget {
                                           ? userData.name
                                           : messageData.userData.name,
                                   color: Colors.white,
-                                  fontSize: safeAreaWidth / 27,
+                                  fontSize: safeAreaWidth / 31,
                                   bold: 700,
                                 ),
                               ),
                               Padding(
                                 padding:
-                                    EdgeInsets.only(left: safeAreaWidth * 0.02),
+                                    EdgeInsets.only(left: safeAreaWidth * 0.01),
                                 child: nText(
                                   isNearby ? "付近います" : "通信範囲外です",
                                   color: isNearby ? greenColor : Colors.grey,
@@ -172,7 +172,7 @@ class OnMessage extends HookConsumerWidget {
                                     : "リアクションが送信されました"
                                 : message.message,
                             color: Colors.grey,
-                            fontSize: safeAreaWidth / 27,
+                            fontSize: safeAreaWidth / 31,
                             bold: 500,
                           ),
                         ],

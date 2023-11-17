@@ -151,6 +151,7 @@ class NotInstagramPage extends HookConsumerWidget {
                     text: "完了",
                     onTap: () async {
                       if (isCheck()) {
+                        primaryFocus?.unfocus();
                         isLoading.value = true;
                         final accountGet =
                             await getInstagramAccount(text.value);
