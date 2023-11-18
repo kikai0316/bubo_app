@@ -140,9 +140,6 @@ class HomePage extends HookConsumerWidget {
       ),
     );
 
-    useEffect(() {
-      return null;
-    });
     return Stack(
       children: [
         Scaffold(

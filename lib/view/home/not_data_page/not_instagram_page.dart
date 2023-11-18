@@ -134,6 +134,38 @@ class NotInstagramPage extends HookConsumerWidget {
                       ),
                     ),
                   ),
+                  Padding(
+                    padding: EdgeInsets.only(
+                      top: safeAreaHeight * 0.04,
+                    ),
+                    child: GestureDetector(
+                      onTap: () => text.value.isEmpty
+                          ? null
+                          : openURL(
+                              url: "https://instagram.com/${text.value}",
+                              onError: () =>
+                                  errorText.value = "確認時に、エラーが発生しました。",
+                            ),
+                      child: Opacity(
+                        opacity: text.value.isEmpty ? 0.3 : 1,
+                        child: Container(
+                          alignment: Alignment.center,
+                          height: safeAreaHeight * 0.045,
+                          width: safeAreaWidth * 0.4,
+                          decoration: BoxDecoration(
+                            color: blueColor,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: nText(
+                            "アカウント確認する",
+                            color: Colors.white,
+                            fontSize: safeAreaWidth / 30,
+                            bold: 700,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -152,35 +184,7 @@ class NotInstagramPage extends HookConsumerWidget {
                     onTap: () async {
                       if (isCheck()) {
                         primaryFocus?.unfocus();
-                        isLoading.value = true;
-                        final accountGet =
-                            await getInstagramAccount(text.value);
-                        if (accountGet != null) {
-                          isLoading.value = false;
-                          // ignore: use_build_context_synchronously
-                          showDialog<void>(
-                            context: context,
-                            builder: (
-                              BuildContext context,
-                            ) =>
-                                Dialog(
-                              elevation: 0,
-                              backgroundColor: Colors.transparent,
-                              child: instagramAccount(
-                                context,
-                                name: "${accountGet.username}",
-                                img: "${accountGet.imgurl}",
-                                onTap: () {
-                                  Navigator.pop(context);
-                                  dataUpLoad();
-                                },
-                              ),
-                            ),
-                          );
-                        } else {
-                          isLoading.value = false;
-                          errorText.value = "アカウントが見つかりませんでした。";
-                        }
+                        dataUpLoad();
                       }
                     },
                   ),
@@ -197,80 +201,4 @@ class NotInstagramPage extends HookConsumerWidget {
       ),
     );
   }
-}
-
-Widget instagramAccount(
-  BuildContext context, {
-  required String name,
-  required String img,
-  required void Function() onTap,
-}) {
-  final safeAreaHeight = safeHeight(context);
-  final safeAreaWidth = MediaQuery.of(context).size.width;
-  return Container(
-    height: safeAreaHeight * 0.4,
-    width: safeAreaWidth * 0.9,
-    decoration: BoxDecoration(
-      color: whiteColor,
-      borderRadius: BorderRadius.circular(20),
-    ),
-    child: Padding(
-      padding: EdgeInsets.all(safeAreaWidth * 0.04),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Expanded(
-            child: Container(
-              alignment: Alignment.center,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    height: safeAreaWidth * 0.2,
-                    width: safeAreaWidth * 0.2,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.withOpacity(0.5),
-                      image: DecorationImage(
-                        image: NetworkImage(img),
-                        fit: BoxFit.cover,
-                      ),
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  nText(
-                    name,
-                    color: Colors.black,
-                    fontSize: safeAreaWidth / 20,
-                    bold: 700,
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.only(
-              // top: safeAreaHeight * 0.01,
-              bottom: safeAreaHeight * 0.01,
-            ),
-            child: dialogButton(
-              context,
-              title: "このアカウントで登録",
-              onTap: onTap,
-              backGroundColor: blueColor2,
-              textColor: Colors.white,
-              border: null,
-            ),
-          ),
-          dialogButton(
-            context,
-            title: "とじる",
-            onTap: () => Navigator.pop(context),
-            backGroundColor: Colors.transparent,
-            textColor: Colors.black,
-            border: Border.all(),
-          ),
-        ],
-      ),
-    ),
-  );
 }

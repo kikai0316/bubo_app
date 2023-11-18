@@ -72,16 +72,19 @@ class NotImgPage extends HookConsumerWidget {
       }
     }
 
-    useEffect(() {
-      Future(() async {
-        await Permission.photosAddOnly.request();
-        final isBool = await hasPhotoPermission();
-        if (context.mounted) {
-          isPermission.value = isBool;
-        }
-      });
-      return null;
-    });
+    useEffect(
+      () {
+        Future(() async {
+          await Permission.photosAddOnly.request();
+          final isBool = await hasPhotoPermission();
+          if (context.mounted) {
+            isPermission.value = isBool;
+          }
+        });
+        return null;
+      },
+      [],
+    );
 
     return Scaffold(
       backgroundColor: blackColor,
