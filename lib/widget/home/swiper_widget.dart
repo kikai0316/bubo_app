@@ -75,10 +75,13 @@ class EncountersWidget extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final safeAreaWidth = MediaQuery.of(context).size.width;
     final safeAreaHeight = safeHeight(context);
-    useEffect(() {
-      encounterSnackbar(name: name, count: count);
-      return null;
-    });
+    useEffect(
+      () {
+        encounterSnackbar(name: name, count: count);
+        return null;
+      },
+      [],
+    );
     return Padding(
       padding: EdgeInsets.only(
         top: safeAreaHeight * 0.04,
@@ -157,8 +160,7 @@ class InstagramGetDialog extends HookConsumerWidget {
                 ...notifierWhen.free,
                 TicketData(
                   id: userData.id,
-                  acquisitionAt: DateTime.now()
-                      .subtract(const Duration(hours: 11, minutes: 59)),
+                  acquisitionAt: DateTime.now(),
                 ),
               ]
             : notifierWhen.free,

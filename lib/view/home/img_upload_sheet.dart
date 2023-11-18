@@ -2,8 +2,11 @@ import 'package:bubu_app/component/button.dart';
 import 'package:bubu_app/component/loading.dart';
 import 'package:bubu_app/component/text.dart';
 import 'package:bubu_app/model/user_data.dart';
+import 'package:bubu_app/utility/screen_transition_utility.dart';
 import 'package:bubu_app/utility/snack_bar_utility.dart';
 import 'package:bubu_app/utility/utility.dart';
+import 'package:bubu_app/view/home/img_confirmation_page.dart';
+import 'package:bubu_app/view/img_fullscreen_page.dart';
 import 'package:bubu_app/widget/app_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +27,20 @@ class ImgUpLoadPage extends HookConsumerWidget {
     final isLoading = useState<bool>(false);
     final deepEq =
         const DeepCollectionEquality().equals(userData.imgList, imgList.value);
+
+    Future<void> successGetImg(Uint8List value) async {
+      if (context.mounted) {
+        screenTransitionToTop(
+          context,
+          ImgConfirmation(
+            img: value,
+            onTap: (value) {
+              imgList.value = [...imgList.value, value];
+            },
+          ),
+        );
+      }
+    }
 
     return SizedBox(
       height: safeAreaHeight * 0.9,
@@ -69,7 +86,7 @@ class ImgUpLoadPage extends HookConsumerWidget {
                                     context,
                                     ValueKey(index),
                                     img: imgList.value[index],
-                                    onTap: () {
+                                    deleteOnTap: () {
                                       imgList.value.removeAt(index);
                                       imgList.value = [...imgList.value];
                                     },
@@ -96,14 +113,8 @@ class ImgUpLoadPage extends HookConsumerWidget {
                                     if (imgList.value.length < 3) {
                                       isLoading.value = true;
                                       await getMobileImage(
-                                        onSuccess: (value) {
-                                          if (context.mounted) {
-                                            imgList.value = [
-                                              ...imgList.value,
-                                              value,
-                                            ];
-                                          }
-                                        },
+                                        onSuccess: (value) =>
+                                            successGetImg(value),
                                         onError: () => errorSnackbar(
                                           text: "",
                                           padding: 0,
@@ -172,7 +183,7 @@ class ImgUpLoadPage extends HookConsumerWidget {
 Widget imgWidget(
   BuildContext context,
   Key? key, {
-  required void Function()? onTap,
+  required void Function()? deleteOnTap,
   required Uint8List img,
 }) {
   final safeAreaHeight = safeHeight(context);
@@ -183,34 +194,46 @@ Widget imgWidget(
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(10),
     ),
-    child: Container(
-      key: key,
-      height: safeAreaHeight * 0.2,
-      width: safeAreaWidth * 0.25,
-      alignment: Alignment.bottomRight,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        image: DecorationImage(
-          image: MemoryImage(img),
-          fit: BoxFit.cover,
+    child: GestureDetector(
+      onTap: () {
+        OverlayEntry? overlayEntry;
+        overlayEntry = OverlayEntry(
+          builder: (context) => ImgFullScreenPage(
+            img: img,
+            onCancel: () => overlayEntry?.remove(),
+          ),
+        );
+        Overlay.of(context).insert(overlayEntry);
+      },
+      child: Container(
+        key: key,
+        height: safeAreaHeight * 0.2,
+        width: safeAreaWidth * 0.25,
+        alignment: Alignment.bottomRight,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          image: DecorationImage(
+            image: MemoryImage(img),
+            fit: BoxFit.cover,
+          ),
         ),
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(safeAreaWidth * 0.01),
-        child: GestureDetector(
-          onTap: onTap,
-          child: Container(
-            alignment: Alignment.center,
-            height: safeAreaHeight * 0.04,
-            width: safeAreaHeight * 0.04,
-            decoration: const BoxDecoration(
-              color: Colors.red,
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              Icons.delete,
-              color: Colors.white,
-              size: safeAreaWidth / 18,
+        child: Padding(
+          padding: EdgeInsets.all(safeAreaWidth * 0.01),
+          child: GestureDetector(
+            onTap: deleteOnTap,
+            child: Container(
+              alignment: Alignment.center,
+              height: safeAreaHeight * 0.04,
+              width: safeAreaHeight * 0.04,
+              decoration: const BoxDecoration(
+                color: Colors.red,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.delete,
+                color: Colors.white,
+                size: safeAreaWidth / 18,
+              ),
             ),
           ),
         ),

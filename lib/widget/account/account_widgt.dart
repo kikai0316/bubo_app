@@ -65,11 +65,13 @@ class UserEditSheet extends HookConsumerWidget {
   const UserEditSheet({
     super.key,
     required this.isUserName,
+    required this.initData,
     required this.controller,
     required this.onTap,
   });
 
   final bool isUserName;
+  final String initData;
   final TextEditingController controller;
   final void Function()? onTap;
 
@@ -252,8 +254,12 @@ class UserEditSheet extends HookConsumerWidget {
                   isWhiteMainColor: false,
                   text: "保存",
                   onTap: () {
-                    if (isValidator()) {
-                      onTap!();
+                    if (initData == controller.text) {
+                      Navigator.pop(context);
+                    } else {
+                      if (isValidator()) {
+                        onTap!();
+                      }
                     }
                   },
                 ),

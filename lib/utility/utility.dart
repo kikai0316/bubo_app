@@ -1,13 +1,13 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui';
+import 'dart:ui' as ui;
 
 import 'package:bubu_app/component/text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:flutter_insta/flutter_insta.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -53,9 +53,7 @@ Future getMobileImage({
       final List<int> imageBytes = await File(pickedFile.path).readAsBytes();
       final String base64Image = base64Encode(imageBytes);
       final Uint8List unit8 = base64Decode(base64Image);
-      final compressedResult =
-          await FlutterImageCompress.compressWithList(unit8, quality: 10);
-      onSuccess(Uint8List.fromList(compressedResult));
+      onSuccess(unit8);
     }
   } catch (e) {
     onError();
@@ -153,12 +151,50 @@ void showAlertDialog(
   );
 }
 
-Future<FlutterInsta?> getInstagramAccount(String userName) async {
-  try {
-    final FlutterInsta flutterInsta = FlutterInsta();
-    await flutterInsta.getProfileData(userName);
-    return flutterInsta;
-  } catch (e) {
-    return null;
+Future<List<Color>> extractMainColorsFromImage(Uint8List imageData) async {
+  // 画像データからui.Imageを作成
+  final Completer<ui.Image> completer = Completer();
+  ui.decodeImageFromList(imageData, (ui.Image img) {
+    completer.complete(img);
+  });
+  final ui.Image image = await completer.future;
+
+  final ByteData? data = await image.toByteData();
+  final int width = image.width;
+  final int height = image.height;
+  final Color topColor = extractDominantColor(data, width, height, 50);
+  final Color bottomColor =
+      extractDominantColor(data, width, height, 50, isBottomRegion: true);
+  return [topColor, bottomColor];
+}
+
+Color extractDominantColor(
+  ByteData? data,
+  int width,
+  int height,
+  int regionHeight, {
+  bool isBottomRegion = false,
+}) {
+  if (data == null) return Colors.transparent;
+  final int startY = isBottomRegion ? height - regionHeight : 0;
+  final int endY = isBottomRegion ? height : regionHeight;
+  final Map<int, int> colorCount = {};
+  for (int y = startY; y < endY; y++) {
+    for (int x = 0; x < width; x++) {
+      final int offset = (y * width + x) * 4;
+      final int red = data.getUint8(offset);
+      final int green = data.getUint8(offset + 1);
+      final int blue = data.getUint8(offset + 2);
+      final int alpha = data.getUint8(offset + 3);
+      final int colorValue = (alpha << 24) | (red << 16) | (green << 8) | blue;
+      if (!colorCount.containsKey(colorValue)) {
+        colorCount[colorValue] = 1;
+      } else {
+        colorCount[colorValue] = colorCount[colorValue]! + 1;
+      }
+    }
   }
+  final int dominantColorValue =
+      colorCount.entries.reduce((a, b) => a.value > b.value ? a : b).key;
+  return Color(dominantColorValue);
 }

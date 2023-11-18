@@ -8,7 +8,6 @@ import 'package:bubu_app/utility/path_provider_utility.dart';
 import 'package:bubu_app/utility/screen_transition_utility.dart';
 import 'package:bubu_app/utility/snack_bar_utility.dart';
 import 'package:bubu_app/utility/utility.dart';
-import 'package:bubu_app/view/home/not_data_page/not_instagram_page.dart';
 import 'package:bubu_app/view/user_app.dart';
 import 'package:bubu_app/view_model/user_data.dart';
 import 'package:bubu_app/widget/account/account_widgt.dart';
@@ -183,56 +182,19 @@ class ProfileSetting extends HookConsumerWidget {
                                             isBackgroundColor: true,
                                             page: UserEditSheet(
                                               isUserName: i == 0,
+                                              initData: i == 0
+                                                  ? editName.value
+                                                  : editInstagram.value,
                                               controller: textController!,
                                               onTap: () async {
                                                 if (i == 0) {
+                                                  Navigator.pop(context);
                                                   editName.value =
                                                       textController!.text;
                                                 } else {
-                                                  isLoading.value = true;
-
                                                   Navigator.pop(context);
-                                                  final accountGet =
-                                                      await getInstagramAccount(
-                                                    textController!.text,
-                                                  );
-                                                  isLoading.value = false;
-                                                  if (accountGet != null) {
-                                                    // ignore: use_build_context_synchronously
-                                                    showDialog<void>(
-                                                      context: context,
-                                                      builder: (
-                                                        BuildContext context,
-                                                      ) =>
-                                                          Dialog(
-                                                        elevation: 0,
-                                                        backgroundColor:
-                                                            Colors.transparent,
-                                                        child: instagramAccount(
-                                                          context,
-                                                          name:
-                                                              "${accountGet.username}",
-                                                          img:
-                                                              "${accountGet.imgurl}",
-                                                          onTap: () {
-                                                            Navigator.pop(
-                                                              context,
-                                                            );
-                                                            editInstagram
-                                                                    .value =
-                                                                textController!
-                                                                    .text;
-                                                          },
-                                                        ),
-                                                      ),
-                                                    );
-                                                  } else {
-                                                    errorSnackbar(
-                                                      text: "アカウントが見つかりませんでした",
-                                                      padding:
-                                                          safeAreaHeight * 0.08,
-                                                    );
-                                                  }
+                                                  editInstagram.value =
+                                                      textController!.text;
                                                 }
                                               },
                                             ),

@@ -88,7 +88,7 @@ class DeviseListNotifier extends _$DeviseListNotifier {
             messageSnackbar(
               messageText: emojiData.containsKey(messageDecode)
                   ? "リアクションがありました"
-                  : message,
+                  : messageDecode,
               name: name,
               id: id,
             );

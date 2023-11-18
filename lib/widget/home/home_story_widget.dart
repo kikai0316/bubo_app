@@ -44,51 +44,55 @@ class OnStory extends HookConsumerWidget {
         );
       }
 
-      final loadingNotifier = ref.read(loadingNotifierProvider.notifier);
-      final imgItem = imgList.length;
-      loadingNotifier.upData(
-        loadinPage(
-          context: context,
-          isLoading: true,
-          text: "アップロード中（ 0/$imgItem ）...",
-        ),
-      );
-      final isUpLoad = await comparisonUpLoad(
-        userData: userData,
-        newImgList: imgList,
-        onStream: (index) {
-          loadingNotifier.upData(
-            loadinPage(
-              context: context,
-              isLoading: true,
-              text: "アップロード中（ $index/$imgItem ）...",
-            ),
-          );
-        },
-      );
-      if (isUpLoad) {
-        final setData = UserData(
-          imgList: imgList,
-          id: userData.id,
-          name: userData.name,
-          birthday: userData.birthday,
-          family: userData.family,
-          instagram: userData.instagram,
-          isGetData: true,
-          isView: false,
-          acquisitionAt: null,
+      if (context.mounted) {
+        final loadingNotifier = ref.read(loadingNotifierProvider.notifier);
+        final imgItem = imgList.length;
+        loadingNotifier.upData(
+          loadinPage(
+            context: context,
+            isLoading: true,
+            text: "アップロード中（ 0/$imgItem ）...",
+          ),
         );
-        final iswWite = await writeUserData(setData);
-        if (iswWite) {
-          loadingNotifier.upData(null);
-          final notifier = ref.read(userDataNotifierProvider.notifier);
-          notifier.reLoad();
+        final isUpLoad = await comparisonUpLoad(
+          userData: userData,
+          newImgList: imgList,
+          onStream: (index) {
+            loadingNotifier.upData(
+              loadinPage(
+                context: context,
+                isLoading: true,
+                text: "アップロード中（ $index/$imgItem ）...",
+              ),
+            );
+          },
+        );
+        if (isUpLoad) {
+          final setData = UserData(
+            imgList: imgList,
+            id: userData.id,
+            name: userData.name,
+            birthday: userData.birthday,
+            family: userData.family,
+            instagram: userData.instagram,
+            isGetData: true,
+            isView: false,
+            acquisitionAt: null,
+          );
+          final iswWite = await writeUserData(setData);
+          if (iswWite) {
+            loadingNotifier.upData(null);
+            final notifier = ref.read(userDataNotifierProvider.notifier);
+            notifier.reLoad();
+          } else {
+            loadingNotifier.upData(null);
+            showSnackbar();
+          }
         } else {
           loadingNotifier.upData(null);
           showSnackbar();
         }
       } else {
-        loadingNotifier.upData(null);
         showSnackbar();
       }
     }
@@ -266,7 +270,7 @@ class OnStory extends HookConsumerWidget {
                     child: nText(
                       userData.name,
                       color: Colors.white.withOpacity(0.9),
-                      fontSize: safeAreaWidth / 40,
+                      fontSize: safeAreaWidth / 37,
                       bold: 500,
                     ),
                   ),

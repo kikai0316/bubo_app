@@ -6,6 +6,7 @@ import 'package:bubu_app/model/message_list_data.dart';
 import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/screen_transition_utility.dart';
 import 'package:bubu_app/utility/utility.dart';
+import 'package:bubu_app/view/home/story_all_page.dart';
 import 'package:bubu_app/view/home/swiper.dart';
 import 'package:bubu_app/view/user_app.dart';
 import 'package:bubu_app/view_model/device_list.dart';
@@ -14,7 +15,6 @@ import 'package:bubu_app/view_model/story_list.dart';
 import 'package:bubu_app/widget/home/home_message_widget.dart';
 import 'package:bubu_app/widget/home/home_story_widget.dart';
 import 'package:bubu_app/widget/home/home_widget.dart';
-import 'package:bubu_app/widget/home/swiper_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -44,7 +44,7 @@ class HomePage extends HookConsumerWidget {
                   bottom: safeAreaHeight * 0.01,
                 ),
                 child: Padding(
-                  padding: EdgeInsets.all(safeAreaHeight * 0.02),
+                  padding: EdgeInsets.all(safeAreaHeight * 0.01),
                   child: nText(
                     setData.isEmpty
                         ? "付近にユーザーは存在しません"
@@ -140,9 +140,6 @@ class HomePage extends HookConsumerWidget {
       ),
     );
 
-    useEffect(() {
-      return null;
-    });
     return Stack(
       children: [
         Scaffold(
@@ -233,23 +230,10 @@ class HomePage extends HookConsumerWidget {
             padding: EdgeInsets.only(bottom: safeAreaHeight * 0.1),
             child: FloatingActionButton(
               backgroundColor: blueColor,
-              onPressed: () => showDialog<void>(
-                context: context,
-                builder: (
-                  BuildContext context,
-                ) =>
-                    Dialog(
-                  elevation: 0,
-                  backgroundColor: Colors.transparent,
-                  child: InstagramGetDialog(
-                    userData: userData,
-                  ),
-                ),
+              onPressed: () => screenTransitionNormal(
+                context,
+                const StoryAllPage(),
               ),
-              // screenTransitionNormal(
-              //   context,
-              //   const StoryAllPage(),
-              // ),
               child: Icon(
                 Icons.history,
                 color: Colors.white,
@@ -275,7 +259,7 @@ class HomePage extends HookConsumerWidget {
     final safeAreaHeight = safeHeight(context);
     final safeAreaWidth = MediaQuery.of(context).size.width;
     return PreferredSize(
-      preferredSize: Size.fromHeight(safeAreaHeight * 0.05),
+      preferredSize: Size.fromHeight(safeAreaHeight * 0.04),
       child: AppBar(
         backgroundColor: Colors.transparent,
         automaticallyImplyLeading: false,
@@ -285,7 +269,7 @@ class HomePage extends HookConsumerWidget {
           children: [
             Container(
               height: safeAreaHeight * 0.1,
-              width: safeAreaWidth * 0.22,
+              width: safeAreaWidth * 0.3,
               decoration: const BoxDecoration(
                 image: DecorationImage(
                   image: AssetImage("assets/img/logo.png"),

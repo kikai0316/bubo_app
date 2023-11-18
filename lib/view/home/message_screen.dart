@@ -101,9 +101,7 @@ class MessageScreenPage extends HookConsumerWidget {
                       child: GestureDetector(
                         onTap: () => FocusScope.of(context).unfocus(),
                         child: SingleChildScrollView(
-                          reverse: true,
                           child: Column(
-                            // for(final item in)
                             children: [
                               SizedBox(
                                 height: safeAreaHeight * 0.01,
@@ -177,13 +175,22 @@ class MessageScreenPage extends HookConsumerWidget {
                             )
                           : Padding(
                               padding: EdgeInsets.only(
-                                bottom: safeAreaHeight * 0.02,
+                                bottom: safeAreaHeight * 0.01,
                               ),
-                              child: nText(
-                                "相手が通信範囲外です",
-                                color: Colors.white,
-                                fontSize: safeAreaWidth / 25,
-                                bold: 700,
+                              child: Container(
+                                alignment: Alignment.center,
+                                height: safeAreaHeight * 0.055,
+                                width: safeAreaWidth * 0.7,
+                                decoration: BoxDecoration(
+                                  color: const Color.fromARGB(255, 38, 38, 38),
+                                  borderRadius: BorderRadius.circular(50),
+                                ),
+                                child: nText(
+                                  "相手が通信範囲外です",
+                                  color: Colors.white,
+                                  fontSize: safeAreaWidth / 28,
+                                  bold: 700,
+                                ),
                               ),
                             ),
                     ),
@@ -388,36 +395,39 @@ class MessageScreenPage extends HookConsumerWidget {
     List<MessageList> getData,
     int index,
   ) {
-    final newIndex = getData.first.message.length - index - 1;
-    final date = getData.first.message[newIndex].dateTime;
-    final lastDate =
-        newIndex - 1 > -1 ? getData.first.message[newIndex - 1].dateTime : null;
-    final bool isNewDay = lastDate?.day == date.day &&
-        lastDate?.month == date.month &&
-        lastDate?.year == date.year;
+    final message = getData.first.message[index];
+    final date = message.dateTime;
+    final bool isNewDay;
+    if (index == 0) {
+      isNewDay = true;
+    } else {
+      final prevDate = getData.first.message[index - 1].dateTime;
+      isNewDay = date.day != prevDate.day ||
+          date.month != prevDate.month ||
+          date.year != prevDate.year;
+    }
+
     return Column(
       children: [
-        if (!isNewDay || index == 0) ...{
+        if (isNewDay) ...{
           dateLabelWidget(context, date),
         },
-        if (emojiData.containsKey(
-          getData.first.message[newIndex].message,
-        )) ...{
+        if (emojiData.containsKey(message.message)) ...{
           emojiChatWidget(
             context,
-            messeageData: getData.first.message[newIndex],
+            messeageData: message,
             userData: getData.first.userData,
           ),
         } else ...{
-          if (getData.first.message[newIndex].isMyMessage) ...{
+          if (message.isMyMessage) ...{
             myChatWidget(
               context,
-              messeageData: getData.first.message[newIndex],
+              messeageData: message,
             ),
           } else ...{
             recipientChatWidget(
               context,
-              messeageData: getData.first.message[newIndex],
+              messeageData: message,
               userData: getData.first.userData,
             ),
           },
