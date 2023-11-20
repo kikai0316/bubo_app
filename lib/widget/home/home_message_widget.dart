@@ -108,7 +108,7 @@ class OnMessage extends HookConsumerWidget {
                         height: safeAreaHeight * 0.07,
                         width: safeAreaHeight * 0.07,
                         decoration: BoxDecoration(
-                          color: blackColor,
+                          color: Colors.grey.withOpacity(0.1),
                           image: userData != null && userData.imgList.isNotEmpty
                               ? DecorationImage(
                                   image: MemoryImage(

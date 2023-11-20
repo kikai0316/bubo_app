@@ -65,7 +65,7 @@ class SingInSheetWidget extends HookConsumerWidget {
     }
 
     return SizedBox(
-      height: safeAreaHeight * 0.8,
+      height: safeAreaHeight * 0.9,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: appBarWidget(

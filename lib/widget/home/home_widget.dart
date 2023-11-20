@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'dart:ui' as ui;
 
 import 'package:bubu_app/component/button.dart';
 import 'package:bubu_app/component/text.dart';
@@ -115,76 +116,71 @@ Widget nearbyStartWidget(
       style: TextStyle(
         fontFamily: "Normal",
         fontVariations: const [FontVariation("wght", 700)],
-        color: text == "ON" ? greenColor : Colors.grey,
-        fontSize: safeAreaWidth / 25,
+        color: text == "許可" ? greenColor : Colors.grey,
+        fontSize: safeAreaWidth / 35,
       ),
     );
   }
 
-  return Container(
-    height: double.infinity,
-    width: double.infinity,
-    color: Colors.black.withOpacity(0.9),
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Padding(
-          padding: EdgeInsets.only(bottom: safeAreaHeight * 0.08),
-          child: nText(
-            "周囲のデバイスとの接続を\n開始しますか？",
-            color: Colors.white,
-            fontSize: safeAreaWidth / 15,
-            bold: 700,
+  return BackdropFilter(
+    filter: ui.ImageFilter.blur(
+      sigmaX: 80.0,
+      sigmaY: 80.0,
+    ),
+    child: Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Padding(
+            padding: EdgeInsets.only(bottom: safeAreaHeight * 0.05),
+            child: nText(
+              "周囲のデバイスとの接続を\n開始しますか？",
+              color: Colors.white,
+              fontSize: safeAreaWidth / 15,
+              bold: 700,
+            ),
           ),
-        ),
-        Container(
-          height: safeAreaHeight * 0.43,
-          width: safeAreaWidth * 0.9,
-          decoration: BoxDecoration(
-            // color: blackColor,
-            borderRadius: BorderRadius.circular(15),
-          ),
-          child: Padding(
-            padding: EdgeInsets.all(safeAreaWidth * 0.04),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                RichText(
-                  textAlign: TextAlign.center,
-                  text: TextSpan(
-                    children: [
-                      textWidget("端末の設定からローカルネットワークを\n「 "),
-                      textWidget("ON"),
-                      textWidget(" 」にしてください。"),
-                    ],
+          Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.white.withOpacity(0.5)),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Padding(
+              padding: EdgeInsets.all(safeAreaWidth * 0.03),
+              child: Column(
+                children: [
+                  RichText(
+                    textAlign: TextAlign.center,
+                    text: TextSpan(
+                      children: [
+                        textWidget("端末の設定からローカルネットワークを\n「 "),
+                        textWidget("許可"),
+                        textWidget(" 」してください。"),
+                      ],
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(
-                    bottom: safeAreaHeight * 0.05,
-                    top: safeAreaHeight * 0.01,
-                  ),
-                  child: Container(
+                  Container(
                     alignment: Alignment.center,
                     height: safeAreaHeight * 0.1,
-                    width: double.infinity,
+                    width: safeAreaWidth * 0.7,
                     child: Stack(
                       alignment: Alignment.center,
                       children: [
                         Container(
                           alignment: Alignment.center,
-                          height: safeAreaHeight * 0.06,
+                          height: safeAreaHeight * 0.05,
+                          width: safeAreaWidth * 0.65,
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Padding(
                             padding: EdgeInsets.only(
-                              left: safeAreaWidth * 0.02,
-                              right: safeAreaWidth * 0.02,
+                              left: safeAreaWidth * 0.03,
+                              right: safeAreaWidth * 0.03,
                             ),
                             child: Container(
-                              height: safeAreaHeight * 0.06,
+                              height: safeAreaHeight * 0.05,
                               decoration: const BoxDecoration(
                                 image: DecorationImage(
                                   image: AssetImage("assets/img/setting.png"),
@@ -196,29 +192,33 @@ Widget nearbyStartWidget(
                         ),
                         Align(
                           alignment: Alignment.centerRight,
-                          child: Container(
-                            alignment: Alignment.center,
-                            width: safeAreaHeight * 0.09,
-                            height: safeAreaHeight * 0.09,
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.white,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: blueColor2,
-                                  blurRadius: 20,
-                                  spreadRadius: 10.0,
-                                ),
-                              ],
-                            ),
+                          child: Padding(
+                            padding:
+                                EdgeInsets.only(right: safeAreaWidth * 0.04),
                             child: Container(
-                              height: safeAreaHeight * 0.09,
-                              width: safeAreaHeight * 0.09,
-                              decoration: const BoxDecoration(
+                              alignment: Alignment.center,
+                              width: safeAreaHeight * 0.065,
+                              height: safeAreaHeight * 0.065,
+                              decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                image: DecorationImage(
-                                  image: AssetImage("assets/img/switch.png"),
-                                  fit: BoxFit.cover,
+                                color: Colors.white,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: blueColor2.withOpacity(0.5),
+                                    blurRadius: 10,
+                                    spreadRadius: 1.0,
+                                  ),
+                                ],
+                              ),
+                              child: Container(
+                                height: safeAreaHeight * 0.09,
+                                width: safeAreaHeight * 0.09,
+                                decoration: const BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  image: DecorationImage(
+                                    image: AssetImage("assets/img/switch.png"),
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
                               ),
                             ),
@@ -227,21 +227,40 @@ Widget nearbyStartWidget(
                       ],
                     ),
                   ),
-                ),
-                miniButton(
-                  context: context,
-                  text: "設定画面へ",
-                  onTap: () => openAppSettings(),
-                ),
-              ],
+                  Material(
+                    color: const Color.fromARGB(255, 91, 91, 91),
+                    borderRadius: BorderRadius.circular(50),
+                    child: InkWell(
+                      onTap: () => openAppSettings(),
+                      borderRadius: BorderRadius.circular(50),
+                      child: Container(
+                        alignment: Alignment.center,
+                        height: safeAreaHeight * 0.04,
+                        width: safeAreaWidth * 0.4,
+                        decoration: BoxDecoration(
+                          border:
+                              Border.all(color: Colors.white.withOpacity(0.2)),
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                        child: nText(
+                          "設定画面へ",
+                          color: Colors.white,
+                          fontSize: safeAreaWidth / 35,
+                          bold: 400,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-        Padding(
-          padding: EdgeInsets.only(top: safeAreaHeight * 0.1),
-          child: shadowButton(context, text: "開始", onTap: onTap),
-        ),
-      ],
+          Padding(
+            padding: EdgeInsets.only(top: safeAreaHeight * 0.1),
+            child: shadowButton(context, text: "開始", onTap: onTap),
+          ),
+        ],
+      ),
     ),
   );
 }

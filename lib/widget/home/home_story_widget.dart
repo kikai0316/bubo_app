@@ -40,7 +40,7 @@ class OnStory extends HookConsumerWidget {
       void showSnackbar() {
         errorSnackbar(
           text: "何らかの問題が発生しました。再試行してください。",
-          padding: safeAreaHeight * 0.07,
+          padding: safeAreaHeight * 0.01,
         );
       }
 
@@ -51,7 +51,7 @@ class OnStory extends HookConsumerWidget {
           loadinPage(
             context: context,
             isLoading: true,
-            text: "アップロード中（ 0/$imgItem ）...",
+            text: "アップロード中（ 0/$imgItem ）",
           ),
         );
         final isUpLoad = await comparisonUpLoad(
@@ -62,7 +62,7 @@ class OnStory extends HookConsumerWidget {
               loadinPage(
                 context: context,
                 isLoading: true,
-                text: "アップロード中（ $index/$imgItem ）...",
+                text: "アップロード中（ $index/$imgItem ）",
               ),
             );
           },

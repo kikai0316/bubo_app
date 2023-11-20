@@ -115,7 +115,7 @@ Widget recipientChatWidget(
                   ),
                 ),
                 child: Padding(
-                  padding: EdgeInsets.all(safeAreaWidth * 0.03),
+                  padding: EdgeInsets.all(safeAreaWidth * 0.025),
                   child: nText2(
                     messeageData.message,
                     color: Colors.white,

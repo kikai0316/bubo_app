@@ -6,7 +6,6 @@ import 'package:bubu_app/utility/screen_transition_utility.dart';
 import 'package:bubu_app/utility/snack_bar_utility.dart';
 import 'package:bubu_app/utility/utility.dart';
 import 'package:bubu_app/view/home/img_confirmation_page.dart';
-import 'package:bubu_app/view/img_fullscreen_page.dart';
 import 'package:bubu_app/widget/app_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +14,11 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ImgUpLoadPage extends HookConsumerWidget {
-  const ImgUpLoadPage({super.key, required this.userData, required this.onTap});
+  const ImgUpLoadPage({
+    super.key,
+    required this.userData,
+    required this.onTap,
+  });
   final UserData userData;
   final void Function(List<Uint8List>) onTap;
 
@@ -41,6 +44,10 @@ class ImgUpLoadPage extends HookConsumerWidget {
         );
       }
     }
+
+    useEffect(() {
+      return null;
+    });
 
     return SizedBox(
       height: safeAreaHeight * 0.9,
@@ -74,7 +81,7 @@ class ImgUpLoadPage extends HookConsumerWidget {
                               ),
                             ),
                             SizedBox(
-                              height: safeAreaHeight * 0.24,
+                              height: safeAreaHeight / 3.6,
                               child: ReorderableListView.builder(
                                 padding: EdgeInsets.only(
                                   top: safeAreaHeight * 0.02,
@@ -178,66 +185,4 @@ class ImgUpLoadPage extends HookConsumerWidget {
       ),
     );
   }
-}
-
-Widget imgWidget(
-  BuildContext context,
-  Key? key, {
-  required void Function()? deleteOnTap,
-  required Uint8List img,
-}) {
-  final safeAreaHeight = safeHeight(context);
-  final safeAreaWidth = MediaQuery.of(context).size.width;
-  return Card(
-    key: key,
-    elevation: 10,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(10),
-    ),
-    child: GestureDetector(
-      onTap: () {
-        OverlayEntry? overlayEntry;
-        overlayEntry = OverlayEntry(
-          builder: (context) => ImgFullScreenPage(
-            img: img,
-            onCancel: () => overlayEntry?.remove(),
-          ),
-        );
-        Overlay.of(context).insert(overlayEntry);
-      },
-      child: Container(
-        key: key,
-        height: safeAreaHeight * 0.2,
-        width: safeAreaWidth * 0.25,
-        alignment: Alignment.bottomRight,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          image: DecorationImage(
-            image: MemoryImage(img),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: Padding(
-          padding: EdgeInsets.all(safeAreaWidth * 0.01),
-          child: GestureDetector(
-            onTap: deleteOnTap,
-            child: Container(
-              alignment: Alignment.center,
-              height: safeAreaHeight * 0.04,
-              width: safeAreaHeight * 0.04,
-              decoration: const BoxDecoration(
-                color: Colors.red,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.delete,
-                color: Colors.white,
-                size: safeAreaWidth / 18,
-              ),
-            ),
-          ),
-        ),
-      ),
-    ),
-  );
 }
