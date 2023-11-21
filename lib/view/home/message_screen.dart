@@ -229,7 +229,6 @@ class MessageScreenPage extends HookConsumerWidget {
         loadinPageWithCncel(
           context: context,
           isLoading: isLoading.value,
-          text: "接続中...",
           onTap: () {
             final notifier = ref.read(deviseListNotifierProvider.notifier);
             notifier.sendMessageCancel();
@@ -252,7 +251,7 @@ class MessageScreenPage extends HookConsumerWidget {
     final storyNotifierWhen = storyNotifier.when(
       data: (data) {
         final int index = data.indexWhere(
-          (userData) => userData.id == userData.id,
+          (value) => value.id == userData.id,
         );
         if (index != -1) {
           return data[index];

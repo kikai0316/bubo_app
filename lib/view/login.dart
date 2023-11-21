@@ -133,11 +133,14 @@ class StartPage extends HookConsumerWidget {
       }
     }
 
-    useEffect(() {
-      final listNotifier = ref.read(messageListNotifierProvider.notifier);
-      listNotifier.reSet();
-      return null;
-    });
+    useEffect(
+      () {
+        final listNotifier = ref.read(messageListNotifierProvider.notifier);
+        listNotifier.reSet();
+        return null;
+      },
+      [],
+    );
 
     return Stack(
       children: [

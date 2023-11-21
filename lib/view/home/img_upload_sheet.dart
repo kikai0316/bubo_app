@@ -45,10 +45,6 @@ class ImgUpLoadPage extends HookConsumerWidget {
       }
     }
 
-    useEffect(() {
-      return null;
-    });
-
     return SizedBox(
       height: safeAreaHeight * 0.9,
       child: Stack(

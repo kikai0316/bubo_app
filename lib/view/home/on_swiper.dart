@@ -69,7 +69,6 @@ class OnSwiper extends HookConsumerWidget {
         loadinPageWithCncel(
           context: context,
           isLoading: true,
-          text: "接続中...",
           onTap: () {
             final notifier = ref.read(deviseListNotifierProvider.notifier);
             notifier.sendMessageCancel();
