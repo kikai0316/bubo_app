@@ -2,9 +2,7 @@ import 'package:bubu_app/component/button.dart';
 import 'package:bubu_app/component/text.dart';
 import 'package:bubu_app/constant/color.dart';
 import 'package:bubu_app/utility/notification_utility.dart';
-import 'package:bubu_app/utility/screen_transition_utility.dart';
 import 'package:bubu_app/utility/utility.dart';
-import 'package:bubu_app/view/user_app.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -161,7 +159,8 @@ class RequestNotificationsPage extends HookConsumerWidget {
                   onTap: () async {
                     await NotificationClass().requestPermissions();
                     // ignore: use_build_context_synchronously
-                    screenTransitionNormal(context, const UserApp(initPage: 0));
+                    //後
+                    // screenTransitionNormal(context,  HomePage(id:));
                   },
                 ),
               ),

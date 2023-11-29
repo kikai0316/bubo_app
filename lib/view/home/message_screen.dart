@@ -9,8 +9,8 @@ import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/firebase_utility.dart';
 import 'package:bubu_app/utility/snack_bar_utility.dart';
 import 'package:bubu_app/utility/utility.dart';
-import 'package:bubu_app/view_model/device_list.dart';
 import 'package:bubu_app/view_model/message_list.dart';
+import 'package:bubu_app/view_model/nearby_list.dart';
 import 'package:bubu_app/view_model/story_list.dart';
 import 'package:bubu_app/view_model/user_data.dart';
 import 'package:bubu_app/widget/home/home_message_widget.dart';
@@ -32,7 +32,7 @@ class MessageScreenPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final safeAreaHeight = safeHeight(context);
     final safeAreaWidth = MediaQuery.of(context).size.width;
-    final deviceList = ref.watch(deviseListNotifierProvider);
+    final nearbyList = ref.watch(nearbyUsersNotifierProvider);
     final isLoading = useState(false);
     final myUserNotifire = ref.watch(userDataNotifierProvider);
     final myUserNotifireWhen = myUserNotifire.when(
@@ -48,9 +48,6 @@ class MessageScreenPage extends HookConsumerWidget {
       error: (e, s) => null,
       loading: () => null,
     );
-    final setDeviceList = (deviceList ?? [])
-        .map((element) => element.deviceId.split('@')[0])
-        .toList();
 
     final messageList = ref.watch(messageListNotifierProvider);
 
@@ -91,7 +88,7 @@ class MessageScreenPage extends HookConsumerWidget {
                 ref: ref,
                 myUserData: myUserNotifireWhen,
                 userData: getData.first.userData,
-                isNearby: setDeviceList.contains(id),
+                isNearby: (nearbyList?.data ?? []).contains(id),
               ),
               body: Stack(
                 children: [
@@ -124,7 +121,7 @@ class MessageScreenPage extends HookConsumerWidget {
                   SafeArea(
                     child: Align(
                       alignment: Alignment.bottomCenter,
-                      child: setDeviceList.contains(id)
+                      child: (nearbyList?.data ?? []).contains(id)
                           ? Padding(
                               padding: EdgeInsets.only(
                                 top: safeAreaHeight * 0.001,
@@ -132,37 +129,38 @@ class MessageScreenPage extends HookConsumerWidget {
                               child: MessageTextFieldWidget(
                                 controller: controller,
                                 onTap: () async {
-                                  if (setDeviceList.contains(id)) {
-                                    if (controller.text.isNotEmpty) {
-                                      final text = controller.text;
-                                      primaryFocus?.unfocus();
-                                      controller.clear();
-                                      isLoading.value = true;
-                                      final notifier = ref.read(
-                                        deviseListNotifierProvider.notifier,
-                                      );
-                                      final isSend = await notifier.sendMessage(
-                                        message: text,
-                                        userData: messageUserDataNotifireWhen
-                                            .userData,
-                                        myData: myUserNotifireWhen,
-                                      );
-                                      if (context.mounted) {
-                                        isLoading.value = false;
-                                        if (!isSend) {
-                                          // ignore: use_build_context_synchronously
-                                          errorSnackbar(
-                                            text: "メッセージの送信に失敗しました。",
-                                            padding: safeAreaHeight * 0.08,
-                                          );
-                                        }
-                                      }
-                                    } else {
-                                      errorSnackbar(
-                                        text: "空白のメッセージは送信できません。",
-                                        padding: safeAreaHeight * 0.08,
-                                      );
-                                    }
+                                  if ((nearbyList?.data ?? []).contains(id)) {
+                                    //後
+                                    // if (controller.text.isNotEmpty) {
+                                    //   final text = controller.text;
+                                    //   primaryFocus?.unfocus();
+                                    //   controller.clear();
+                                    //   isLoading.value = true;
+                                    //   final notifier = ref.read(
+                                    //     deviseListNotifierProvider.notifier,
+                                    //   );
+                                    //   final isSend = await notifier.sendMessage(
+                                    //     message: text,
+                                    //     userData: messageUserDataNotifireWhen
+                                    //         .userData,
+                                    //     myData: myUserNotifireWhen,
+                                    //   );
+                                    //   if (context.mounted) {
+                                    //     isLoading.value = false;
+                                    //     if (!isSend) {
+                                    //       // ignore: use_build_context_synchronously
+                                    //       errorSnackbar(
+                                    //         text: "メッセージの送信に失敗しました。",
+                                    //         padding: safeAreaHeight * 0.08,
+                                    //       );
+                                    //     }
+                                    //   }
+                                    // } else {
+                                    //   errorSnackbar(
+                                    //     text: "空白のメッセージは送信できません。",
+                                    //     padding: safeAreaHeight * 0.08,
+                                    //   );
+                                    // }
                                   } else {
                                     controller.clear();
                                     errorSnackbar(
@@ -230,8 +228,9 @@ class MessageScreenPage extends HookConsumerWidget {
           context: context,
           isLoading: isLoading.value,
           onTap: () {
-            final notifier = ref.read(deviseListNotifierProvider.notifier);
-            notifier.sendMessageCancel();
+            //後
+            // final notifier = ref.read(deviseListNotifierProvider.notifier);
+            // notifier.sendMessageCancel();
           },
         ),
       ],

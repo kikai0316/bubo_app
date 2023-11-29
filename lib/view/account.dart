@@ -13,7 +13,6 @@ import 'package:bubu_app/utility/snack_bar_utility.dart';
 import 'package:bubu_app/utility/utility.dart';
 import 'package:bubu_app/view/account/profile_setting.dart';
 import 'package:bubu_app/view/login.dart';
-import 'package:bubu_app/view_model/device_list.dart';
 import 'package:bubu_app/view_model/history_list.dart';
 import 'package:bubu_app/view_model/loading_model.dart';
 import 'package:bubu_app/widget/account/account_widgt.dart';
@@ -189,9 +188,6 @@ class AccountPage extends HookConsumerWidget {
                               buttonText: "削除する",
                               ontap: () async {
                                 Navigator.pop(context);
-                                final deviceListNotifier = ref
-                                    .read(deviseListNotifierProvider.notifier);
-                                deviceListNotifier.resetData();
                                 final loadingNotifier =
                                     ref.read(loadingNotifierProvider.notifier);
                                 loadingNotifier.upData(

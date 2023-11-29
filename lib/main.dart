@@ -3,7 +3,7 @@ import 'package:bubu_app/firebase_options.dart';
 import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/notification_utility.dart';
 import 'package:bubu_app/utility/path_provider_utility.dart';
-import 'package:bubu_app/view/home_page.dart';
+import 'package:bubu_app/view/home.dart';
 import 'package:bubu_app/view/login.dart';
 import 'package:bubu_app/view/request_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -41,10 +41,6 @@ class MyApp extends HookConsumerWidget {
       return userData;
     }
 
-    // return const MaterialApp(
-    //   debugShowCheckedModeBanner: false,
-    //   home: HomePage2(),
-    // );
     if (user == null) {
       return const MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -70,7 +66,7 @@ class MyApp extends HookConsumerWidget {
                   builder:
                       (BuildContext context, AsyncSnapshot<bool> snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return HomePage2(
+                      return HomePage(
                         id: user.uid,
                       );
                     } else if (snapshot.hasError) {
@@ -83,7 +79,7 @@ class MyApp extends HookConsumerWidget {
                       if (snapshot.data == false) {
                         return const RequestNotificationsPage();
                       } else {
-                        return HomePage2(
+                        return HomePage(
                           id: user.uid,
                         );
                       }
