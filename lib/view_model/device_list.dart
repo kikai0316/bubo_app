@@ -8,7 +8,6 @@ import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/aes_utility.dart';
 import 'package:bubu_app/utility/snack_bar_utility.dart';
 import 'package:bubu_app/view_model/message_list.dart';
-import 'package:bubu_app/view_model/story_list.dart';
 import 'package:flutter_nearby_connections/flutter_nearby_connections.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'device_list.g.dart';
@@ -62,10 +61,10 @@ class DeviseListNotifier extends _$DeviseListNotifier {
         if (devicesList.length > 20) {
           devicesList.removeRange(20, devicesList.length);
         }
-        for (final device in setDevicesList) {
-          final notifier = ref.read(storyListNotifierProvider.notifier);
-          notifier.addData(device.deviceId);
-        }
+        // for (final device in setDevicesList) {
+        //   final notifier = ref.read(storyListNotifierProvider.notifier);
+        //   // notifier.addData(device.deviceId);
+        // }
         state = setDevicesList;
       },
     );
@@ -129,7 +128,7 @@ class DeviseListNotifier extends _$DeviseListNotifier {
   Future<void> sendMessageCancel() async {
     final setData = [...state!];
     state = [];
-    await Future<void>.delayed(const Duration(milliseconds: 600));
+    await Future<void>.delayed(const Duration(seconds: 1));
     state = setData;
   }
 
@@ -193,7 +192,7 @@ class DeviseListNotifier extends _$DeviseListNotifier {
           isLoop = false;
           return false;
         }
-        await Future<void>.delayed(const Duration(milliseconds: 500));
+        await Future<void>.delayed(const Duration(seconds: 1));
       }
       return false;
     }

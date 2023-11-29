@@ -72,24 +72,23 @@ Future<UserData?> myDataGet(String id) async {
   }
 }
 
-Future<UserData?> imgMainGet(UserData userData) async {
+Future<UserData?> imgMainGet(String id) async {
   try {
-    final resultMain =
-        await FirebaseStorage.instance.ref("${userData.id}/main").listAll();
+    final resultMain = await FirebaseStorage.instance.ref("$id/main").listAll();
     if (resultMain.items.isNotEmpty) {
       final mainImgGet = await resultMain.items.first.getData();
       if (mainImgGet != null) {
         final List<String> parts = resultMain.items.first.name.split('@');
         return UserData(
           imgList: [mainImgGet],
-          id: userData.id,
+          id: id,
           name: parts[0],
           birthday: parts[1],
           family: parts[2],
           instagram: parts[3],
           isGetData: false,
-          isView: userData.isView,
-          acquisitionAt: userData.acquisitionAt,
+          isView: false,
+          acquisitionAt: DateTime.now(),
         );
       }
     }

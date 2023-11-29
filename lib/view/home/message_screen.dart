@@ -71,7 +71,7 @@ class MessageScreenPage extends HookConsumerWidget {
           if (getData.first.userData.imgList.isEmpty) {
             Future(() async {
               if (getData.first.userData.imgList.isEmpty) {
-                final getImg = await imgMainGet(getData.first.userData);
+                final getImg = await imgMainGet(getData.first.userData.id);
                 if (getImg != null) {
                   if (context.mounted) {
                     final notifier =
@@ -248,19 +248,8 @@ class MessageScreenPage extends HookConsumerWidget {
     final safeAreaWidth = MediaQuery.of(context).size.width;
     final safeAreaHeight = safeHeight(context);
     final storyNotifier = ref.watch(storyListNotifierProvider);
-    final storyNotifierWhen = storyNotifier.when(
-      data: (data) {
-        final int index = data.indexWhere(
-          (value) => value.id == userData.id,
-        );
-        if (index != -1) {
-          return data[index];
-        } else {
-          return null;
-        }
-      },
-      error: (e, s) => null,
-      loading: () => null,
+    final int index = storyNotifier.indexWhere(
+      (value) => value.id == userData.id,
     );
     Widget imgWidget() {
       if (userData.imgList.isEmpty) {
@@ -272,7 +261,7 @@ class MessageScreenPage extends HookConsumerWidget {
             shape: BoxShape.circle,
           ),
         );
-      } else if (!isNearby || storyNotifierWhen == null) {
+      } else if (!isNearby || index == -1) {
         return Container(
           width: safeAreaHeight * 0.065,
           height: safeAreaHeight * 0.065,
@@ -291,7 +280,7 @@ class MessageScreenPage extends HookConsumerWidget {
           width: safeAreaHeight * 0.065,
           height: safeAreaHeight * 0.065,
           child: MainImgWidget(
-            userData: storyNotifierWhen,
+            userData: storyNotifier[index],
             myUserData: myUserData,
           ),
         );

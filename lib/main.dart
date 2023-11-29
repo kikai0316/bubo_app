@@ -3,9 +3,9 @@ import 'package:bubu_app/firebase_options.dart';
 import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/notification_utility.dart';
 import 'package:bubu_app/utility/path_provider_utility.dart';
+import 'package:bubu_app/view/home_page.dart';
 import 'package:bubu_app/view/login.dart';
 import 'package:bubu_app/view/request_page.dart';
-import 'package:bubu_app/view/user_app.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +20,7 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
+    name: "bobo-app",
     options: DefaultFirebaseOptions.currentPlatform,
   );
   MobileAds.instance.initialize();
@@ -37,10 +38,13 @@ class MyApp extends HookConsumerWidget {
     Future<UserData?> getSecureStorageData() async {
       await cacheSecureStorage();
       final UserData? userData = await readUserData();
-
       return userData;
     }
 
+    // return const MaterialApp(
+    //   debugShowCheckedModeBanner: false,
+    //   home: HomePage2(),
+    // );
     if (user == null) {
       return const MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -66,7 +70,9 @@ class MyApp extends HookConsumerWidget {
                   builder:
                       (BuildContext context, AsyncSnapshot<bool> snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const UserApp(initPage: 0);
+                      return HomePage2(
+                        id: user.uid,
+                      );
                     } else if (snapshot.hasError) {
                       return loadinPage(
                         context: context,
@@ -77,7 +83,9 @@ class MyApp extends HookConsumerWidget {
                       if (snapshot.data == false) {
                         return const RequestNotificationsPage();
                       } else {
-                        return const UserApp(initPage: 0);
+                        return HomePage2(
+                          id: user.uid,
+                        );
                       }
                     }
                   },

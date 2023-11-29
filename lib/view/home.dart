@@ -7,13 +7,10 @@ import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/screen_transition_utility.dart';
 import 'package:bubu_app/utility/utility.dart';
 import 'package:bubu_app/view/home/story_all_page.dart';
-import 'package:bubu_app/view/home/swiper.dart';
 import 'package:bubu_app/view/user_app.dart';
 import 'package:bubu_app/view_model/device_list.dart';
 import 'package:bubu_app/view_model/message_list.dart';
-import 'package:bubu_app/view_model/story_list.dart';
 import 'package:bubu_app/widget/home/home_message_widget.dart';
-import 'package:bubu_app/widget/home/home_story_widget.dart';
 import 'package:bubu_app/widget/home/home_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -26,80 +23,12 @@ class HomePage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final safeAreaHeight = safeHeight(context);
     final safeAreaWidth = MediaQuery.of(context).size.width;
-    final storyList = ref.watch(storyListNotifierProvider);
     final messageList = ref.watch(messageListNotifierProvider);
     final deviceList = ref.watch(deviseListNotifierProvider);
     final isServiceState = useState<double>(deviceList == null ? 1.5 : 1);
     final setDeviceList = (deviceList ?? [])
         .map((element) => element.deviceId.split('@')[0])
         .toList();
-    final storyListWhen = storyList.when(
-      data: (value) {
-        final setData = sortStoryList(value, setDeviceList);
-        return Column(
-          children: [
-            Align(
-              child: Padding(
-                padding: EdgeInsets.only(
-                  bottom: safeAreaHeight * 0.01,
-                ),
-                child: Padding(
-                  padding: EdgeInsets.all(safeAreaHeight * 0.01),
-                  child: nText(
-                    setData.isEmpty
-                        ? "付近にユーザーは存在しません"
-                        : "付近に${setData.length}人のユーザーがいます",
-                    color: Colors.grey.withOpacity(0.7),
-                    fontSize: safeAreaWidth / 35,
-                    bold: 700,
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(
-              width: safeAreaWidth * 1,
-              child: Stack(
-                children: [
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
-                        SizedBox(
-                          width: safeAreaWidth * 0.02,
-                        ),
-                        for (int i = 0; i < setData.length + 1; i++) ...{
-                          OnStory(
-                            isImgOnly: false,
-                            userData: i == 0 ? userData : setData[i - 1],
-                            isMyData: i == 0,
-                            isNearby: true,
-                            onTap: () => screenTransitionHero(
-                              context,
-                              SwiperPage(
-                                myUserData: userData,
-                                isMyData: i == 0,
-                                index: i == 0 ? 0 : i - 1,
-                                storyList: i == 0 ? [userData] : setData,
-                              ),
-                            ),
-                          ),
-                        },
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        );
-      },
-      error: (e, s) => storyErrorWidget(
-        context,
-      ),
-      loading: () => storyLoadingWidget(
-        context,
-      ),
-    );
     final messageListWhen = messageList.when(
       data: (value) {
         final setData = sortMessageListsByDateAndId(value, setDeviceList);
@@ -153,7 +82,7 @@ class HomePage extends HookConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    storyListWhen,
+                    // storyListWhen,
                     line(
                       context,
                       top: safeAreaHeight * 0.015,

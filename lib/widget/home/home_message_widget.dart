@@ -33,35 +33,35 @@ class OnMessage extends HookConsumerWidget {
     final safeAreaWidth = MediaQuery.of(context).size.width;
     final safeAreaHeight = safeHeight(context);
     final message = messageData.message[messageData.message.length - 1];
-    final isGetData = useState(false);
+    final userData = useState<UserData?>(null);
     final storyListNotifier = ref.watch(storyListNotifierProvider);
     Future<void> imgGet() async {
-      final getData = await imgMainGet(messageData.userData);
+      final getData = await imgMainGet(messageData.userData.id);
       if (context.mounted) {
         if (getData != null) {
           final notifier = ref.read(messageListNotifierProvider.notifier);
           notifier.mainImgUpDate(getData, messageData);
-        } else {
-          isGetData.value = true;
+          userData.value = getData;
         }
       }
     }
 
-    final userData = storyListNotifier.when(
-      data: (data) {
-        final int index = data
-            .indexWhere((userData) => userData.id == messageData.userData.id);
-        if (index != -1) {
-          return data[index];
-        } else {
+    useEffect(
+      () {
+        final int index = storyListNotifier
+            .indexWhere((value) => value.id == messageData.userData.id);
+        if (index == -1) {
           if (messageData.userData.imgList.isEmpty) {
             imgGet();
+          } else {
+            userData.value = messageData.userData;
           }
-          return null;
+        } else {
+          userData.value = storyListNotifier[index];
         }
+        return null;
       },
-      error: (e, s) => null,
-      loading: () => null,
+      [],
     );
     return InkWell(
       onTap: () => screenTransitionNormal(
@@ -109,24 +109,14 @@ class OnMessage extends HookConsumerWidget {
                         width: safeAreaHeight * 0.07,
                         decoration: BoxDecoration(
                           color: Colors.grey.withOpacity(0.1),
-                          image: userData != null && userData.imgList.isNotEmpty
+                          image: userData.value != null
                               ? DecorationImage(
                                   image: MemoryImage(
-                                    userData.imgList.first,
+                                    userData.value!.imgList.first,
                                   ),
                                   fit: BoxFit.cover,
                                 )
-                              : userData == null &&
-                                      messageData.userData.imgList.isNotEmpty
-                                  ? DecorationImage(
-                                      image: MemoryImage(
-                                        messageData.userData.imgList.first,
-                                      ),
-                                      fit: BoxFit.cover,
-                                    )
-                                  : isGetData.value
-                                      ? notImg()
-                                      : null,
+                              : notImg(),
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -143,11 +133,9 @@ class OnMessage extends HookConsumerWidget {
                                   maxWidth: safeAreaWidth * 0.35,
                                 ),
                                 child: nText(
-                                  isGetData.value
+                                  userData.value == null
                                       ? "Unknown"
-                                      : userData != null
-                                          ? userData.name
-                                          : messageData.userData.name,
+                                      : userData.value!.name,
                                   color: Colors.white,
                                   fontSize: safeAreaWidth / 31,
                                   bold: 700,

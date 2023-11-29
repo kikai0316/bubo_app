@@ -16,7 +16,6 @@ import 'package:bubu_app/view/login.dart';
 import 'package:bubu_app/view_model/device_list.dart';
 import 'package:bubu_app/view_model/history_list.dart';
 import 'package:bubu_app/view_model/loading_model.dart';
-import 'package:bubu_app/view_model/story_list.dart';
 import 'package:bubu_app/widget/account/account_widgt.dart';
 import 'package:bubu_app/widget/home/home_story_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -30,13 +29,9 @@ class AccountPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final safeAreaHeight = safeHeight(context);
     final safeAreaWidth = MediaQuery.of(context).size.width;
-    final toDayNotifier = ref.watch(storyListNotifierProvider);
+
     final historyNotifier = ref.watch(historyListNotifierProvider);
-    final int? toDayNotifierWhen = toDayNotifier.when(
-      data: (data) => countDataForToday(data),
-      error: (e, s) => null,
-      loading: () => null,
-    );
+
     final int? historyNotifierWhen = historyNotifier.when(
       data: (data) {
         return data
@@ -56,55 +51,67 @@ class AccountPage extends HookConsumerWidget {
 
     return Scaffold(
       backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        title: nText(
+          "設定",
+          color: Colors.white,
+          fontSize: safeAreaWidth / 17,
+          bold: 700,
+        ),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             children: [
-              Container(
-                width: safeAreaWidth * 0.9,
-                decoration: BoxDecoration(
-                  color: blackColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Padding(
-                  padding: EdgeInsets.all(
-                    safeAreaHeight * 0.02,
+              Padding(
+                padding: EdgeInsets.only(top: safeAreaHeight * 0.02),
+                child: Container(
+                  width: safeAreaWidth * 0.9,
+                  decoration: BoxDecoration(
+                    color: blackColor,
+                    borderRadius: BorderRadius.circular(20),
                   ),
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: safeAreaHeight * 0.105,
-                        child: OnStory(
-                          isImgOnly: true,
-                          isMyData: true,
-                          userData: userData,
-                          onTap: () {},
-                          isNearby: false,
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(
-                          top: safeAreaHeight * 0.01,
-                          bottom: safeAreaHeight * 0.015,
-                        ),
-                        child: nText(
-                          userData.name,
-                          color: Colors.white,
-                          fontSize: safeAreaWidth / 20,
-                          bold: 700,
-                        ),
-                      ),
-                      miniButton(
-                        context: context,
-                        text: "プロフィールを編集",
-                        onTap: () => screenTransitionNormal(
-                          context,
-                          ProfileSetting(
+                  child: Padding(
+                    padding: EdgeInsets.all(
+                      safeAreaHeight * 0.02,
+                    ),
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          height: safeAreaHeight * 0.105,
+                          child: OnStory(
+                            isImgOnly: true,
+                            isMyData: true,
                             userData: userData,
+                            onTap: () {},
+                            isNearby: false,
                           ),
                         ),
-                      ),
-                    ],
+                        Padding(
+                          padding: EdgeInsets.only(
+                            top: safeAreaHeight * 0.01,
+                            bottom: safeAreaHeight * 0.015,
+                          ),
+                          child: nText(
+                            userData.name,
+                            color: Colors.white,
+                            fontSize: safeAreaWidth / 20,
+                            bold: 700,
+                          ),
+                        ),
+                        miniButton(
+                          context: context,
+                          text: "プロフィールを編集",
+                          onTap: () => screenTransitionNormal(
+                            context,
+                            ProfileSetting(
+                              userData: userData,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -123,11 +130,11 @@ class AccountPage extends HookConsumerWidget {
                 padding: EdgeInsets.only(
                   top: safeAreaHeight * 0.01,
                 ),
-                child: accountMainWidget(
-                  context,
-                  isEncounter: true,
-                  data: toDayNotifierWhen ?? 0,
-                ),
+                // child: accountMainWidget(
+                //   context,
+                //   isEncounter: true,
+                //   data: toDayNotifierWhen ?? 0,
+                // ),
               ),
               Align(
                 alignment: Alignment.centerLeft,

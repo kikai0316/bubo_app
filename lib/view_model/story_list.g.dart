@@ -6,12 +6,12 @@ part of 'story_list.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$storyListNotifierHash() => r'9bfc4221fee7a8d250c4465f21c33d7edc3de989';
+String _$storyListNotifierHash() => r'a027e4e5e14e3e551e1960a12384809dc90bd55b';
 
 /// See also [StoryListNotifier].
 @ProviderFor(StoryListNotifier)
 final storyListNotifierProvider =
-    AsyncNotifierProvider<StoryListNotifier, List<UserData>>.internal(
+    NotifierProvider<StoryListNotifier, List<UserData>>.internal(
   StoryListNotifier.new,
   name: r'storyListNotifierProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -21,6 +21,6 @@ final storyListNotifierProvider =
   allTransitiveDependencies: null,
 );
 
-typedef _$StoryListNotifier = AsyncNotifier<List<UserData>>;
+typedef _$StoryListNotifier = Notifier<List<UserData>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

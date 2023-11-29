@@ -10,7 +10,6 @@ import 'package:bubu_app/utility/snack_bar_utility.dart';
 import 'package:bubu_app/utility/utility.dart';
 import 'package:bubu_app/view/home/img_upload_sheet.dart';
 import 'package:bubu_app/view_model/loading_model.dart';
-import 'package:bubu_app/view_model/story_list.dart';
 import 'package:bubu_app/view_model/user_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -97,29 +96,8 @@ class OnStory extends HookConsumerWidget {
       }
     }
 
-    useEffect(
-      () {
-        var cancelled = false;
-        if (userData.imgList.isEmpty) {
-          Future(() async {
-            if (userData.imgList.isEmpty) {
-              final getData = await imgMainGet(userData);
-              if (cancelled) return;
-              if (getData != null) {
-                final notifier = ref.read(storyListNotifierProvider.notifier);
-                notifier.dataUpDate(getData);
-              }
-            }
-          });
-        }
-        return () {
-          cancelled = true;
-        };
-      },
-      [],
-    );
     return Padding(
-      padding: EdgeInsets.only(right: isImgOnly ? 0 : safeAreaHeight * 0.02),
+      padding: EdgeInsets.only(right: isImgOnly ? 0 : safeAreaWidth * 0.02),
       child: GestureDetector(
         onTap: () {
           isTapEvent.value = false;
