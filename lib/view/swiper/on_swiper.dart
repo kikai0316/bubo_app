@@ -3,7 +3,7 @@ import 'package:bubu_app/component/text.dart';
 import 'package:bubu_app/constant/color.dart';
 import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/utility.dart';
-import 'package:bubu_app/view/home/message_sheet.dart';
+import 'package:bubu_app/view/swiper/message_sheet.dart';
 import 'package:bubu_app/view_model/history_list.dart';
 import 'package:bubu_app/view_model/loading_model.dart';
 import 'package:bubu_app/view_model/message_list.dart';

@@ -33,6 +33,7 @@ class OnMessage extends HookConsumerWidget {
     final safeAreaHeight = safeHeight(context);
     final message = messageData.message[messageData.message.length - 1];
     final userData = useState<UserData?>(null);
+    final isGetData = useState<bool>(false);
     final storyList = ref.watch(storyListNotifierProvider);
     final List<UserData> storyNotifier = storyList.when(
       data: (data) => data,
@@ -46,6 +47,7 @@ class OnMessage extends HookConsumerWidget {
           final notifier = ref.read(messageListNotifierProvider.notifier);
           notifier.mainImgUpDate(getData, messageData);
           userData.value = getData;
+          isGetData.value = true;
         }
       }
     }
@@ -59,9 +61,11 @@ class OnMessage extends HookConsumerWidget {
             imgGet();
           } else {
             userData.value = messageData.userData;
+            isGetData.value = true;
           }
         } else {
           userData.value = storyNotifier[index];
+          isGetData.value = true;
         }
         return null;
       },
@@ -120,7 +124,9 @@ class OnMessage extends HookConsumerWidget {
                                   ),
                                   fit: BoxFit.cover,
                                 )
-                              : notImg(),
+                              : isGetData.value
+                                  ? notImg()
+                                  : null,
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -138,7 +144,9 @@ class OnMessage extends HookConsumerWidget {
                                 ),
                                 child: nText(
                                   userData.value == null
-                                      ? "Unknown"
+                                      ? isGetData.value
+                                          ? "Unknown"
+                                          : "データ取得中..."
                                       : userData.value!.name,
                                   color: Colors.white,
                                   fontSize: safeAreaWidth / 31,

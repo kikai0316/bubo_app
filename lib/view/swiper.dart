@@ -1,6 +1,6 @@
 import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/firebase_utility.dart';
-import 'package:bubu_app/view/home/on_swiper.dart';
+import 'package:bubu_app/view/swiper/on_swiper.dart';
 import 'package:bubu_app/view_model/loading_model.dart';
 import 'package:bubu_app/view_model/story_list.dart';
 import 'package:flutter/material.dart';

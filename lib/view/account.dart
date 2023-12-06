@@ -16,7 +16,6 @@ import 'package:bubu_app/view/login.dart';
 import 'package:bubu_app/view_model/history_list.dart';
 import 'package:bubu_app/view_model/loading_model.dart';
 import 'package:bubu_app/widget/account/account_widgt.dart';
-import 'package:bubu_app/widget/home/home_story_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -79,12 +78,8 @@ class AccountPage extends HookConsumerWidget {
                       children: [
                         SizedBox(
                           height: safeAreaHeight * 0.105,
-                          child: OnStory(
-                            isImgOnly: true,
-                            isMyData: true,
+                          child: MyOnNearby(
                             userData: userData,
-                            onTap: () {},
-                            isNearby: false,
                           ),
                         ),
                         Padding(

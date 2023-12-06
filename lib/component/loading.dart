@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:bubu_app/component/text.dart';
 import 'package:bubu_app/constant/img.dart';
 import 'package:bubu_app/utility/utility.dart';
@@ -87,97 +85,6 @@ Widget messageLoading(BuildContext context) {
       child: CupertinoActivityIndicator(
         color: Colors.white,
         radius: safeAreaHeight * 0.018,
-      ),
-    ),
-  );
-}
-
-Widget storyLoadingWidget(BuildContext context) {
-  final safeAreaHeight = safeHeight(context);
-  return Container(
-    alignment: Alignment.center,
-    height: safeAreaHeight * 0.13,
-    width: double.infinity,
-    child: CupertinoActivityIndicator(
-      color: Colors.white,
-      radius: safeAreaHeight * 0.018,
-    ),
-  );
-}
-
-Widget loadinPageWithCncel({
-  required BuildContext context,
-  required bool isLoading,
-  required void Function() onTap,
-}) {
-  final safeAreaHeight = safeHeight(context);
-  final safeAreaWidth = MediaQuery.of(context).size.width;
-  return Visibility(
-    visible: isLoading,
-    child: GestureDetector(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(
-          sigmaX: 5.0,
-          sigmaY: 5.0,
-        ),
-        child: Container(
-          alignment: Alignment.center,
-          color: Colors.black.withOpacity(0.7),
-          height: double.infinity,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CupertinoActivityIndicator(
-                color: Colors.white,
-                radius: safeAreaHeight * 0.02,
-              ),
-              Padding(
-                padding: EdgeInsets.only(top: safeAreaHeight * 0.01),
-                child: nText(
-                  "接続中...",
-                  color: Colors.white,
-                  fontSize: safeAreaWidth / 30,
-                  bold: 600,
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(top: safeAreaHeight * 0.03),
-                child: nText(
-                  "ネットワークの状況によっては数分かかる場合があります",
-                  color: Colors.grey,
-                  fontSize: safeAreaWidth / 40,
-                  bold: 600,
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(top: safeAreaHeight * 0.02),
-                child: Material(
-                  color: Colors.transparent,
-                  borderRadius: BorderRadius.circular(5),
-                  child: InkWell(
-                    onTap: onTap,
-                    borderRadius: BorderRadius.circular(5),
-                    child: Container(
-                      alignment: Alignment.center,
-                      height: safeAreaHeight * 0.04,
-                      width: safeAreaWidth * 0.3,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.red),
-                        borderRadius: BorderRadius.circular(50),
-                      ),
-                      child: nText(
-                        "キャンセル",
-                        color: Colors.red,
-                        fontSize: safeAreaWidth / 30,
-                        bold: 700,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     ),
   );

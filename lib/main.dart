@@ -5,7 +5,7 @@ import 'package:bubu_app/utility/notification_utility.dart';
 import 'package:bubu_app/utility/path_provider_utility.dart';
 import 'package:bubu_app/utility/utility.dart';
 import 'package:bubu_app/view/login.dart';
-import 'package:bubu_app/view/request_page.dart';
+import 'package:bubu_app/view/request/notification_request.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';

@@ -6,7 +6,7 @@ import 'package:bubu_app/constant/img.dart';
 import 'package:bubu_app/model/message_list_data.dart';
 import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/utility.dart';
-import 'package:bubu_app/view/home/swiper.dart';
+import 'package:bubu_app/view/swiper.dart';
 import 'package:bubu_app/view_model/nearby_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';

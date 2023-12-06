@@ -1,5 +1,4 @@
 import 'package:bubu_app/component/button.dart';
-import 'package:bubu_app/component/component.dart';
 import 'package:bubu_app/component/loading.dart';
 import 'package:bubu_app/component/text.dart';
 import 'package:bubu_app/constant/color.dart';
@@ -15,7 +14,7 @@ import 'package:bubu_app/utility/utility.dart';
 import 'package:bubu_app/view/home/not_data_page/not_birthday_page.dart';
 import 'package:bubu_app/view/login/login_sheet.dart';
 import 'package:bubu_app/view/login/singin_sheet.dart';
-import 'package:bubu_app/view/request_page.dart';
+import 'package:bubu_app/view/request/notification_request.dart';
 import 'package:bubu_app/view_model/message_list.dart';
 import 'package:bubu_app/view_model/user_data.dart';
 import 'package:bubu_app/widget/login/login_widget.dart';
@@ -250,13 +249,18 @@ class StartPage extends HookConsumerWidget {
   Widget loginLine(BuildContext context) {
     final safeAreaHeight = safeHeight(context);
     final safeAreaWidth = MediaQuery.of(context).size.width;
+
     return SizedBox(
       height: safeAreaHeight * 0.05,
       width: double.infinity,
       child: Row(
         children: [
           Expanded(
-            child: line(context, bottom: 0, top: 0),
+            child: Container(
+              height: 0.2,
+              width: double.infinity,
+              color: Colors.grey,
+            ),
           ),
           Padding(
             padding: EdgeInsets.all(safeAreaWidth * 0.025),
@@ -270,7 +274,11 @@ class StartPage extends HookConsumerWidget {
             ),
           ),
           Expanded(
-            child: line(context, bottom: 0, top: 0),
+            child: Container(
+              height: 0.2,
+              width: double.infinity,
+              color: Colors.grey,
+            ),
           ),
         ],
       ),
