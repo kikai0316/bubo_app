@@ -6,9 +6,7 @@ import 'package:bubu_app/constant/color.dart';
 import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/firebase_utility.dart';
 import 'package:bubu_app/utility/utility.dart';
-import 'package:bubu_app/view_model/marker_data.dart';
 import 'package:bubu_app/view_model/story_list.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -30,40 +28,60 @@ class OnNearby extends HookConsumerWidget {
     final safeAreaWidth = MediaQuery.of(context).size.width;
     final safeAreaHeight = safeHeight(context);
     final storyList = ref.watch(storyListNotifierProvider);
+    final isImgLoading = useState<bool>(true);
     final userData = useState<UserData?>(null);
-
-    Future<void> getData({required bool isAddData}) async {
-      final getData = await imgMainGet(id);
-      if (getData != null && context.mounted) {
+    Future<void> upDateMainImg() async {
+      isImgLoading.value = false;
+      final getMainIMG = await imgMainGet(id);
+      if (getMainIMG != null && context.mounted) {
         final notifier = ref.read(storyListNotifierProvider.notifier);
-        if (isAddData) {
-          userData.value = getData;
-          notifier.addData(getData);
-        } else {
-          userData.value = getData;
-          notifier.dataUpDate(getData);
-        }
+        notifier.dataUpDate(getMainIMG);
+        isImgLoading.value = true;
       }
     }
 
+    Future<void> setMainImg() async {
+      isImgLoading.value = false;
+      final getMainIMG = await imgMainGet(id);
+      if (getMainIMG != null && context.mounted) {
+        final notifier = ref.read(storyListNotifierProvider.notifier);
+        notifier.addData(getMainIMG);
+        isImgLoading.value = true;
+      }
+    }
+
+    final List<UserData> storyNotifier = storyList.when(
+      data: (data) => data,
+      error: (e, s) => [],
+      loading: () => [],
+    );
     useEffect(
       () {
-        final int index = storyList.indexWhere((value) => value.id == id);
-        if (index == -1) {
-          getData(isAddData: true);
-        } else {
-          final is12Hours = storyList[index].acquisitionAt == null ||
-              is12HoursPassed(storyList[index].acquisitionAt!);
+        final int index = storyNotifier.indexWhere((value) => value.id == id);
+        if (index != -1) {
+          final is12Hours = storyNotifier[index].acquisitionAt == null ||
+              is12HoursPassed(storyNotifier[index].acquisitionAt!);
           if (is12Hours) {
-            getData(isAddData: false);
+            if (isImgLoading.value) {
+              if (isImgLoading.value) {
+                Future(() async {
+                  await upDateMainImg();
+                });
+              }
+            }
           } else {
-            userData.value = storyList[index];
+            userData.value = storyNotifier[index];
+          }
+        } else {
+          if (isImgLoading.value) {
+            Future(() async {
+              await setMainImg();
+            });
           }
         }
-
         return null;
       },
-      [],
+      [storyNotifier],
     );
     return Padding(
       padding: EdgeInsets.only(right: safeAreaWidth * 0.02),
@@ -287,91 +305,66 @@ Widget googleMapWidget({
   );
 }
 
-class OnMarker extends HookConsumerWidget {
-  OnMarker({
-    super.key,
-    required this.userData,
-  });
+Widget onMarker(
+  BuildContext context,
+  UserData userData,
+  void Function(Future<Uint8List>) task,
+) {
+  final GlobalKey repaintBoundaryKey = GlobalKey(debugLabel: userData.id);
+  final safeAreaWidth = MediaQuery.of(context).size.width;
 
-  final UserData userData;
-  final GlobalKey repaintBoundaryKey = GlobalKey();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final safeAreaWidth = MediaQuery.of(context).size.width;
-    // ignore: deprecated_member_use
-    final databaseReference = FirebaseDatabase(
-      databaseURL:
-          "https://bobo-app-9e643-default-rtdb.asia-southeast1.firebasedatabase.app",
-    ).ref("users");
-    Future<void> updateMarker() async {
-      final snapshot = await databaseReference.child(userData.id).get();
-      final getMarker = await getBytesFromWidget(repaintBoundaryKey);
-      if (snapshot.exists) {
-        // ignore: unused_local_variable, cast_nullable_to_non_nullable
-        final lat = snapshot.child('latitude').value as double;
-        // ignore: unused_local_variable, cast_nullable_to_non_nullable
-        final lon = snapshot.child('longitude').value as double;
-        final notifier = ref.read(markerDataNotifierProvider.notifier);
-        notifier.addData(
-          Marker(
-            markerId: MarkerId(userData.id),
-            position: LatLng(lat, lon),
-            icon: BitmapDescriptor.fromBytes(getMarker),
-          ),
-        );
-      }
-    }
-
-    return RepaintBoundary(
-      key: repaintBoundaryKey,
+  return RepaintBoundary(
+    key: repaintBoundaryKey,
+    child: Container(
+      alignment: Alignment.center,
+      height: safeAreaWidth * 0.19,
+      width: safeAreaWidth * 0.19,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: blueColor2.withOpacity(0.2),
+        border: Border.all(color: blueColor.withOpacity(0.1)),
+      ),
       child: Container(
         alignment: Alignment.center,
-        height: safeAreaWidth * 0.19,
-        width: safeAreaWidth * 0.19,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: blueColor2.withOpacity(0.2),
-          border: Border.all(color: blueColor.withOpacity(0.1)),
-        ),
-        child: Container(
-          alignment: Alignment.center,
-          height: safeAreaWidth * 0.115,
-          width: safeAreaWidth * 0.115,
-          decoration:
-              const BoxDecoration(shape: BoxShape.circle, color: Colors.white),
-          child: ClipOval(
-            child: Image.memory(
-              userData.imgList.first,
-              fit: BoxFit.cover,
-              height: safeAreaWidth * 0.11,
-              width: safeAreaWidth * 0.11,
-              frameBuilder: (
-                BuildContext context,
-                Widget child,
-                int? frame,
-                bool wasSynchronouslyLoaded,
-              ) {
-                if (frame == null) {
-                  return const SizedBox();
-                } else {
-                  updateMarker();
-                  return child;
-                }
-              },
-            ),
+        height: safeAreaWidth * 0.115,
+        width: safeAreaWidth * 0.115,
+        decoration:
+            const BoxDecoration(shape: BoxShape.circle, color: Colors.white),
+        child: ClipOval(
+          child: Image.memory(
+            userData.imgList.first,
+            fit: BoxFit.cover,
+            height: safeAreaWidth * 0.11,
+            width: safeAreaWidth * 0.11,
+            frameBuilder: (
+              BuildContext context,
+              Widget child,
+              int? frame,
+              bool wasSynchronouslyLoaded,
+            ) {
+              if (frame == null) {
+                return const SizedBox();
+              } else {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  task(getBytesFromWidget(repaintBoundaryKey));
+                });
+
+                return child;
+              }
+            },
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
-  Future<Uint8List> getBytesFromWidget(GlobalKey key) async {
-    final RenderRepaintBoundary boundary =
-        key.currentContext!.findRenderObject()! as RenderRepaintBoundary;
-    final ui.Image image = await boundary.toImage(pixelRatio: 2.0);
-    final ByteData? byteData =
-        await image.toByteData(format: ui.ImageByteFormat.png);
-    return byteData!.buffer.asUint8List();
-  }
+//
+Future<Uint8List> getBytesFromWidget(GlobalKey key) async {
+  final RenderRepaintBoundary boundary =
+      key.currentContext!.findRenderObject()! as RenderRepaintBoundary;
+  final ui.Image image = await boundary.toImage(pixelRatio: 2.0);
+  final ByteData? byteData =
+      await image.toByteData(format: ui.ImageByteFormat.png);
+  return byteData!.buffer.asUint8List();
 }

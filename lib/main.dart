@@ -3,7 +3,7 @@ import 'package:bubu_app/firebase_options.dart';
 import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/notification_utility.dart';
 import 'package:bubu_app/utility/path_provider_utility.dart';
-import 'package:bubu_app/view/home.dart';
+import 'package:bubu_app/utility/utility.dart';
 import 'package:bubu_app/view/login.dart';
 import 'package:bubu_app/view/request_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -52,13 +52,14 @@ class MyApp extends HookConsumerWidget {
         debugShowCheckedModeBanner: false,
         home: FutureBuilder<UserData?>(
           future: getSecureStorageData(),
-          builder: (BuildContext context, AsyncSnapshot<UserData?> snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
+          builder:
+              (BuildContext context, AsyncSnapshot<UserData?> snapshotUser) {
+            if (snapshotUser.connectionState == ConnectionState.waiting) {
               return const WithIconInLoadingPage();
-            } else if (snapshot.hasError) {
+            } else if (snapshotUser.hasError) {
               return const StartPage();
             } else {
-              if (snapshot.data == null) {
+              if (snapshotUser.data == null) {
                 return const StartPage();
               } else {
                 return FutureBuilder<bool>(
@@ -66,9 +67,7 @@ class MyApp extends HookConsumerWidget {
                   builder:
                       (BuildContext context, AsyncSnapshot<bool> snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return HomePage(
-                        id: user.uid,
-                      );
+                      return nextScreenWhisUserDataCheck(snapshotUser.data!);
                     } else if (snapshot.hasError) {
                       return loadinPage(
                         context: context,
@@ -77,11 +76,11 @@ class MyApp extends HookConsumerWidget {
                       );
                     } else {
                       if (snapshot.data == false) {
-                        return const RequestNotificationsPage();
-                      } else {
-                        return HomePage(
-                          id: user.uid,
+                        return RequestNotificationsPage(
+                          userData: snapshotUser.data!,
                         );
+                      } else {
+                        return nextScreenWhisUserDataCheck(snapshotUser.data!);
                       }
                     }
                   },

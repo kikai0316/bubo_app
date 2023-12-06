@@ -6,6 +6,12 @@ import 'dart:ui';
 import 'dart:ui' as ui;
 
 import 'package:bubu_app/component/text.dart';
+import 'package:bubu_app/model/user_data.dart';
+import 'package:bubu_app/view/home.dart';
+import 'package:bubu_app/view/home/not_data_page/not_birthday_page.dart';
+import 'package:bubu_app/view/home/not_data_page/not_image_page.dart';
+import 'package:bubu_app/view/home/not_data_page/not_instagram_page.dart';
+import 'package:bubu_app/view_model/location_data.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -197,4 +203,34 @@ Color extractDominantColor(
   final int dominantColorValue =
       colorCount.entries.reduce((a, b) => a.value > b.value ? a : b).key;
   return Color(dominantColorValue);
+}
+
+Widget nextScreenWhisUserDataCheck(UserData userData) {
+  return userData.birthday.isEmpty
+      ? NotBirthdayPage(
+          userData: userData,
+        )
+      : userData.instagram.isEmpty
+          ? NotInstagramPage(
+              userData: userData,
+            )
+          : userData.imgList.isEmpty
+              ? NotImgPage(
+                  userData: userData,
+                )
+              : HomePage(id: userData.id);
+}
+
+bool isWithin150Meters(
+  double baseLat,
+  double baseLon,
+  double targetLat,
+  double targetLon,
+) {
+  // 距離をキロメートルで計算
+  final double distance =
+      calculateDistance(baseLat, baseLon, targetLat, targetLon);
+
+  // 距離が0.2キロメートル（200メートル）以内かどうかを判断
+  return distance <= 0.15;
 }

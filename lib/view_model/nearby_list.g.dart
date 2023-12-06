@@ -7,7 +7,7 @@ part of 'nearby_list.dart';
 // **************************************************************************
 
 String _$nearbyUsersNotifierHash() =>
-    r'78418786c9c1708cfa7585acd2c99cd0f6ef86b9';
+    r'4cbbf812177493a3929c46cfe72c6c35616a0b9b';
 
 /// See also [NearbyUsersNotifier].
 @ProviderFor(NearbyUsersNotifier)

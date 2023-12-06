@@ -10,7 +10,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'location_data.g.dart';
 
-StreamSubscription<Position>? locationget;
+Timer? locationget;
 
 @Riverpod(keepAlive: true)
 class LocationDataNotifier extends _$LocationDataNotifier {
@@ -20,17 +20,32 @@ class LocationDataNotifier extends _$LocationDataNotifier {
   }
 
   Future<void> positionStream(String id) async {
-    locationget = Geolocator.getPositionStream().listen((event) async {
-      if (state.value == null) {
-        await updateLocation(id, event);
-      } else if (isWithin10Meters(
-        state.value!.latitude,
-        state.value!.longitude,
-        event.latitude,
-        event.longitude,
-      )) {
-        await updateLocation(id, event);
+    final currentPosition = await Geolocator.getCurrentPosition();
+    await updateLocation(id, currentPosition);
+    locationget = Timer.periodic(const Duration(seconds: 15), (_) async {
+      final currentPosition = await Geolocator.getCurrentPosition();
+      if (state.value == null ||
+          isWithin10Meters(
+            state.value!.latitude,
+            state.value!.longitude,
+            currentPosition.latitude,
+            currentPosition.longitude,
+          )) {
+        await updateLocation(id, currentPosition);
       }
+    });
+  }
+
+  Future<void> positionStreamCansel(String id) async {
+    // ignore: deprecated_member_use
+    final databaseReference = FirebaseDatabase(
+      databaseURL:
+          "https://bobo-app-9e643-default-rtdb.asia-southeast1.firebasedatabase.app",
+    ).ref("users");
+    locationget?.cancel();
+    await databaseReference.child(id).remove();
+    state = await AsyncValue.guard(() async {
+      return null;
     });
   }
 
@@ -42,17 +57,17 @@ class LocationDataNotifier extends _$LocationDataNotifier {
       'latitude': event.latitude,
       'longitude': event.longitude,
     };
-    // ignore: deprecated_member_use
-    final databaseReference = FirebaseDatabase(
-      databaseURL:
-          "https://bobo-app-9e643-default-rtdb.asia-southeast1.firebasedatabase.app",
-    ).ref("users");
 
     try {
+      // ignore: deprecated_member_use
+      final databaseReference = FirebaseDatabase(
+        databaseURL:
+            "https://bobo-app-9e643-default-rtdb.asia-southeast1.firebasedatabase.app",
+      ).ref("users");
       await databaseReference.child(id).set(data);
       state = await AsyncValue.guard(() async {
         final notifier = ref.read(nearbyUsersNotifierProvider.notifier);
-        notifier.getData(event.latitude, event.longitude);
+        notifier.getData(event.latitude, event.longitude, id);
         return LatLng(event.latitude, event.longitude);
       });
     } catch (e) {

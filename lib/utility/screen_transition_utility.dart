@@ -43,13 +43,15 @@ void screenTransitionToTop(BuildContext context, Widget page) {
 }
 
 void screenTransitionNormal(BuildContext context, Widget page) {
-  Navigator.of(context).push(
-    MaterialPageRoute(
-      builder: (context) {
-        return page; // 遷移先の画面widgetを指定
-      },
-    ),
-  );
+  if (context.mounted) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) {
+          return page; // 遷移先の画面widgetを指定
+        },
+      ),
+    );
+  }
 }
 
 void screenTransitionHero(BuildContext context, Widget page) {

@@ -1,9 +1,12 @@
 import 'dart:async';
+import 'dart:collection';
 import 'package:bubu_app/component/text.dart';
 import 'package:bubu_app/constant/color.dart';
+import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/screen_transition_utility.dart';
 import 'package:bubu_app/utility/utility.dart';
 import 'package:bubu_app/view/account.dart';
+import 'package:bubu_app/view/home/swiper.dart';
 import 'package:bubu_app/view/message_page.dart';
 import 'package:bubu_app/view_model/location_data.dart';
 import 'package:bubu_app/view_model/marker_data.dart';
@@ -12,6 +15,7 @@ import 'package:bubu_app/view_model/nearby_list.dart';
 import 'package:bubu_app/view_model/story_list.dart';
 import 'package:bubu_app/view_model/user_data.dart';
 import 'package:bubu_app/widget/home/home_map_widget.dart';
+import 'package:dart_geohash/dart_geohash.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -22,20 +26,22 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 // ignore: deprecated_member_use
-final databaseReference = FirebaseDatabase(
+final refDB = FirebaseDatabase(
   databaseURL:
       "https://bobo-app-9e643-default-rtdb.asia-southeast1.firebasedatabase.app",
 ).ref("users");
 
 class HomePage extends HookConsumerWidget {
-  const HomePage({super.key, required this.id});
+  HomePage({super.key, required this.id});
   final String id;
-
+  final taskQueue = AsyncTaskQueue();
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final safeAreaHeight = safeHeight(context);
     final safeAreaWidth = MediaQuery.of(context).size.width;
     final mapController = useState<GoogleMapController?>(null);
+
+    final appLifecycleState = useState<AppLifecycleState?>(null);
     final userData = ref.watch(userDataNotifierProvider);
     final storyList = ref.watch(storyListNotifierProvider);
     final markerList = ref.watch(markerDataNotifierProvider);
@@ -43,23 +49,38 @@ class HomePage extends HookConsumerWidget {
     final myLocation = ref.watch(locationDataNotifierProvider);
     final messageNotifier = ref.watch(messageListNotifierProvider);
     final databaseSubscriptions = useState<List<SubscriptionsDataList>>([]);
-    final markerWidget = useState<List<Widget>>([]);
     final Set<Marker> markerListNotifier = markerList.when(
       data: (data) {
         final ids2 =
             databaseSubscriptions.value.map((value) => value.id).toList();
         for (final marker in data) {
           final getID = marker.markerId.value;
-          if (!ids2.contains(getID)) {
+          if (!ids2.contains(getID) &&
+              appLifecycleState.value != AppLifecycleState.paused) {
             // ignore: cancel_subscriptions
-            final subscription =
-                databaseReference.child(getID).onValue.listen((event) {
-              final data = event.snapshot.value! as Map<dynamic, dynamic>;
-              final lat = data['latitude'] as double;
-              final lon = data['longitude'] as double;
-              if (context.mounted) {
+            final subscription = refDB.child(getID).onValue.listen((event) {
+              if (event.snapshot.value != null) {
                 final notifier = ref.read(markerDataNotifierProvider.notifier);
-                notifier.upData(lat, lon, getID);
+                notifier.markerDelete(id: getID);
+              } else {
+                try {
+                  final data = event.snapshot.value! as Map<dynamic, dynamic>;
+                  final lat = data['latitude'] as double;
+                  final lon = data['longitude'] as double;
+                  if (myLocation.asData?.value != null && context.mounted) {
+                    final notifier =
+                        ref.read(markerDataNotifierProvider.notifier);
+                    notifier.upData(
+                      latitude: lat,
+                      longitude: lon,
+                      id: getID,
+                      myID: id,
+                      myPosition: myLocation.asData!.value!,
+                    );
+                  }
+                } catch (e) {
+                  return;
+                }
               }
             });
             if (context.mounted) {
@@ -100,15 +121,6 @@ class HomePage extends HookConsumerWidget {
               CameraPosition(target: data, zoom: 17.2, tilt: 15),
             ),
           );
-        } else {
-          Future(() async {
-            final notifier = ref.read(locationDataNotifierProvider.notifier);
-            final permission = await checkLocation();
-            if (permission && context.mounted) {
-              notifier.positionStream(id);
-            }
-          });
-          return null;
         }
       },
     );
@@ -119,38 +131,94 @@ class HomePage extends HookConsumerWidget {
       error: (e, s) => null,
       loading: () => null,
     );
+    final List<UserData> storyListWhen = storyList.when(
+      data: (data) {
+        final ids =
+            markerListNotifier.map((marker) => marker.markerId.value).toList();
+        return data.where((userData) {
+          return (nearbyList?.data ?? []).contains(userData.id) &&
+              !ids.contains(userData.id);
+        }).toList();
+      },
+      error: (e, s) => [],
+      loading: () => [],
+    );
 
     useEffect(
       () {
-        // print(markerList);
-        // final Set<Marker> newMarkers = Set<Marker>();
-        // for (final markerData in markerList) {
-        //   newMarkers.add(markerData);
-        // }
-        // marker.value = newMarkers;
-        final ids =
-            markerListNotifier.map((marker) => marker.markerId.value).toList();
-        for (final userData in storyList) {
-          if ((nearbyList?.data ?? []).contains(userData.id) &&
-              !ids.contains(userData.id)) {
-            markerWidget.value = [
-              ...markerWidget.value,
-              OnMarker(
-                userData: userData,
-              ),
-            ];
+        Future(() async {
+          final notifier = ref.read(locationDataNotifierProvider.notifier);
+          final permission = await checkLocation();
+          if (permission && context.mounted) {
+            notifier.positionStream(id);
           }
-        }
+        });
+        final observer = _LifecycleObserver(
+          onChange: (state) {
+            appLifecycleState.value = state;
+            if (state == AppLifecycleState.resumed) {
+              final notifier = ref.read(locationDataNotifierProvider.notifier);
+              notifier.positionStream(id);
+              databaseSubscriptions.value = [];
+              final ids2 =
+                  databaseSubscriptions.value.map((value) => value.id).toList();
+              for (final marker in markerListNotifier) {
+                final getID = marker.markerId.value;
+                if (!ids2.contains(getID)) {
+                  // ignore: cancel_subscriptions
+                  final subscription =
+                      refDB.child(getID).onValue.listen((event) {
+                    try {
+                      final data =
+                          event.snapshot.value! as Map<dynamic, dynamic>;
+                      final lat = data['latitude'] as double;
+                      final lon = data['longitude'] as double;
+                      if (myLocation.asData?.value != null && context.mounted) {
+                        final notifier =
+                            ref.read(markerDataNotifierProvider.notifier);
+                        notifier.upData(
+                          latitude: lat,
+                          longitude: lon,
+                          id: getID,
+                          myID: id,
+                          myPosition: myLocation.asData!.value!,
+                        );
+                      }
+                    } catch (e) {
+                      return;
+                    }
+                  });
+                  if (context.mounted) {
+                    databaseSubscriptions.value = [
+                      ...databaseSubscriptions.value,
+                      SubscriptionsDataList(
+                        event: subscription,
+                        id: getID,
+                      ),
+                    ];
+                  }
+                }
+              }
+            }
+            if (state == AppLifecycleState.paused) {
+              for (final subscription in databaseSubscriptions.value) {
+                subscription.event.cancel();
+              }
+              final notifier = ref.read(locationDataNotifierProvider.notifier);
+              notifier.positionStreamCansel(id);
+            }
+          },
+        );
 
+        WidgetsBinding.instance.addObserver(observer);
         return () {
+          WidgetsBinding.instance.removeObserver(observer);
           for (final subscription in databaseSubscriptions.value) {
             subscription.event.cancel();
           }
         };
       },
-      [
-        storyList,
-      ],
+      const [],
     );
 
     return WillPopScope(
@@ -159,18 +227,29 @@ class HomePage extends HookConsumerWidget {
         backgroundColor: Colors.black,
         body: Stack(
           children: [
-            // for (final userData in storyList) ...{
-            //   if ((nearbyList?.data ?? []).contains(userData.id) &&
-            //       markerList
-            //           .map((marker) => marker.markerId.value)
-            //           .toList()
-            //           .contains(userData.id)) ...{
-            //     OnMarker(
-            //       userData: userData,
-            //     ),
-            //   },
-            // },
-            ...markerWidget.value,
+            for (int i = 0; i < storyListWhen.length; i++) ...{
+              onMarker(context, storyListWhen[i], (value) {
+                taskQueue.addTask(() async {
+                  final getIMG = await value;
+                  final snapshot = await refDB.child(storyListWhen[i].id).get();
+                  if (snapshot.exists & context.mounted) {
+                    // ignore: unused_local_variable, cast_nullable_to_non_nullable
+                    final lat = snapshot.child('latitude').value as double;
+                    // ignore: unused_local_variable, cast_nullable_to_non_nullable
+                    final lon = snapshot.child('longitude').value as double;
+                    final notifier =
+                        ref.read(markerDataNotifierProvider.notifier);
+                    notifier.addData(
+                      Marker(
+                        markerId: MarkerId(storyListWhen[i].id),
+                        position: LatLng(lat, lon),
+                        icon: BitmapDescriptor.fromBytes(getIMG),
+                      ),
+                    );
+                  }
+                });
+              }),
+            },
             GoogleMap(
               myLocationButtonEnabled: false,
               myLocationEnabled: true,
@@ -187,6 +266,18 @@ class HomePage extends HookConsumerWidget {
                   controller.setMapStyle(string);
                 });
               },
+              onTap: (po) {
+                final GeoHasher geoHasher = GeoHasher();
+                final String geoHash =
+                    geoHasher.encode(po.longitude, po.latitude);
+                final Map<String, dynamic> data = {
+                  'geohash': geoHash,
+                  'latitude': po.latitude,
+                  'longitude': po.longitude,
+                };
+
+                refDB.child("V2KaBqkDhXd8F9HpTI7JgISJvVs1").set(data);
+              },
               markers: markerListNotifier,
             ),
             SafeArea(
@@ -202,7 +293,7 @@ class HomePage extends HookConsumerWidget {
                           padding: EdgeInsets.only(top: safeAreaHeight * 0.015),
                           child: otherWidget(
                             context,
-                            onTap: () {
+                            onTap: () async {
                               if (userDataNotifier != null) {
                                 screenTransitionNormal(
                                   context,
@@ -355,17 +446,19 @@ class HomePage extends HookConsumerWidget {
                                         i < (nearbyList?.data ?? []).length;
                                         i++) ...{
                                       OnNearby(
-                                        id: nearbyList!.data[i],
-                                        onTap: () {},
-                                        // onTap: () => screenTransitionHero(
-                                        //   context,
-                                        //   SwiperPage(
-                                        //     myUserData: userData,
-                                        //     isMyData: i == 0,
-                                        //     index: i == 0 ? 0 : i - 1,
-                                        //     storyList: i == 0 ? [userData] : setData,
-                                        //   ),
-                                        // ),
+                                        key: ValueKey(
+                                          nearbyList!.data[i],
+                                        ),
+                                        id: nearbyList.data[i],
+                                        onTap: () => screenTransitionHero(
+                                          context,
+                                          SwiperPage(
+                                            myUserData: userDataNotifier!,
+                                            isMyData: false,
+                                            index: i,
+                                            nearbyList: nearbyList.data,
+                                          ),
+                                        ),
                                       ),
                                     },
                                   ],
@@ -411,4 +504,36 @@ class SubscriptionsDataList {
   String id;
   StreamSubscription<DatabaseEvent> event;
   SubscriptionsDataList({required this.id, required this.event});
+}
+
+class _LifecycleObserver extends WidgetsBindingObserver {
+  final void Function(AppLifecycleState) onChange;
+
+  _LifecycleObserver({required this.onChange});
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    onChange(state);
+  }
+}
+
+class AsyncTaskQueue {
+  final Queue<Future Function()> _taskQueue = Queue();
+  bool _isProcessing = false;
+
+  void addTask(Future Function() task) {
+    _taskQueue.add(task);
+    if (!_isProcessing) {
+      _processQueue();
+    }
+  }
+
+  Future<void> _processQueue() async {
+    _isProcessing = true;
+    while (_taskQueue.isNotEmpty) {
+      final task = _taskQueue.removeFirst();
+      await task();
+    }
+    _isProcessing = false;
+  }
 }

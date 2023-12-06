@@ -3,13 +3,12 @@ import 'package:bubu_app/component/text.dart';
 import 'package:bubu_app/constant/color.dart';
 import 'package:bubu_app/constant/emoji.dart';
 import 'package:bubu_app/constant/img.dart';
-import 'package:bubu_app/model/message_data.dart';
 import 'package:bubu_app/model/message_list_data.dart';
 import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/firebase_utility.dart';
 import 'package:bubu_app/utility/screen_transition_utility.dart';
 import 'package:bubu_app/utility/utility.dart';
-import 'package:bubu_app/view/home/message_screen.dart';
+import 'package:bubu_app/view/home/personal_chat.dart';
 import 'package:bubu_app/view_model/message_list.dart';
 import 'package:bubu_app/view_model/story_list.dart';
 import 'package:flutter/material.dart';
@@ -34,7 +33,12 @@ class OnMessage extends HookConsumerWidget {
     final safeAreaHeight = safeHeight(context);
     final message = messageData.message[messageData.message.length - 1];
     final userData = useState<UserData?>(null);
-    final storyListNotifier = ref.watch(storyListNotifierProvider);
+    final storyList = ref.watch(storyListNotifierProvider);
+    final List<UserData> storyNotifier = storyList.when(
+      data: (data) => data,
+      error: (e, s) => [],
+      loading: () => [],
+    );
     Future<void> imgGet() async {
       final getData = await imgMainGet(messageData.userData.id);
       if (context.mounted) {
@@ -48,7 +52,7 @@ class OnMessage extends HookConsumerWidget {
 
     useEffect(
       () {
-        final int index = storyListNotifier
+        final int index = storyNotifier
             .indexWhere((value) => value.id == messageData.userData.id);
         if (index == -1) {
           if (messageData.userData.imgList.isEmpty) {
@@ -57,7 +61,7 @@ class OnMessage extends HookConsumerWidget {
             userData.value = messageData.userData;
           }
         } else {
-          userData.value = storyListNotifier[index];
+          userData.value = storyNotifier[index];
         }
         return null;
       },
@@ -105,8 +109,8 @@ class OnMessage extends HookConsumerWidget {
                     Padding(
                       padding: EdgeInsets.only(right: safeAreaWidth * 0.05),
                       child: Container(
-                        height: safeAreaHeight * 0.07,
-                        width: safeAreaHeight * 0.07,
+                        height: safeAreaHeight * 0.065,
+                        width: safeAreaHeight * 0.065,
                         decoration: BoxDecoration(
                           color: Colors.grey.withOpacity(0.1),
                           image: userData.value != null
@@ -170,6 +174,7 @@ class OnMessage extends HookConsumerWidget {
                       height: safeAreaHeight * 0.08,
                       width: safeAreaWidth * 0.15,
                       child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           nText(
                             formatDate(
@@ -185,20 +190,16 @@ class OnMessage extends HookConsumerWidget {
                             Padding(
                               padding:
                                   EdgeInsets.only(top: safeAreaHeight * 0.01),
-                              child: Container(
-                                alignment: Alignment.center,
-                                height: safeAreaHeight * 0.037,
-                                width: safeAreaHeight * 0.037,
-                                decoration: const BoxDecoration(
-                                  color: blueColor2,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: nText(
-                                  countUnreadMessages(messageData.message)
-                                      .toString(),
-                                  color: Colors.white,
-                                  fontSize: safeAreaWidth / 28,
-                                  bold: 700,
+                              child: Transform.scale(
+                                scale: 1.5,
+                                child: Badge.count(
+                                  backgroundColor: blueColor2,
+                                  count:
+                                      countUnreadMessages(messageData.message),
+                                  isLabelVisible: countUnreadMessages(
+                                        messageData.message,
+                                      ) !=
+                                      0,
                                 ),
                               ),
                             ),

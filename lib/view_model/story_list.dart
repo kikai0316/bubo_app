@@ -5,31 +5,37 @@ part 'story_list.g.dart';
 @Riverpod(keepAlive: true)
 class StoryListNotifier extends _$StoryListNotifier {
   @override
-  List<UserData> build() {
+  Future<List<UserData>> build() async {
     return [];
   }
 
   Future<void> addData(UserData data) async {
-    state = [...state, data];
+    state = await AsyncValue.guard(() async {
+      return [...state.value!, data];
+    });
   }
 
   Future<void> dataUpDate(UserData newUserData) async {
     final int index =
-        state.indexWhere((userData) => userData.id == newUserData.id);
+        state.value!.indexWhere((userData) => userData.id == newUserData.id);
     if (index != -1) {
-      final setList = [...state];
+      final setList = [...state.value!];
       setList[index] = newUserData;
-      state = setList;
+      state = await AsyncValue.guard(() async {
+        return [...setList];
+      });
     }
   }
 
-  void isViwUpDate(UserData newUserData) {
+  Future<void> isViwUpDate(UserData newUserData) async {
     final int index =
-        state.indexWhere((userData) => userData.id == newUserData.id);
+        state.value!.indexWhere((userData) => userData.id == newUserData.id);
     if (index != -1) {
-      final setList = [...state];
+      final setList = [...state.value!];
       setList[index] = newUserData;
-      state = setList;
+      state = await AsyncValue.guard(() async {
+        return [...setList];
+      });
     }
   }
 }

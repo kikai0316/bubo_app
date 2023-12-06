@@ -6,6 +6,7 @@ import 'package:bubu_app/utility/utility.dart';
 import 'package:bubu_app/view/home/message_sheet.dart';
 import 'package:bubu_app/view_model/history_list.dart';
 import 'package:bubu_app/view_model/loading_model.dart';
+import 'package:bubu_app/view_model/message_list.dart';
 import 'package:bubu_app/view_model/nearby_list.dart';
 import 'package:bubu_app/view_model/story_list.dart';
 import 'package:bubu_app/view_model/user_data.dart';
@@ -48,49 +49,42 @@ class OnSwiper extends HookConsumerWidget {
     final isNearby = (nearbyList?.data ?? []).contains(
       data.id,
     );
-    //後
-    // Future<void> messageSend(String text) async {
-    //   if (message.value == null) {
-    //     message.value = text;
-    //     await Future<void>.delayed(
-    //       const Duration(seconds: 1, milliseconds: 500),
-    //     );
-    //     if (context.mounted) {
-    //       message.value = null;
-    //     }
-    //   }
-    // }
+
+    Future<void> messageSend(String text) async {
+      if (message.value == null) {
+        message.value = text;
+        await Future<void>.delayed(
+          const Duration(seconds: 1, milliseconds: 500),
+        );
+        if (context.mounted) {
+          message.value = null;
+        }
+      }
+    }
 
     Future<void> sendMessage(String text) async {
       final loadingNotifier = ref.read(loadingNotifierProvider.notifier);
+      final messageListNotifier =
+          ref.read(messageListNotifierProvider.notifier);
       loadingNotifier.upData(
-        loadinPageWithCncel(
-          context: context,
-          isLoading: true,
-          onTap: () {
-            //後
-            // final notifier = ref.read(deviseListNotifierProvider.notifier);
-            // notifier.sendMessageCancel();
-          },
-        ),
+        loadinPage(context: context, isLoading: true, text: null),
       );
-      // final notifier = ref.read(deviseListNotifierProvider.notifier);
-      // final isSend = await notifier.sendMessage(
-      //   message: text,
-      //   userData: data,
-      //   myData: myData,
-      // );
-      // if (isSend) {
-      //   loadingNotifier.upData(null);
-      //   messageSend(
-      //     "メッセージを送信しました",
-      //   );
-      // } else {
-      //   loadingNotifier.upData(null);
-      //   messageSend(
-      //     "送信に失敗しました",
-      //   );
-      // }
+      final isSend = await messageListNotifier.sendMessage(
+        myData.id,
+        data,
+        text,
+      );
+      if (isSend) {
+        loadingNotifier.upData(null);
+        messageSend(
+          "メッセージを送信しました",
+        );
+      } else {
+        loadingNotifier.upData(null);
+        messageSend(
+          "送信に失敗しました",
+        );
+      }
     }
 
     void isViweupData() {
@@ -106,23 +100,30 @@ class OnSwiper extends HookConsumerWidget {
         instagram: data.instagram,
       );
       if (isMyData) {
-        final notifier = ref.read(
-          userDataNotifierProvider.notifier,
-        );
-        notifier.isViewupData();
+        if (context.mounted) {
+          final notifier = ref.read(
+            userDataNotifierProvider.notifier,
+          );
+          notifier.isViewupData();
+        }
       } else {
-        final notifier = ref.read(
-          storyListNotifierProvider.notifier,
-        );
-        notifier.dataUpDate(setData);
+        if (context.mounted) {
+          final notifier = ref.read(
+            storyListNotifierProvider.notifier,
+          );
+          notifier.dataUpDate(setData);
+        }
       }
     }
 
     useEffect(
       () {
-        if (data.imgList.length == 1) {
-          isViweupData();
-        }
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (data.imgList.length == 1) {
+            isViweupData();
+          }
+        });
+
         void listener() {
           try {
             if (controller!.offset > 0 && !isShowBottomSheet.value) {

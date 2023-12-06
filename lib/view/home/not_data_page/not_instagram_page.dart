@@ -6,6 +6,7 @@ import 'package:bubu_app/constant/color.dart';
 import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/firebase_utility.dart';
 import 'package:bubu_app/utility/path_provider_utility.dart';
+import 'package:bubu_app/utility/screen_transition_utility.dart';
 import 'package:bubu_app/utility/snack_bar_utility.dart';
 import 'package:bubu_app/utility/utility.dart';
 import 'package:bubu_app/view_model/user_data.dart';
@@ -26,7 +27,6 @@ class NotInstagramPage extends HookConsumerWidget {
     final text = useState<String>("");
     final errorText = useState<String?>(null);
     final isLoading = useState<bool>(false);
-
     Future<void> dataUpLoad() async {
       isLoading.value = true;
       final setData = UserData(
@@ -47,6 +47,8 @@ class NotInstagramPage extends HookConsumerWidget {
       if (iswWite && dbupData) {
         final notifier = ref.read(userDataNotifierProvider.notifier);
         notifier.reLoad();
+        // ignore: use_build_context_synchronously
+        screenTransitionNormal(context, nextScreenWhisUserDataCheck(setData));
       } else {
         isLoading.value = false;
         // ignore: use_build_context_synchronously

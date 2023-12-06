@@ -7,7 +7,7 @@ part of 'marker_data.dart';
 // **************************************************************************
 
 String _$markerDataNotifierHash() =>
-    r'fdb4f844230cab2558936feb2ffde538f7b942ab';
+    r'e2370ff0fd7012f908c2e2d55d7eef6b8bd3b036';
 
 /// See also [MarkerDataNotifier].
 @ProviderFor(MarkerDataNotifier)

@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:bubu_app/view_model/location_data.dart';
+import 'package:bubu_app/utility/utility.dart';
 import 'package:dart_geohash/dart_geohash.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -15,17 +15,19 @@ class NearbyUsersNotifier extends _$NearbyUsersNotifier {
     return NearbyUsersData(data: [], totalCount: 0);
   }
 
-  Future<void> getData(double latitude, double longitude) async {
+  Future<void> getData(double latitude, double longitude, String myID) async {
     if (state != null && state!.data.length < 11) {
       final userList = await fetchUsers(latitude, longitude);
       final filteredList = userList
           .where(
-            (user) => isWithin150Meters(
-              latitude,
-              longitude,
-              user.latitude,
-              user.longitude,
-            ),
+            (user) =>
+                isWithin150Meters(
+                  latitude,
+                  longitude,
+                  user.latitude,
+                  user.longitude,
+                ) &&
+                user.id != myID,
           )
           .toList();
       final sortedList = sortByProximity(filteredList, latitude, longitude);
@@ -35,8 +37,19 @@ class NearbyUsersNotifier extends _$NearbyUsersNotifier {
           .toList();
       // ignore: prefer_collection_literals
       final list = [...state!.data, ...newIds].toSet().take(10).toList();
+
       state = NearbyUsersData(data: list, totalCount: userList.length);
     }
+  }
+
+  Future<void> deleteData({
+    required String id,
+  }) async {
+    final setList = [
+      ...state!.data,
+    ];
+    setList.remove(id);
+    state = NearbyUsersData(data: setList, totalCount: state!.totalCount);
   }
 
   Future<List<LocationDataEdit>> fetchUsers(
@@ -61,7 +74,6 @@ class NearbyUsersNotifier extends _$NearbyUsersNotifier {
           .endAt("$hash\uf8ff")
           .once(),
     );
-
     final results = await Future.wait(queries);
     return processResults(results, state!.data);
   }
@@ -145,18 +157,4 @@ class LocationDataEdit {
     required this.longitude,
     required this.id,
   });
-}
-
-bool isWithin150Meters(
-  double baseLat,
-  double baseLon,
-  double targetLat,
-  double targetLon,
-) {
-  // 距離をキロメートルで計算
-  final double distance =
-      calculateDistance(baseLat, baseLon, targetLat, targetLon);
-
-  // 距離が0.2キロメートル（200メートル）以内かどうかを判断
-  return distance <= 0.15;
 }

@@ -12,7 +12,7 @@ import 'package:bubu_app/utility/screen_transition_utility.dart';
 import 'package:bubu_app/utility/secure_storage_utility.dart';
 import 'package:bubu_app/utility/snack_bar_utility.dart';
 import 'package:bubu_app/utility/utility.dart';
-import 'package:bubu_app/view/home.dart';
+import 'package:bubu_app/view/home/not_data_page/not_birthday_page.dart';
 import 'package:bubu_app/view/login/login_sheet.dart';
 import 'package:bubu_app/view/login/singin_sheet.dart';
 import 'package:bubu_app/view/request_page.dart';
@@ -57,9 +57,11 @@ class StartPage extends HookConsumerWidget {
         screenTransitionNormal(
           context,
           isPermission
-              ? const RequestNotificationsPage()
-              : HomePage(
-                  id: userData.id,
+              ? RequestNotificationsPage(
+                  userData: userData,
+                )
+              : NotBirthdayPage(
+                  userData: userData,
                 ),
         );
       } else {

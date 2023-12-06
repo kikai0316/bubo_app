@@ -25,14 +25,11 @@ class MessagePage extends HookConsumerWidget {
             sortMessageListsByDateAndId(value, nearbyList?.data ?? []);
         if (setData.isEmpty) {
           return Center(
-            child: Padding(
-              padding: EdgeInsets.only(top: safeAreaHeight * 0.2),
-              child: nText(
-                "メッセージはありません。",
-                color: Colors.white.withOpacity(0.5),
-                fontSize: safeAreaWidth / 25,
-                bold: 700,
-              ),
+            child: nText(
+              "メッセージはありません。",
+              color: Colors.white.withOpacity(0.5),
+              fontSize: safeAreaWidth / 25,
+              bold: 700,
             ),
           );
         } else {

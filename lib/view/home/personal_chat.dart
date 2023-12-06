@@ -3,7 +3,6 @@ import 'package:bubu_app/component/text.dart';
 import 'package:bubu_app/constant/color.dart';
 import 'package:bubu_app/constant/emoji.dart';
 import 'package:bubu_app/constant/img.dart';
-import 'package:bubu_app/model/message_data.dart';
 import 'package:bubu_app/model/message_list_data.dart';
 import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/firebase_utility.dart';
@@ -17,7 +16,6 @@ import 'package:bubu_app/widget/home/home_message_widget.dart';
 import 'package:bubu_app/widget/home/message_widget.dart';
 import 'package:bubu_app/widget/home/swiper_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class MessageScreenPage extends HookConsumerWidget {
@@ -33,7 +31,6 @@ class MessageScreenPage extends HookConsumerWidget {
     final safeAreaHeight = safeHeight(context);
     final safeAreaWidth = MediaQuery.of(context).size.width;
     final nearbyList = ref.watch(nearbyUsersNotifierProvider);
-    final isLoading = useState(false);
     final myUserNotifire = ref.watch(userDataNotifierProvider);
     final myUserNotifireWhen = myUserNotifire.when(
       data: (value) => value,
@@ -130,37 +127,32 @@ class MessageScreenPage extends HookConsumerWidget {
                                 controller: controller,
                                 onTap: () async {
                                   if ((nearbyList?.data ?? []).contains(id)) {
-                                    //後
-                                    // if (controller.text.isNotEmpty) {
-                                    //   final text = controller.text;
-                                    //   primaryFocus?.unfocus();
-                                    //   controller.clear();
-                                    //   isLoading.value = true;
-                                    //   final notifier = ref.read(
-                                    //     deviseListNotifierProvider.notifier,
-                                    //   );
-                                    //   final isSend = await notifier.sendMessage(
-                                    //     message: text,
-                                    //     userData: messageUserDataNotifireWhen
-                                    //         .userData,
-                                    //     myData: myUserNotifireWhen,
-                                    //   );
-                                    //   if (context.mounted) {
-                                    //     isLoading.value = false;
-                                    //     if (!isSend) {
-                                    //       // ignore: use_build_context_synchronously
-                                    //       errorSnackbar(
-                                    //         text: "メッセージの送信に失敗しました。",
-                                    //         padding: safeAreaHeight * 0.08,
-                                    //       );
-                                    //     }
-                                    //   }
-                                    // } else {
-                                    //   errorSnackbar(
-                                    //     text: "空白のメッセージは送信できません。",
-                                    //     padding: safeAreaHeight * 0.08,
-                                    //   );
-                                    // }
+                                    if (controller.text.isNotEmpty) {
+                                      final text = controller.text;
+                                      primaryFocus?.unfocus();
+                                      controller.clear();
+                                      final notifier = ref.read(
+                                        messageListNotifierProvider.notifier,
+                                      );
+                                      final isSend = await notifier.sendMessage(
+                                        myUserNotifireWhen.id,
+                                        messageUserDataNotifireWhen.userData,
+                                        text,
+                                      );
+                                      if (context.mounted) {
+                                        if (!isSend) {
+                                          errorSnackbar(
+                                            text: "メッセージの送信に失敗しました。",
+                                            padding: safeAreaHeight * 0.08,
+                                          );
+                                        }
+                                      }
+                                    } else {
+                                      errorSnackbar(
+                                        text: "空白のメッセージは送信できません。",
+                                        padding: safeAreaHeight * 0.08,
+                                      );
+                                    }
                                   } else {
                                     controller.clear();
                                     errorSnackbar(
@@ -224,15 +216,6 @@ class MessageScreenPage extends HookConsumerWidget {
         SizedBox(
           child: messageListWhen,
         ),
-        loadinPageWithCncel(
-          context: context,
-          isLoading: isLoading.value,
-          onTap: () {
-            //後
-            // final notifier = ref.read(deviseListNotifierProvider.notifier);
-            // notifier.sendMessageCancel();
-          },
-        ),
       ],
     );
   }
@@ -246,7 +229,13 @@ class MessageScreenPage extends HookConsumerWidget {
   }) {
     final safeAreaWidth = MediaQuery.of(context).size.width;
     final safeAreaHeight = safeHeight(context);
-    final storyNotifier = ref.watch(storyListNotifierProvider);
+    final storyList = ref.watch(storyListNotifierProvider);
+    final List<UserData> storyNotifier = storyList.when(
+      data: (data) => data,
+      error: (e, s) => [],
+      loading: () => [],
+    );
+
     final int index = storyNotifier.indexWhere(
       (value) => value.id == userData.id,
     );
@@ -433,6 +422,7 @@ MessageList updateAllToRead(List<MessageData> messages, UserData userData) {
             isMyMessage: message.isMyMessage,
             message: message.message,
             dateTime: message.dateTime,
+            valueKey: message.valueKey,
             isRead: true,
           ),
         )
