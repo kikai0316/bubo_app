@@ -78,6 +78,8 @@ class NotImgPage extends HookConsumerWidget {
         if (iswWite) {
           final notifier = ref.read(userDataNotifierProvider.notifier);
           notifier.reLoad();
+          // ignore: use_build_context_synchronously
+          screenTransitionNormal(context, nextScreenWhisUserDataCheck(setData));
         } else {
           isLoading.value = false;
           showSnackbar();

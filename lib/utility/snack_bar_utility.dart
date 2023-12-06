@@ -6,7 +6,7 @@ import 'package:bubu_app/constant/color.dart';
 import 'package:bubu_app/main.dart';
 import 'package:bubu_app/utility/screen_transition_utility.dart';
 import 'package:bubu_app/utility/utility.dart';
-import 'package:bubu_app/view/home/message_screen.dart';
+import 'package:bubu_app/view/home/personal_chat.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 

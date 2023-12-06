@@ -7,7 +7,7 @@ part of 'intersitital_ad.dart';
 // **************************************************************************
 
 String _$interstitialAdNotifierHash() =>
-    r'2c1685569306ebc4555c06abd9092825feac7f47';
+    r'72c6db8f07dc46405d2a6ce283790ef710aeb44c';
 
 /// See also [InterstitialAdNotifier].
 @ProviderFor(InterstitialAdNotifier)

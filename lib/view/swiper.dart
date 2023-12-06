@@ -1,6 +1,6 @@
 import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/firebase_utility.dart';
-import 'package:bubu_app/view/home/on_swiper.dart';
+import 'package:bubu_app/view/swiper/on_swiper.dart';
 import 'package:bubu_app/view_model/loading_model.dart';
 import 'package:bubu_app/view_model/story_list.dart';
 import 'package:flutter/material.dart';
@@ -15,23 +15,29 @@ class SwiperPage extends HookConsumerWidget {
   const SwiperPage({
     super.key,
     required this.index,
-    required this.storyList,
+    required this.nearbyList,
     required this.isMyData,
     required this.myUserData,
   });
   final int index;
   final bool isMyData;
-  final List<UserData> storyList;
+  final List<String> nearbyList;
   final UserData myUserData;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final pageIndex = useState<int>(index + 1);
     final isMove = useState<bool>(false);
     final scrollBack = useState<double>(0);
-    final dataList = useState<List<UserData>>([...storyList]);
+    final storyList = ref.watch(storyListNotifierProvider);
+    final List<UserData> storyNotifier = storyList.when(
+      data: (data) =>
+          data.where((userData) => nearbyList.contains(userData.id)).toList(),
+      error: (e, s) => [],
+      loading: () => [],
+    );
     final loadingNotifier = ref.watch(loadingNotifierProvider);
     bool isNotScreen(int index) {
-      if (index == 0 || index == dataList.value.length + 1) {
+      if (index == 0 || index == storyNotifier.length + 1) {
         return true;
       } else {
         return false;
@@ -45,29 +51,27 @@ class SwiperPage extends HookConsumerWidget {
     }
 
     Future<void> fetchAndUpdate(int index) async {
-      final getImg = await imgOtherGet(dataList.value[index]);
-      if (getImg != null && !dataList.value[index].isGetData) {
+      final getImg = await imgOtherGet(storyNotifier[index]);
+      if (getImg != null && !storyNotifier[index].isGetData) {
         if (context.mounted) {
           final notifier = ref.read(storyListNotifierProvider.notifier);
           notifier.dataUpDate(getImg);
-          dataList.value[index] = getImg;
-          dataList.value = [...dataList.value];
         }
       }
     }
 
     Future<void> getOthers(int dataIndex) async {
-      if (!dataList.value[dataIndex].isGetData) {
+      if (!storyNotifier[dataIndex].isGetData) {
         fetchAndUpdate(dataIndex);
       }
-      if (dataIndex + 1 < dataList.value.length &&
-          !dataList.value[dataIndex + 1].isGetData) {
+      if (dataIndex + 1 < storyNotifier.length &&
+          !storyNotifier[dataIndex + 1].isGetData) {
         fetchAndUpdate(dataIndex + 1);
       }
-      if (dataIndex - 1 >= 0 && !dataList.value[dataIndex - 1].isGetData) {
+      if (dataIndex - 1 >= 0 && !storyNotifier[dataIndex - 1].isGetData) {
         fetchAndUpdate(dataIndex - 1);
-      } else if (dataIndex + 2 < dataList.value.length &&
-          !dataList.value[dataIndex + 2].isGetData) {
+      } else if (dataIndex + 2 < storyNotifier.length &&
+          !storyNotifier[dataIndex + 2].isGetData) {
         fetchAndUpdate(dataIndex + 2);
       }
     }
@@ -100,10 +104,10 @@ class SwiperPage extends HookConsumerWidget {
 
     return Hero(
       tag: pageIndex.value == 0
-          ? dataList.value[0].id
-          : pageIndex.value == dataList.value.length + 1
-              ? dataList.value[dataList.value.length - 1].id
-              : dataList.value[pageIndex.value - 1].id,
+          ? storyNotifier[0].id
+          : pageIndex.value == storyNotifier.length + 1
+              ? storyNotifier[storyNotifier.length - 1].id
+              : storyNotifier[pageIndex.value - 1].id,
       child: Stack(
         children: [
           Scaffold(
@@ -122,7 +126,7 @@ class SwiperPage extends HookConsumerWidget {
                 pageIndex.value = value;
               },
               slideTransform: const CubeTransform(),
-              itemCount: dataList.value.length + 2,
+              itemCount: storyNotifier.length + 2,
               slideBuilder: (index) {
                 if (isNotScreen(index)) {
                   return Container(
@@ -130,13 +134,13 @@ class SwiperPage extends HookConsumerWidget {
                     color: Colors.black,
                   );
                 } else {
-                  return dataList.value.isEmpty
+                  return storyNotifier.isEmpty
                       ? Container()
                       : OnSwiper(
                           myData: myUserData,
                           isMyData: isMyData,
                           controller: scrollController,
-                          data: dataList.value[index - 1],
+                          data: storyNotifier[index - 1],
                           onNext: () {
                             moveAnimation();
                             controller.nextPage(

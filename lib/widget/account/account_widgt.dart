@@ -1,8 +1,17 @@
+import 'dart:typed_data';
 import 'dart:ui';
 import 'package:bubu_app/component/button.dart';
+import 'package:bubu_app/component/loading.dart';
 import 'package:bubu_app/component/text.dart';
 import 'package:bubu_app/constant/color.dart';
+import 'package:bubu_app/model/user_data.dart';
+import 'package:bubu_app/utility/firebase_utility.dart';
+import 'package:bubu_app/utility/path_provider_utility.dart';
+import 'package:bubu_app/utility/snack_bar_utility.dart';
 import 'package:bubu_app/utility/utility.dart';
+import 'package:bubu_app/view/home/img_upload_sheet.dart';
+import 'package:bubu_app/view_model/loading_model.dart';
+import 'package:bubu_app/view_model/user_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -341,4 +350,194 @@ Widget accountMainWidget(
       ),
     ),
   );
+}
+
+class MyOnNearby extends HookConsumerWidget {
+  const MyOnNearby({
+    super.key,
+    required this.userData,
+  });
+  final UserData userData;
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isTapEvent = useState<bool>(false);
+    final safeAreaWidth = MediaQuery.of(context).size.width;
+    final safeAreaHeight = safeHeight(context);
+    Future<void> dataUpLoad(List<Uint8List> imgList) async {
+      void showSnackbar() {
+        errorSnackbar(
+          text: "何らかの問題が発生しました。再試行してください。",
+          padding: safeAreaHeight * 0.01,
+        );
+      }
+
+      if (context.mounted) {
+        final loadingNotifier = ref.read(loadingNotifierProvider.notifier);
+        final imgItem = imgList.length;
+        loadingNotifier.upData(
+          loadinPage(
+            context: context,
+            isLoading: true,
+            text: "アップロード中（ 0/$imgItem ）",
+          ),
+        );
+        final isUpLoad = await comparisonUpLoad(
+          userData: userData,
+          newImgList: imgList,
+          onStream: (index) {
+            loadingNotifier.upData(
+              loadinPage(
+                context: context,
+                isLoading: true,
+                text: "アップロード中（ $index/$imgItem ）",
+              ),
+            );
+          },
+        );
+        if (isUpLoad) {
+          final setData = UserData(
+            imgList: imgList,
+            id: userData.id,
+            name: userData.name,
+            birthday: userData.birthday,
+            family: userData.family,
+            instagram: userData.instagram,
+            isGetData: true,
+            isView: false,
+            acquisitionAt: null,
+          );
+          final iswWite = await writeUserData(setData);
+          if (iswWite) {
+            loadingNotifier.upData(null);
+            final notifier = ref.read(userDataNotifierProvider.notifier);
+            notifier.reLoad();
+          } else {
+            loadingNotifier.upData(null);
+            showSnackbar();
+          }
+        } else {
+          loadingNotifier.upData(null);
+          showSnackbar();
+        }
+      } else {
+        showSnackbar();
+      }
+    }
+
+    return Padding(
+      padding: EdgeInsets.only(right: safeAreaWidth * 0.02),
+      child: Hero(
+        tag: userData.id,
+        child: Container(
+          alignment: Alignment.center,
+          height: safeAreaHeight * 0.13,
+          width: safeAreaHeight * 0.105,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.all(
+                    isTapEvent.value ? safeAreaWidth * 0.008 : 0,
+                  ),
+                  child: Container(
+                    alignment: Alignment.center,
+                    height: safeAreaHeight * 0.105,
+                    width: safeAreaHeight * 0.105,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color:
+                          userData.isView ? Colors.grey.withOpacity(0.5) : null,
+                      gradient: userData.isView
+                          ? null
+                          : const LinearGradient(
+                              begin: FractionalOffset.topRight,
+                              end: FractionalOffset.bottomLeft,
+                              colors: [
+                                Color.fromARGB(255, 4, 15, 238),
+                                Color.fromARGB(255, 6, 120, 255),
+                                Color.fromARGB(255, 4, 200, 255),
+                              ],
+                            ),
+                    ),
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.all(safeAreaHeight * 0.003),
+                          child: Container(
+                            alignment: Alignment.center,
+                            height: double.infinity,
+                            width: double.infinity,
+                            decoration: const BoxDecoration(
+                              color: blackColor,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Padding(
+                              padding: EdgeInsets.all(safeAreaHeight * 0.003),
+                              child: Container(
+                                height: double.infinity,
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  color: Colors.black,
+                                  shape: BoxShape.circle,
+                                  image: userData.imgList.isEmpty
+                                      ? null
+                                      : DecorationImage(
+                                          image: MemoryImage(
+                                            userData.imgList.first,
+                                          ),
+                                          fit: BoxFit.cover,
+                                        ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Align(
+                          alignment: Alignment.bottomRight,
+                          child: GestureDetector(
+                            onTap: () => bottomSheet(
+                              context,
+                              page: ImgUpLoadPage(
+                                userData: userData,
+                                onTap: (value) => dataUpLoad(value),
+                              ),
+                              isBackgroundColor: true,
+                              isPOP: true,
+                            ),
+                            child: Container(
+                              alignment: Alignment.center,
+                              height: safeAreaHeight * 0.038,
+                              width: safeAreaHeight * 0.038,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.5),
+                                    blurRadius: 10,
+                                    spreadRadius: 1.0,
+                                  ),
+                                ],
+                              ),
+                              child: Icon(
+                                Icons.add,
+                                color: blueColor,
+                                size: safeAreaWidth / 16,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }

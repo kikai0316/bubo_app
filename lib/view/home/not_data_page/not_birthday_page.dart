@@ -4,6 +4,7 @@ import 'package:bubu_app/component/text.dart';
 import 'package:bubu_app/constant/color.dart';
 import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/path_provider_utility.dart';
+import 'package:bubu_app/utility/screen_transition_utility.dart';
 import 'package:bubu_app/utility/snack_bar_utility.dart';
 import 'package:bubu_app/utility/utility.dart';
 import 'package:bubu_app/view_model/user_data.dart';
@@ -27,6 +28,7 @@ class NotBirthdayPage extends HookConsumerWidget {
     final isLoading = useState<bool>(false);
     final DateTime now = DateTime.now();
     final DateTime twentyYearsAgo = DateTime(now.year - 20);
+
     DateTime parseDate(String input) {
       if (input.length != 8) {
         return twentyYearsAgo;
@@ -61,6 +63,8 @@ class NotBirthdayPage extends HookConsumerWidget {
       if (iswWite) {
         final notifier = ref.read(userDataNotifierProvider.notifier);
         notifier.reLoad();
+        // ignore: use_build_context_synchronously
+        screenTransitionNormal(context, nextScreenWhisUserDataCheck(setData));
       } else {
         isLoading.value = false;
         // ignore: use_build_context_synchronously

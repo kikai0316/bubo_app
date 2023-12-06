@@ -3,21 +3,19 @@ import 'package:bubu_app/component/text.dart';
 import 'package:bubu_app/constant/color.dart';
 import 'package:bubu_app/constant/emoji.dart';
 import 'package:bubu_app/constant/img.dart';
-import 'package:bubu_app/model/message_data.dart';
 import 'package:bubu_app/model/message_list_data.dart';
 import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/firebase_utility.dart';
 import 'package:bubu_app/utility/snack_bar_utility.dart';
 import 'package:bubu_app/utility/utility.dart';
-import 'package:bubu_app/view_model/device_list.dart';
 import 'package:bubu_app/view_model/message_list.dart';
+import 'package:bubu_app/view_model/nearby_list.dart';
 import 'package:bubu_app/view_model/story_list.dart';
 import 'package:bubu_app/view_model/user_data.dart';
 import 'package:bubu_app/widget/home/home_message_widget.dart';
 import 'package:bubu_app/widget/home/message_widget.dart';
 import 'package:bubu_app/widget/home/swiper_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class MessageScreenPage extends HookConsumerWidget {
@@ -32,8 +30,7 @@ class MessageScreenPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final safeAreaHeight = safeHeight(context);
     final safeAreaWidth = MediaQuery.of(context).size.width;
-    final deviceList = ref.watch(deviseListNotifierProvider);
-    final isLoading = useState(false);
+    final nearbyList = ref.watch(nearbyUsersNotifierProvider);
     final myUserNotifire = ref.watch(userDataNotifierProvider);
     final myUserNotifireWhen = myUserNotifire.when(
       data: (value) => value,
@@ -48,9 +45,6 @@ class MessageScreenPage extends HookConsumerWidget {
       error: (e, s) => null,
       loading: () => null,
     );
-    final setDeviceList = (deviceList ?? [])
-        .map((element) => element.deviceId.split('@')[0])
-        .toList();
 
     final messageList = ref.watch(messageListNotifierProvider);
 
@@ -71,7 +65,7 @@ class MessageScreenPage extends HookConsumerWidget {
           if (getData.first.userData.imgList.isEmpty) {
             Future(() async {
               if (getData.first.userData.imgList.isEmpty) {
-                final getImg = await imgMainGet(getData.first.userData);
+                final getImg = await imgMainGet(getData.first.userData.id);
                 if (getImg != null) {
                   if (context.mounted) {
                     final notifier =
@@ -91,7 +85,7 @@ class MessageScreenPage extends HookConsumerWidget {
                 ref: ref,
                 myUserData: myUserNotifireWhen,
                 userData: getData.first.userData,
-                isNearby: setDeviceList.contains(id),
+                isNearby: (nearbyList?.data ?? []).contains(id),
               ),
               body: Stack(
                 children: [
@@ -124,7 +118,7 @@ class MessageScreenPage extends HookConsumerWidget {
                   SafeArea(
                     child: Align(
                       alignment: Alignment.bottomCenter,
-                      child: setDeviceList.contains(id)
+                      child: (nearbyList?.data ?? []).contains(id)
                           ? Padding(
                               padding: EdgeInsets.only(
                                 top: safeAreaHeight * 0.001,
@@ -132,25 +126,21 @@ class MessageScreenPage extends HookConsumerWidget {
                               child: MessageTextFieldWidget(
                                 controller: controller,
                                 onTap: () async {
-                                  if (setDeviceList.contains(id)) {
+                                  if ((nearbyList?.data ?? []).contains(id)) {
                                     if (controller.text.isNotEmpty) {
                                       final text = controller.text;
                                       primaryFocus?.unfocus();
                                       controller.clear();
-                                      isLoading.value = true;
                                       final notifier = ref.read(
-                                        deviseListNotifierProvider.notifier,
+                                        messageListNotifierProvider.notifier,
                                       );
                                       final isSend = await notifier.sendMessage(
-                                        message: text,
-                                        userData: messageUserDataNotifireWhen
-                                            .userData,
-                                        myData: myUserNotifireWhen,
+                                        myUserNotifireWhen.id,
+                                        messageUserDataNotifireWhen.userData,
+                                        text,
                                       );
                                       if (context.mounted) {
-                                        isLoading.value = false;
                                         if (!isSend) {
-                                          // ignore: use_build_context_synchronously
                                           errorSnackbar(
                                             text: "メッセージの送信に失敗しました。",
                                             padding: safeAreaHeight * 0.08,
@@ -226,14 +216,6 @@ class MessageScreenPage extends HookConsumerWidget {
         SizedBox(
           child: messageListWhen,
         ),
-        loadinPageWithCncel(
-          context: context,
-          isLoading: isLoading.value,
-          onTap: () {
-            final notifier = ref.read(deviseListNotifierProvider.notifier);
-            notifier.sendMessageCancel();
-          },
-        ),
       ],
     );
   }
@@ -247,20 +229,15 @@ class MessageScreenPage extends HookConsumerWidget {
   }) {
     final safeAreaWidth = MediaQuery.of(context).size.width;
     final safeAreaHeight = safeHeight(context);
-    final storyNotifier = ref.watch(storyListNotifierProvider);
-    final storyNotifierWhen = storyNotifier.when(
-      data: (data) {
-        final int index = data.indexWhere(
-          (value) => value.id == userData.id,
-        );
-        if (index != -1) {
-          return data[index];
-        } else {
-          return null;
-        }
-      },
-      error: (e, s) => null,
-      loading: () => null,
+    final storyList = ref.watch(storyListNotifierProvider);
+    final List<UserData> storyNotifier = storyList.when(
+      data: (data) => data,
+      error: (e, s) => [],
+      loading: () => [],
+    );
+
+    final int index = storyNotifier.indexWhere(
+      (value) => value.id == userData.id,
     );
     Widget imgWidget() {
       if (userData.imgList.isEmpty) {
@@ -272,7 +249,7 @@ class MessageScreenPage extends HookConsumerWidget {
             shape: BoxShape.circle,
           ),
         );
-      } else if (!isNearby || storyNotifierWhen == null) {
+      } else if (!isNearby || index == -1) {
         return Container(
           width: safeAreaHeight * 0.065,
           height: safeAreaHeight * 0.065,
@@ -291,7 +268,7 @@ class MessageScreenPage extends HookConsumerWidget {
           width: safeAreaHeight * 0.065,
           height: safeAreaHeight * 0.065,
           child: MainImgWidget(
-            userData: storyNotifierWhen,
+            userData: storyNotifier[index],
             myUserData: myUserData,
           ),
         );
@@ -445,6 +422,7 @@ MessageList updateAllToRead(List<MessageData> messages, UserData userData) {
             isMyMessage: message.isMyMessage,
             message: message.message,
             dateTime: message.dateTime,
+            valueKey: message.valueKey,
             isRead: true,
           ),
         )

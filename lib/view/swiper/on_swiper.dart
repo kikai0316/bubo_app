@@ -3,10 +3,11 @@ import 'package:bubu_app/component/text.dart';
 import 'package:bubu_app/constant/color.dart';
 import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/utility.dart';
-import 'package:bubu_app/view/home/message_sheet.dart';
-import 'package:bubu_app/view_model/device_list.dart';
+import 'package:bubu_app/view/swiper/message_sheet.dart';
 import 'package:bubu_app/view_model/history_list.dart';
 import 'package:bubu_app/view_model/loading_model.dart';
+import 'package:bubu_app/view_model/message_list.dart';
+import 'package:bubu_app/view_model/nearby_list.dart';
 import 'package:bubu_app/view_model/story_list.dart';
 import 'package:bubu_app/view_model/user_data.dart';
 import 'package:bubu_app/widget/home/swiper_widget.dart';
@@ -38,19 +39,17 @@ class OnSwiper extends HookConsumerWidget {
     final imgIndex = useState<int>(data.isView ? data.imgList.length - 1 : 0);
     final message = useState<String?>(null);
     final isShowBottomSheet = useState<bool>(false);
-    final deviceList = ref.watch(deviseListNotifierProvider);
-    final setDeviceList = (deviceList ?? [])
-        .map((element) => element.deviceId.split('@')[0])
-        .toList();
+    final nearbyList = ref.watch(nearbyUsersNotifierProvider);
     final historyNotifier = ref.watch(historyListNotifierProvider);
     final int historyNotifierWhen = historyNotifier.when(
       data: (value) => value.where((item) => item == data.id).length,
       error: (e, s) => 0,
       loading: () => 0,
     );
-    final isNearby = setDeviceList.contains(
+    final isNearby = (nearbyList?.data ?? []).contains(
       data.id,
     );
+
     Future<void> messageSend(String text) async {
       if (message.value == null) {
         message.value = text;
@@ -65,21 +64,15 @@ class OnSwiper extends HookConsumerWidget {
 
     Future<void> sendMessage(String text) async {
       final loadingNotifier = ref.read(loadingNotifierProvider.notifier);
+      final messageListNotifier =
+          ref.read(messageListNotifierProvider.notifier);
       loadingNotifier.upData(
-        loadinPageWithCncel(
-          context: context,
-          isLoading: true,
-          onTap: () {
-            final notifier = ref.read(deviseListNotifierProvider.notifier);
-            notifier.sendMessageCancel();
-          },
-        ),
+        loadinPage(context: context, isLoading: true, text: null),
       );
-      final notifier = ref.read(deviseListNotifierProvider.notifier);
-      final isSend = await notifier.sendMessage(
-        message: text,
-        userData: data,
-        myData: myData,
+      final isSend = await messageListNotifier.sendMessage(
+        myData.id,
+        data,
+        text,
       );
       if (isSend) {
         loadingNotifier.upData(null);
@@ -107,23 +100,30 @@ class OnSwiper extends HookConsumerWidget {
         instagram: data.instagram,
       );
       if (isMyData) {
-        final notifier = ref.read(
-          userDataNotifierProvider.notifier,
-        );
-        notifier.isViewupData();
+        if (context.mounted) {
+          final notifier = ref.read(
+            userDataNotifierProvider.notifier,
+          );
+          notifier.isViewupData();
+        }
       } else {
-        final notifier = ref.read(
-          storyListNotifierProvider.notifier,
-        );
-        notifier.dataUpDate(setData);
+        if (context.mounted) {
+          final notifier = ref.read(
+            storyListNotifierProvider.notifier,
+          );
+          notifier.dataUpDate(setData);
+        }
       }
     }
 
     useEffect(
       () {
-        if (data.imgList.length == 1) {
-          isViweupData();
-        }
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (data.imgList.length == 1) {
+            isViweupData();
+          }
+        });
+
         void listener() {
           try {
             if (controller!.offset > 0 && !isShowBottomSheet.value) {

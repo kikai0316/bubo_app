@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:bubu_app/model/message_data.dart';
 import 'package:bubu_app/model/message_list_data.dart';
 import 'package:bubu_app/model/ticket_list.dart';
 import 'package:bubu_app/model/user_data.dart';
@@ -272,6 +271,7 @@ Future<bool> writeMessageData(List<MessageList> data) async {
                   "isMyMessage": m.isMyMessage,
                   "message": m.message,
                   "isRead": m.isRead,
+                  "valueKey": m.valueKey,
                   "dateTime": m.dateTime.toString(),
                 },
               )
@@ -295,7 +295,6 @@ Future<List<MessageList>> readeMessageData() async {
   if (file != null) {
     try {
       final List<MessageList> list = [];
-
       final rawData = await file.readAsString();
       final List<Map<String, dynamic>> storyList =
           List<Map<String, dynamic>>.from(
@@ -311,6 +310,7 @@ Future<List<MessageList>> readeMessageData() async {
             dateTime: DateTime.parse(
               cast["dateTime"] as String,
             ),
+            valueKey: cast["valueKey"] as String,
             isRead: cast["isRead"] as bool,
           );
         }).toList();

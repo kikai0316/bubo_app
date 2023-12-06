@@ -3,13 +3,12 @@ import 'package:bubu_app/component/text.dart';
 import 'package:bubu_app/constant/color.dart';
 import 'package:bubu_app/constant/emoji.dart';
 import 'package:bubu_app/constant/img.dart';
-import 'package:bubu_app/model/message_data.dart';
 import 'package:bubu_app/model/message_list_data.dart';
 import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/firebase_utility.dart';
 import 'package:bubu_app/utility/screen_transition_utility.dart';
 import 'package:bubu_app/utility/utility.dart';
-import 'package:bubu_app/view/home/message_screen.dart';
+import 'package:bubu_app/view/home/personal_chat.dart';
 import 'package:bubu_app/view_model/message_list.dart';
 import 'package:bubu_app/view_model/story_list.dart';
 import 'package:flutter/material.dart';
@@ -33,35 +32,44 @@ class OnMessage extends HookConsumerWidget {
     final safeAreaWidth = MediaQuery.of(context).size.width;
     final safeAreaHeight = safeHeight(context);
     final message = messageData.message[messageData.message.length - 1];
-    final isGetData = useState(false);
-    final storyListNotifier = ref.watch(storyListNotifierProvider);
+    final userData = useState<UserData?>(null);
+    final isGetData = useState<bool>(false);
+    final storyList = ref.watch(storyListNotifierProvider);
+    final List<UserData> storyNotifier = storyList.when(
+      data: (data) => data,
+      error: (e, s) => [],
+      loading: () => [],
+    );
     Future<void> imgGet() async {
-      final getData = await imgMainGet(messageData.userData);
+      final getData = await imgMainGet(messageData.userData.id);
       if (context.mounted) {
         if (getData != null) {
           final notifier = ref.read(messageListNotifierProvider.notifier);
           notifier.mainImgUpDate(getData, messageData);
-        } else {
+          userData.value = getData;
           isGetData.value = true;
         }
       }
     }
 
-    final userData = storyListNotifier.when(
-      data: (data) {
-        final int index = data
-            .indexWhere((userData) => userData.id == messageData.userData.id);
-        if (index != -1) {
-          return data[index];
-        } else {
+    useEffect(
+      () {
+        final int index = storyNotifier
+            .indexWhere((value) => value.id == messageData.userData.id);
+        if (index == -1) {
           if (messageData.userData.imgList.isEmpty) {
             imgGet();
+          } else {
+            userData.value = messageData.userData;
+            isGetData.value = true;
           }
-          return null;
+        } else {
+          userData.value = storyNotifier[index];
+          isGetData.value = true;
         }
+        return null;
       },
-      error: (e, s) => null,
-      loading: () => null,
+      [],
     );
     return InkWell(
       onTap: () => screenTransitionNormal(
@@ -105,28 +113,20 @@ class OnMessage extends HookConsumerWidget {
                     Padding(
                       padding: EdgeInsets.only(right: safeAreaWidth * 0.05),
                       child: Container(
-                        height: safeAreaHeight * 0.07,
-                        width: safeAreaHeight * 0.07,
+                        height: safeAreaHeight * 0.065,
+                        width: safeAreaHeight * 0.065,
                         decoration: BoxDecoration(
                           color: Colors.grey.withOpacity(0.1),
-                          image: userData != null && userData.imgList.isNotEmpty
+                          image: userData.value != null
                               ? DecorationImage(
                                   image: MemoryImage(
-                                    userData.imgList.first,
+                                    userData.value!.imgList.first,
                                   ),
                                   fit: BoxFit.cover,
                                 )
-                              : userData == null &&
-                                      messageData.userData.imgList.isNotEmpty
-                                  ? DecorationImage(
-                                      image: MemoryImage(
-                                        messageData.userData.imgList.first,
-                                      ),
-                                      fit: BoxFit.cover,
-                                    )
-                                  : isGetData.value
-                                      ? notImg()
-                                      : null,
+                              : isGetData.value
+                                  ? notImg()
+                                  : null,
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -143,11 +143,11 @@ class OnMessage extends HookConsumerWidget {
                                   maxWidth: safeAreaWidth * 0.35,
                                 ),
                                 child: nText(
-                                  isGetData.value
-                                      ? "Unknown"
-                                      : userData != null
-                                          ? userData.name
-                                          : messageData.userData.name,
+                                  userData.value == null
+                                      ? isGetData.value
+                                          ? "Unknown"
+                                          : "データ取得中..."
+                                      : userData.value!.name,
                                   color: Colors.white,
                                   fontSize: safeAreaWidth / 31,
                                   bold: 700,
@@ -182,6 +182,7 @@ class OnMessage extends HookConsumerWidget {
                       height: safeAreaHeight * 0.08,
                       width: safeAreaWidth * 0.15,
                       child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           nText(
                             formatDate(
@@ -197,20 +198,16 @@ class OnMessage extends HookConsumerWidget {
                             Padding(
                               padding:
                                   EdgeInsets.only(top: safeAreaHeight * 0.01),
-                              child: Container(
-                                alignment: Alignment.center,
-                                height: safeAreaHeight * 0.037,
-                                width: safeAreaHeight * 0.037,
-                                decoration: const BoxDecoration(
-                                  color: blueColor2,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: nText(
-                                  countUnreadMessages(messageData.message)
-                                      .toString(),
-                                  color: Colors.white,
-                                  fontSize: safeAreaWidth / 28,
-                                  bold: 700,
+                              child: Transform.scale(
+                                scale: 1.5,
+                                child: Badge.count(
+                                  backgroundColor: blueColor2,
+                                  count:
+                                      countUnreadMessages(messageData.message),
+                                  isLabelVisible: countUnreadMessages(
+                                        messageData.message,
+                                      ) !=
+                                      0,
                                 ),
                               ),
                             ),

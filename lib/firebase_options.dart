@@ -2,7 +2,11 @@
 // ignore_for_file: lines_longer_than_80_chars, avoid_classes_with_only_static_members
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
-    show TargetPlatform, defaultTargetPlatform, kIsWeb;
+    // ignore: combinators_ordering
+    show
+        defaultTargetPlatform,
+        kIsWeb,
+        TargetPlatform;
 
 /// Default [FirebaseOptions] for use with your Firebase apps.
 ///
@@ -49,6 +53,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '393702546014',
     projectId: 'bobo-app-9e643',
     authDomain: 'bobo-app-9e643.firebaseapp.com',
+    databaseURL:
+        'https://bobo-app-9e643-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'bobo-app-9e643.appspot.com',
     measurementId: 'G-GZJEWKW440',
   );
@@ -58,6 +64,8 @@ class DefaultFirebaseOptions {
     appId: '1:393702546014:android:71b007b102f2eefea172cf',
     messagingSenderId: '393702546014',
     projectId: 'bobo-app-9e643',
+    databaseURL:
+        'https://bobo-app-9e643-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'bobo-app-9e643.appspot.com',
   );
 
@@ -66,6 +74,8 @@ class DefaultFirebaseOptions {
     appId: '1:393702546014:ios:5588f3d25a829fa0a172cf',
     messagingSenderId: '393702546014',
     projectId: 'bobo-app-9e643',
+    databaseURL:
+        'https://bobo-app-9e643-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'bobo-app-9e643.appspot.com',
     iosBundleId: 'com.bubuApp',
   );
@@ -75,6 +85,8 @@ class DefaultFirebaseOptions {
     appId: '1:393702546014:ios:8648eb89434feffca172cf',
     messagingSenderId: '393702546014',
     projectId: 'bobo-app-9e643',
+    databaseURL:
+        'https://bobo-app-9e643-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'bobo-app-9e643.appspot.com',
     iosBundleId: 'com.example.bubuApp',
   );

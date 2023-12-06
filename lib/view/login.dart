@@ -1,5 +1,4 @@
 import 'package:bubu_app/component/button.dart';
-import 'package:bubu_app/component/component.dart';
 import 'package:bubu_app/component/loading.dart';
 import 'package:bubu_app/component/text.dart';
 import 'package:bubu_app/constant/color.dart';
@@ -12,12 +11,11 @@ import 'package:bubu_app/utility/screen_transition_utility.dart';
 import 'package:bubu_app/utility/secure_storage_utility.dart';
 import 'package:bubu_app/utility/snack_bar_utility.dart';
 import 'package:bubu_app/utility/utility.dart';
+import 'package:bubu_app/view/home/not_data_page/not_birthday_page.dart';
 import 'package:bubu_app/view/login/login_sheet.dart';
 import 'package:bubu_app/view/login/singin_sheet.dart';
-import 'package:bubu_app/view/request_page.dart';
-import 'package:bubu_app/view/user_app.dart';
+import 'package:bubu_app/view/request/notification_request.dart';
 import 'package:bubu_app/view_model/message_list.dart';
-import 'package:bubu_app/view_model/story_list.dart';
 import 'package:bubu_app/view_model/user_data.dart';
 import 'package:bubu_app/widget/login/login_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -47,11 +45,9 @@ class StartPage extends HookConsumerWidget {
     Future<void> nextPage(UserData userData) async {
       final isSuccess = await writeUserData(userData);
       final userDataNotifier = ref.read(userDataNotifierProvider.notifier);
-      final storyListNotifier = ref.read(storyListNotifierProvider.notifier);
       final messageListNotifier =
           ref.read(messageListNotifierProvider.notifier);
       await userDataNotifier.reLoad();
-      await storyListNotifier.reLoad();
       await messageListNotifier.reLoad();
       final isPermission = await checkNotificationPermissionStatus();
       isLoading.value = false;
@@ -60,8 +56,12 @@ class StartPage extends HookConsumerWidget {
         screenTransitionNormal(
           context,
           isPermission
-              ? const RequestNotificationsPage()
-              : const UserApp(initPage: 0),
+              ? RequestNotificationsPage(
+                  userData: userData,
+                )
+              : NotBirthdayPage(
+                  userData: userData,
+                ),
         );
       } else {
         showSnackbar("エラーが発生しました。");
@@ -249,13 +249,18 @@ class StartPage extends HookConsumerWidget {
   Widget loginLine(BuildContext context) {
     final safeAreaHeight = safeHeight(context);
     final safeAreaWidth = MediaQuery.of(context).size.width;
+
     return SizedBox(
       height: safeAreaHeight * 0.05,
       width: double.infinity,
       child: Row(
         children: [
           Expanded(
-            child: line(context, bottom: 0, top: 0),
+            child: Container(
+              height: 0.2,
+              width: double.infinity,
+              color: Colors.grey,
+            ),
           ),
           Padding(
             padding: EdgeInsets.all(safeAreaWidth * 0.025),
@@ -269,7 +274,11 @@ class StartPage extends HookConsumerWidget {
             ),
           ),
           Expanded(
-            child: line(context, bottom: 0, top: 0),
+            child: Container(
+              height: 0.2,
+              width: double.infinity,
+              color: Colors.grey,
+            ),
           ),
         ],
       ),

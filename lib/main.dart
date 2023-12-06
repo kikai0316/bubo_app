@@ -3,9 +3,9 @@ import 'package:bubu_app/firebase_options.dart';
 import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/notification_utility.dart';
 import 'package:bubu_app/utility/path_provider_utility.dart';
+import 'package:bubu_app/utility/utility.dart';
 import 'package:bubu_app/view/login.dart';
-import 'package:bubu_app/view/request_page.dart';
-import 'package:bubu_app/view/user_app.dart';
+import 'package:bubu_app/view/request/notification_request.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +20,7 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
+    name: "bobo-app",
     options: DefaultFirebaseOptions.currentPlatform,
   );
   MobileAds.instance.initialize();
@@ -37,7 +38,6 @@ class MyApp extends HookConsumerWidget {
     Future<UserData?> getSecureStorageData() async {
       await cacheSecureStorage();
       final UserData? userData = await readUserData();
-
       return userData;
     }
 
@@ -52,13 +52,14 @@ class MyApp extends HookConsumerWidget {
         debugShowCheckedModeBanner: false,
         home: FutureBuilder<UserData?>(
           future: getSecureStorageData(),
-          builder: (BuildContext context, AsyncSnapshot<UserData?> snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
+          builder:
+              (BuildContext context, AsyncSnapshot<UserData?> snapshotUser) {
+            if (snapshotUser.connectionState == ConnectionState.waiting) {
               return const WithIconInLoadingPage();
-            } else if (snapshot.hasError) {
+            } else if (snapshotUser.hasError) {
               return const StartPage();
             } else {
-              if (snapshot.data == null) {
+              if (snapshotUser.data == null) {
                 return const StartPage();
               } else {
                 return FutureBuilder<bool>(
@@ -66,7 +67,7 @@ class MyApp extends HookConsumerWidget {
                   builder:
                       (BuildContext context, AsyncSnapshot<bool> snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const UserApp(initPage: 0);
+                      return nextScreenWhisUserDataCheck(snapshotUser.data!);
                     } else if (snapshot.hasError) {
                       return loadinPage(
                         context: context,
@@ -75,9 +76,11 @@ class MyApp extends HookConsumerWidget {
                       );
                     } else {
                       if (snapshot.data == false) {
-                        return const RequestNotificationsPage();
+                        return RequestNotificationsPage(
+                          userData: snapshotUser.data!,
+                        );
                       } else {
-                        return const UserApp(initPage: 0);
+                        return nextScreenWhisUserDataCheck(snapshotUser.data!);
                       }
                     }
                   },

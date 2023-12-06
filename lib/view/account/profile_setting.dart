@@ -5,10 +5,8 @@ import 'package:bubu_app/constant/color.dart';
 import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/firebase_utility.dart';
 import 'package:bubu_app/utility/path_provider_utility.dart';
-import 'package:bubu_app/utility/screen_transition_utility.dart';
 import 'package:bubu_app/utility/snack_bar_utility.dart';
 import 'package:bubu_app/utility/utility.dart';
-import 'package:bubu_app/view/user_app.dart';
 import 'package:bubu_app/view_model/user_data.dart';
 import 'package:bubu_app/widget/account/account_widgt.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -263,12 +261,13 @@ class ProfileSetting extends HookConsumerWidget {
                               notifier.reLoad();
                               isLoading.value = false;
                               // ignore: use_build_context_synchronously
-                              screenTransition(
-                                context,
-                                const UserApp(
-                                  initPage: 1,
-                                ),
-                              );
+                              //後
+                              // screenTransition(
+                              //   context,
+                              //   const UserApp(
+                              //     initPage: 1,
+                              //   ),
+                              // );
                             } else {
                               isLoading.value = false;
                               showSnackbar();

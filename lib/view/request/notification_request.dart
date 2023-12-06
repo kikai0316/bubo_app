@@ -1,17 +1,17 @@
 import 'package:bubu_app/component/button.dart';
 import 'package:bubu_app/component/text.dart';
 import 'package:bubu_app/constant/color.dart';
+import 'package:bubu_app/model/user_data.dart';
 import 'package:bubu_app/utility/notification_utility.dart';
 import 'package:bubu_app/utility/screen_transition_utility.dart';
 import 'package:bubu_app/utility/utility.dart';
-import 'package:bubu_app/view/user_app.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class RequestNotificationsPage extends HookConsumerWidget {
-  const RequestNotificationsPage({
-    super.key,
-  });
+  const RequestNotificationsPage({super.key, required this.userData});
+  final UserData userData;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final safeAreaHeight = safeHeight(context);
@@ -160,8 +160,15 @@ class RequestNotificationsPage extends HookConsumerWidget {
                   text: "通知をONにする",
                   onTap: () async {
                     await NotificationClass().requestPermissions();
-                    // ignore: use_build_context_synchronously
-                    screenTransitionNormal(context, const UserApp(initPage: 0));
+                    if (context.mounted) {
+                      final User? user = FirebaseAuth.instance.currentUser;
+                      if (user != null) {
+                        screenTransitionNormal(
+                          context,
+                          nextScreenWhisUserDataCheck(userData),
+                        );
+                      }
+                    }
                   },
                 ),
               ),
